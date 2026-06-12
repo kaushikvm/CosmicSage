@@ -141,6 +141,13 @@
   .koota-bar{height:7px; background:var(--night); border-radius:99px; overflow:hidden; border:1px solid var(--line);}
   .koota-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,#F6C453,#E2702A); transition:width .8s ease;}
   .koota-fill.zero{background:var(--sindoor); min-width:6px; opacity:.7;}
+  .sky-controls{display:flex; gap:8px; margin-top:12px;}
+  .sky-btn{flex:1; padding:8px 10px; font-size:.82rem;}
+  .sky-time{text-align:center; color:var(--gold-soft); font-size:.84rem; margin-top:6px; font-weight:500;}
+  .sky-info{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 13px;
+    font-size:.85rem; color:var(--moon); margin-top:10px; min-height:42px;}
+  .sky-svg{width:100%; height:auto; display:block; border-radius:50%; cursor:pointer;}
+  input[type=range]{accent-color:var(--gold);}
   /* footer support section */
   .support-foot{text-align:center; padding:34px 0 10px;}
   .support-foot .wlcs{font-family:'Eczar',serif; color:var(--gold); font-size:1.15rem; margin:10px 0 4px;}
@@ -249,6 +256,18 @@
           <h3>Janma Kundali · North Indian style</h3>
           <div id="kundali-holder"></div>
           <div class="legend" id="kundali-legend"></div>
+        </div>
+        <div class="card">
+          <h3>🌌 Your sky <span style="color:var(--muted);font-size:.72rem;font-family:'Work Sans'" id="sky-loc"></span></h3>
+          <div id="sky-holder"></div>
+          <div class="sky-controls">
+            <button class="btn ghost sky-btn" onclick="skyNow()">Tonight</button>
+            <button class="btn ghost sky-btn" onclick="skyBirth()">Sky when you were born</button>
+          </div>
+          <input type="range" id="sky-slider" min="-720" max="720" value="0" step="10" style="width:100%;margin-top:10px" oninput="skySlide(this.value)">
+          <div class="sky-time" id="sky-time"></div>
+          <div class="sky-info" id="sky-info">Tap any planet to know where it is in simple words.</div>
+          <button class="btn" style="margin-top:12px;width:100%" onclick="askSkyAI()">✨ What does tonight's sky mean for me?</button>
         </div>
         <div class="card">
           <h3>Numerology</h3>
@@ -852,6 +871,7 @@ function generateChart(){
   document.getElementById('num-bday').textContent=reduceNum(+dob.split('-')[2]);
   document.getElementById('celebs').innerHTML=celebLine(lifePath(dob));
   renderTopics();
+  skyNow();
   switchView('view-dash');
 }
 
@@ -988,6 +1008,160 @@ Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
   }catch(e){holder.innerHTML='<div class="msg astro" style="max-width:100%">Could not fetch the reading — please try again.</div>';}
   finally{state.busy=false;}
 }
+
+/* ===================== SKY VIEW (real sky dome) ===================== */
+const STARS=[[2.1,29.09,2.1,"Alpheratz","Uttara Bhadrapada"],[2.29,59.15,2.3,"Caph"],[3.31,15.18,2.8,"Algenib"],[4.86,-8.82,3.6,"Deneb Kaitos Shemali"],[6.44,-77.25,2.8],[6.57,-42.31,2.4,"Ankaa"],[9.83,30.86,3.3],[10.13,56.54,2.2,"Shedar"],[10.9,-17.99,2.0,"Diphda"],[12.28,57.82,3.5,"Achird"],[14.18,60.72,2.1,"Navi"],[16.52,-46.72,3.3],[17.15,-10.18,3.5,"Dheneb"],[17.43,35.62,2.1,"Mirach"],[21.01,-8.18,3.6,"Al Naymat"],[21.45,60.24,2.7,"Ruchbah"],[22.09,-43.32,3.4],[24.43,-57.24,0.5,"Achernar"],[24.5,48.63,3.6,"Nembus"],[26.02,-15.94,3.5],[28.27,29.58,3.4,"Mothallah"],[28.6,63.67,3.4,"Segin"],[28.66,20.81,2.6,"Sheratan","Ashwini"],[29.69,-61.57,2.9],[30.97,42.33,2.1,"Almach"],[31.79,23.46,2.0,"Hamal"],[32.39,34.99,3,"Mizan"],[34.13,-51.51,3.6],[37.95,89.26,2.0,"Polaris"],[40.83,3.24,3.5,"Kaffaljidhma"],[44.57,-40.3,2.9,"Acamar"],[45.57,4.09,2.5,"Menkar"],[46.2,53.51,2.9],[46.29,38.84,3.3,"Gorgonea Tertia"],[47.04,40.96,2.1,"Algol"],[51.08,49.86,1.8,"Mirfak"],[55.73,47.79,3.0],[55.81,-9.76,3.5,"Rana"],[56.81,-74.24,3.3],[56.87,24.11,2.9,"Alcyone","Krittika"],[58.53,31.88,2.8,"Atik"],[59.46,40.01,2.9],[59.51,-13.51,3.0,"Zaurak"],[60.17,12.49,3.4],[63.61,-62.47,3.3],[64.47,-33.8,3.5,"Beemim"],[67.15,19.18,3.5,"Ain"],[67.17,15.87,3.4,"Chamukuy"],[68.5,-55.05,3.3],[68.98,16.51,0.9,"Aldebaran","Rohini"],[72.46,6.96,3.2,"Tabit"],[74.25,33.17,2.7,"Hassaleh"],[75.49,43.82,3.0,"Almaaz"],[76.37,-22.37,3.2],[76.63,41.23,3.2,"Haedus"],[76.96,-5.09,2.8,"Cursa"],[78.23,-16.21,3.3],[78.63,-8.2,0.2,"Rigel"],[79.17,46.0,0.1,"Capella"],[79.4,-6.84,3.6],[81.12,-2.4,3.4,"Saif al Jabbar"],[81.28,6.35,1.6,"Bellatrix"],[81.57,28.61,1.6,"Elnath"],[82.06,-20.76,2.8,"Nihal"],[83.0,-0.3,2.2,"Mintaka"],[83.18,-17.82,2.6,"Arneb"],[83.78,9.93,3.4,"Meissa"],[83.86,-5.91,2.8,"Hatysa"],[84.05,-1.2,1.7,"Alnilam"],[84.41,21.14,3.0,"Tianguan"],[84.91,-34.07,2.6,"Phact"],[85.19,-1.94,1.7,"Alnitak"],[86.12,-22.45,3.6,"Kursi al Jabbar"],[86.74,-14.82,3.5],[86.94,-9.67,2.1,"Saiph"],[87.74,-35.77,3.1,"Wazn"],[88.79,7.41,0.5,"Betelgeuse","Ardra"],[89.88,44.95,1.9,"Menkalinan"],[89.93,37.21,2.6,"Mahasim"],[93.72,22.51,3.3,"Propus"],[95.08,-30.06,3.0,"Furud"],[95.67,-17.96,2.0,"Mirzam"],[95.74,22.51,2.9,"Tejat"],[95.99,-52.7,-0.6,"Canopus"],[99.43,16.4,1.9,"Alhena"],[99.44,-43.2,3.2],[100.98,25.13,3.1,"Mebsuta"],[101.29,-16.72,-1.4,"Sirius"],[101.32,12.9,3.4,"Alzirr"],[102.05,-61.94,3.2],[102.46,-32.51,3.5],[102.48,-50.61,2.9],[103.2,33.96,3.6],[104.66,-28.97,1.5,"Adhara"],[105.43,-27.93,3.5,"Unurgunite"],[105.76,-23.83,3.0,"Al Zara"],[107.1,-26.39,1.8,"Wezen"],[109.29,-37.1,2.7],[109.52,16.54,3.6],[110.03,21.98,3.5,"Wasat"],[111.02,-29.3,2.5,"Aludra"],[111.79,8.29,2.9,"Gomeisa"],[112.31,-43.3,3.2],[113.65,31.89,1.6,"Castor","Punarvasu"],[114.83,5.22,0.4,"Procyon"],[116.11,24.4,3.6],[116.33,28.03,1.2,"Pollux","Punarvasu"],[117.32,-24.86,3.3,"Azmidi"],[119.19,-52.98,3.5],[120.9,-40.0,2.2,"Naos"],[121.89,-24.3,2.8,"Tureis"],[122.38,-47.34,1.8,"Regor"],[124.13,9.19,3.5,"Tarf"],[125.63,-59.51,1.9,"Avior"],[127.57,60.72,3.4,"Muscida"],[130.07,-52.92,3.6],[131.18,-54.71,1.9,"Alsephina"],[131.69,6.42,3.4,"Ashlesha"],[133.85,5.95,3.1],[134.8,48.04,3.1,"Talitha"],[135.91,47.16,3.6,"Alkaphrah"],[137.0,-43.43,2.2,"Suhail"],[137.74,-58.97,3.4],[138.3,-69.72,1.7,"Miaplacidus"],[139.27,-59.28,2.2,"Aspidiske"],[140.26,34.39,3.1],[140.53,-55.01,2.5,"Markeb"],[141.9,-8.66,2.0,"Alphard","Ashlesha"],[142.68,-40.47,3.6],[142.81,-57.03,3.2],[143.21,51.68,3.2],[145.29,9.89,3.5,"Subra"],[146.46,23.77,3.0,"Algenubi"],[146.78,-65.07,2.9],[149.22,-54.57,3.5],[151.83,16.76,3.5,"Al Jabhah"],[152.09,11.97,1.4,"Regulus","Magha"],[153.43,-70.04,3.3],[154.17,23.42,3.4,"Adhafera"],[154.27,-61.33,3.4],[154.27,42.91,3.5,"Tania Borealis"],[154.99,19.84,2.0,"Algieba","Purva Phalguni"],[155.58,41.5,3.1,"Tania Australis"],[158.01,-61.69,3.3],[160.74,-64.39,2.7],[161.69,-49.42,2.7],[162.41,-16.19,3.1],[165.46,56.38,2.3,"Merak"],[165.93,61.75,1.8,"Dubhe"],[167.42,44.5,3],[168.53,20.52,2.6,"Zosma"],[168.56,15.43,3.3,"Chertan"],[169.62,33.09,3.5,"Alula Borealis"],[169.84,-14.78,3.6,"Labr"],[173.25,-31.86,3.5],[173.95,-63.02,3.1],[177.26,14.57,2.1,"Denebola","Uttara Phalguni"],[177.67,1.76,3.6,"Zavijava"],[178.46,53.69,2.4,"Phecda"],[182.09,-50.72,2.6],[182.53,-22.62,3.0,"Minkar"],[183.79,-58.75,2.8,"Imai"],[183.86,57.03,3.3,"Megrez"],[183.95,-17.54,2.6,"Gienah"],[185.34,-60.4,3.6,"Ginan"],[186.65,-63.1,0.8,"Acrux"],[187.47,-16.52,2.9,"Algorab"],[187.79,-57.11,1.6,"Gacrux"],[188.6,-23.4,2.6,"Kraz"],[189.3,-69.14,2.7],[190.38,-48.96,2.2,"Muhlifain"],[190.42,-1.45,2.7,"Porrima"],[191.57,-68.11,3.0],[191.93,-59.69,1.2,"Mimosa"],[193.51,55.96,1.8,"Alioth"],[193.9,3.4,3.4,"Minelauva"],[194.01,38.32,2.9,"Cor Caroli"],[195.54,10.96,2.9,"Vindemiatrix"],[199.73,-23.17,3.0],[200.15,-36.71,2.8],[200.98,54.93,2.2,"Mizar"],[201.3,-11.16,1.0,"Spica","Chitra"],[203.67,-0.6,3.4,"Heze"],[204.97,-53.47,2.3],[206.89,49.31,1.9,"Alkaid"],[207.38,-41.69,3.4],[207.4,-42.47,3.5],[208.67,18.4,2.7,"Muphrid"],[208.88,-47.29,2.5,"Alnair"],[210.96,-60.37,0.6,"Hadar"],[211.59,-26.68,3.2],[211.67,-36.37,2.1,"Menkent"],[213.92,19.18,-0.1,"Arcturus","Swati"],[214.85,-46.06,3.5],[217.96,30.37,3.6],[218.02,38.31,3.0,"Seginus"],[218.88,-42.16,2.3],[219.9,-60.84,1.4,"Toliman"],[219.9,-60.83,-0.0,"Rigil Kentaurus"],[220.48,-47.39,2.3,"Men"],[220.63,-64.98,3.2],[221.25,27.07,2.4,"Izar"],[222.68,74.16,2.1,"Kochab"],[222.72,-16.04,2.8,"Zubenelgenubi"],[224.63,-43.13,2.7,"KeKouan"],[224.79,-42.1,3.1,"Ke Kwan"],[225.49,40.39,3.5,"Nekkar"],[226.02,-25.28,3.2,"Brachium"],[228.07,-52.1,3.4],[228.88,33.31,3.5,"Thiba"],[229.25,-9.38,2.6,"Zubeneschamali"],[229.73,-68.68,2.9],[230.18,71.83,3,"Pherkad"],[230.34,-40.65,3.2],[230.45,-36.26,3.6],[230.67,-44.69,3.4],[231.23,58.97,3.3,"Edasich"],[233.67,26.71,2.2,"Alphecca"],[233.79,-41.17,2.8],[234.26,-28.14,3.6],[236.07,6.43,2.6,"Unukalhai"],[237.41,-3.43,3.5],[238.79,-63.43,2.8],[239.71,-26.11,2.9,"Fang"],[240.03,-38.4,3.4],[240.08,-22.62,2.3,"Dschubba"],[241.36,-19.81,2.6,"Acrab"],[243.59,-3.69,2.7,"Yed Prior"],[244.58,-4.69,3.2,"Yed Posterior"],[245.3,-25.59,2.9,"Alniyat"],[246.0,61.51,2.7,"Athebyne"],[247.35,-26.43,1.1,"Antares","Jyeshtha"],[247.56,21.49,2.8,"Kornephoros"],[248.97,-28.22,2.8,"Paikauhale"],[249.29,-10.57,2.5,"Saik"],[250.32,31.6,2.8,"Rutilicus"],[250.72,38.92,3.5],[252.17,-69.03,1.9,"Atria"],[252.54,-34.29,2.3,"Larawag"],[252.97,-38.05,3,"Xamidimura"],[253.08,-38.02,3.6,"Pipirima"],[254.42,9.38,3.2],[254.66,-55.99,3.1],[257.2,65.71,3.2,"Aldhibah"],[257.59,-15.72,2.4,"Sabik"],[258.04,-43.24,3.3],[258.66,14.39,2.8,"Rasalgethi"],[258.76,24.84,3.1,"Sarin"],[258.76,36.81,3.2],[260.5,-25.0,3.3,"Garafsa"],[261.32,-55.53,2.8],[261.35,-56.38,3.3],[262.61,52.3,2.8,"Rastaban"],[262.69,-37.3,2.7,"Lesath"],[262.77,-60.68,3.6],[262.96,-49.88,2.8,"Choo"],[263.4,-37.1,1.6,"Shaula"],[263.73,12.56,2.1,"Rasalhague"],[264.33,-43.0,1.9,"Sargas"],[264.4,-15.4,3.5],[265.62,-39.03,2.4,"Mula"],[265.87,4.57,2.8,"Cebalrai"],[266.61,27.72,3.4],[266.9,-40.13,3.0,"Girtab"],[267.46,-37.04,3.2,"Fuyue"],[269.15,51.49,2.2,"Eltanin"],[269.76,-9.77,3.3,"Sinistra"],[271.45,-30.42,3.0,"Alnasl"],[274.41,-36.76,3.1,"Hamalwarid"],[275.25,-29.83,2.7,"Kaus Media"],[275.26,72.73,3.5,"Alahakan"],[275.33,-2.9,3.2],[276.04,-34.38,1.8,"Kaus Australis"],[276.74,-45.97,3.5],[276.99,-25.42,2.8,"Kaus Borealis"],[279.23,38.78,0.0,"Vega","Abhijit"],[281.41,-26.99,3.2,"Namalsadirah"],[282.52,33.36,3.5,"Sheliak"],[283.82,-26.3,2.0,"Nunki"],[284.43,-21.11,3.5],[284.74,32.69,3.2,"Sulafat"],[285.65,-29.88,2.6,"Ascella"],[286.35,13.86,3.0,"Okab"],[286.56,-4.88,3.4,"Al Thalimain Prior"],[286.74,-27.67,3.3],[287.44,-21.02,2.9,"Albaldah"],[288.14,67.66,3.1,"Altais"],[291.37,3.11,3.4,"Almizan"],[292.68,27.96,3.0,"Albireo"],[296.24,45.13,2.9,"Fawaris"],[296.56,10.61,2.7,"Tarazed"],[297.7,8.87,0.8,"Altair","Shravana"],[299.69,19.49,3.5],[302.18,-66.18,3.5],[302.83,-0.82,3.2],[304.51,-12.54,3.6,"Algedi"],[305.25,-14.78,3.0,"Dabih"],[305.56,40.26,2.2,"Sadr"],[306.41,-56.74,1.9,"Peacock"],[309.39,-47.29,3.1,"Persian"],[310.36,45.28,1.2,"Deneb"],[311.24,-66.2,3.4],[311.32,61.84,3.4,"Kabalfird"],[311.55,33.97,2.5,"Aljanah"],[318.23,30.23,3.2],[319.64,62.59,2.5,"Alderamin"],[322.17,70.56,3.2,"Alfirk"],[322.89,-5.57,2.9,"Sadalsuud"],[326.05,9.88,2.4,"Enif"],[326.76,-16.13,2.9,"Deneb Algedi","Dhanishta"],[328.48,-37.36,3,"Aldhanab"],[331.45,-0.32,3.0,"Sadalmelik","Shatabhisha"],[332.06,-46.96,1.7,"Alnair"],[332.55,6.2,3.5,"Biham"],[332.71,58.2,3.4],[334.63,-60.26,2.9],[340.37,10.83,3.4,"Homam"],[340.67,-46.88,2.1,"Tiaki"],[340.75,30.22,2.9,"Matar"],[342.14,-51.32,3.5],[342.42,66.2,3.5],[342.5,24.6,3.5,"Sadalbari"],[343.66,-15.82,3.3,"Skat"],[344.41,-29.62,1.2,"Fomalhaut"],[345.94,28.08,2.4,"Scheat"],[346.19,15.21,2.5,"Markab","Purva Bhadrapada"],[354.84,77.63,3.2,"Errai"]];
+const NAK_GLOW={'Rohini':1,'Chitra':1,'Jyeshtha':1,'Magha':1,'Punarvasu':1,'Shravana':1,'Abhijit':1,'Ardra':1,'Krittika':1,'Ashwini':1,'Ashlesha':1,'Purva Phalguni':1,'Uttara Phalguni':1,'Swati':1,'Dhanishta':1,'Shatabhisha':1,'Purva Bhadrapada':1,'Uttara Bhadrapada':1};
+const sky={offsetMin:0, anchor:'now'}; // anchor: 'now' | 'birth'
+
+/* full 3D geocentric positions (TROPICAL lon/lat) for the real sky */
+function sunFull(d){const s=sunPos(d);return{lon:s.lon,lat:0,_s:s};}
+function moonFull(d,sun){
+  const N=rev(125.1228-0.0529538083*d),i=5.1454,w=rev(318.0634+0.1643573223*d),a=60.2666,e=0.0549,M=rev(115.3654+13.0649929509*d);
+  const E=keplerE(M,e);const xv=a*(cosd(E)-e),yv=a*Math.sqrt(1-e*e)*sind(E);const v=rev(Math.atan2(yv,xv)*R2D);
+  const xh=cosd(N)*cosd(v+w)-sind(N)*sind(v+w)*cosd(i),yh=sind(N)*cosd(v+w)+cosd(N)*sind(v+w)*cosd(i),zh=sind(v+w)*sind(i);
+  let lon=rev(Math.atan2(yh,xh)*R2D),lat=Math.atan2(zh,Math.sqrt(xh*xh+yh*yh))*R2D;
+  const Lm=rev(N+w+M),D=rev(Lm-sun.lon),F=rev(Lm-N);
+  lon+=-1.274*sind(M-2*D)+0.658*sind(2*D)-0.186*sind(sunPosCache.M||0);
+  lat+=-0.173*sind(F-2*D);
+  return{lon:rev(lon),lat:lat,node:N};
+}
+let sunPosCache={};
+function planetFull(name,d,sun){
+  const h=helio3(ELEM[name],d);
+  const xg=h.x+sun._s.r*cosd(sun.lon),yg=h.y+sun._s.r*sind(sun.lon),zg=h.z;
+  return{lon:rev(Math.atan2(yg,xg)*R2D),lat:Math.atan2(zg,Math.sqrt(xg*xg+yg*yg))*R2D};
+}
+function helio3(el,d){const N=rev(el.N0+el.Nc*d),i=el.i0,w=rev(el.w0+el.wc*d),a=el.a0,e=el.e0+el.ec*d,M=rev(el.M0+el.Mc*d);
+  const E=keplerE(M,e);const xv=a*(cosd(E)-e),yv=a*Math.sqrt(1-e*e)*sind(E);
+  const v=rev(Math.atan2(yv,xv)*R2D),r=Math.sqrt(xv*xv+yv*yv);
+  return{x:r*(cosd(N)*cosd(v+w)-sind(N)*sind(v+w)*cosd(i)),y:r*(sind(N)*cosd(v+w)+cosd(N)*sind(v+w)*cosd(i)),z:r*sind(v+w)*sind(i)};}
+function eclToEq(lon,lat,eps){
+  const ra=rev(Math.atan2(sind(lon)*cosd(eps)-tand(lat)*sind(eps),cosd(lon))*R2D);
+  const dec=Math.asin(sind(lat)*cosd(eps)+cosd(lat)*sind(eps)*sind(lon))*R2D;
+  return{ra,dec};}
+function altAz(ra,dec,lstDeg,phi){
+  const H=rev(lstDeg-ra);
+  const alt=Math.asin(sind(phi)*sind(dec)+cosd(phi)*cosd(dec)*cosd(H))*R2D;
+  let az=Math.atan2(sind(H),cosd(H)*sind(phi)-tand(dec)*cosd(phi))*R2D; // from South, westward
+  az=rev(az+180); // from North, clockwise (E=90)
+  return{alt,az};}
+function lstAt(jd,lonE){const T=(jd-2451545.0)/36525;
+  return rev(rev(280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T)+lonE);}
+
+function skyDate(){
+  const base = sky.anchor==='birth' && state.birth
+    ? new Date(state.birth.dob+'T'+state.birth.tob+':00')
+    : new Date();
+  return new Date(base.getTime()+sky.offsetMin*60000);
+}
+function dirWord(az){const dirs=['north','north-east','east','south-east','south','south-west','west','north-west'];
+  return dirs[Math.round(az/45)%8];}
+function heightWord(alt){return alt>60?'almost overhead':alt>30?'high up':alt>10?'midway up':'low near the horizon';}
+
+function computeSky(date){
+  const jd=2440587.5+date.getTime()/86400000, d=jd-2451543.5;
+  const eps=23.4393-3.563e-7*d, ay=ayanamsa(jd);
+  const place=state.birth.place;
+  const lst=lstAt(jd,place.lon);
+  const sun=sunFull(d); sunPosCache=sun._s;
+  const moon=moonFull(d,sun);
+  const bodies=[];
+  const add=(key,label,lon,lat,opts)=>{const eq=eclToEq(lon,lat,eps);const aa=altAz(eq.ra,eq.dec,lst,place.lat);
+    bodies.push(Object.assign({key,label,lonT:lon,sid:rev(lon-ay),alt:aa.alt,az:aa.az},opts||{}));};
+  add('Sun','Surya (Sun)',sun.lon,0,{r:9,fill:'#FFD75E'});
+  add('Moon','Chandra (Moon)',moon.lon,moon.lat,{r:8,fill:'#E8EAF2',moon:true,elong:rev(moon.lon-sun.lon)});
+  add('Mercury','Budha (Mercury)',...(p=>[p.lon,p.lat])(planetFull('Mercury',d,sun)),{r:4,fill:'#B9C4D8'});
+  add('Venus','Shukra (Venus)',...(p=>[p.lon,p.lat])(planetFull('Venus',d,sun)),{r:6,fill:'#F2F0DC'});
+  add('Mars','Mangala (Mars)',...(p=>[p.lon,p.lat])(planetFull('Mars',d,sun)),{r:5,fill:'#E07856'});
+  add('Jupiter','Guru (Jupiter)',...(p=>[p.lon,p.lat])(planetFull('Jupiter',d,sun)),{r:7,fill:'#EFD9A7'});
+  add('Saturn','Shani (Saturn)',...(p=>[p.lon,p.lat])(planetFull('Saturn',d,sun)),{r:6,fill:'#D8CBA8'});
+  add('Rahu','Rahu (shadow graha)',moon.node,0,{r:6,ghost:true});
+  add('Ketu','Ketu (shadow graha)',rev(moon.node+180),0,{r:6,ghost:true});
+  // stars
+  const starPts=[];
+  for(const s of STARS){const aa=altAz(s[0],s[1],lst,place.lat);
+    if(aa.alt>-0.5)starPts.push({alt:aa.alt,az:aa.az,mag:s[2],name:s[3]||'',nak:s[4]||''});}
+  const sunBody=bodies[0];
+  return{bodies,starPts,sunAlt:sunBody.alt,date,jd,eps,lst};
+}
+
+function project(alt,az,R,cx,cy){const r=(90-alt)/90*R;
+  return[cx-r*sind(az),cy-r*cosd(az)];} // N top, E left (looking up)
+
+function renderSky(){
+  if(!state.birth)return;
+  const sc=computeSky(skyDate());
+  const W=380,R=170,cx=W/2,cy=W/2;
+  // sky background by sun altitude
+  const bg=sc.sunAlt>0?'#27406B':sc.sunAlt>-6?'#1C2C52':sc.sunAlt>-12?'#141E3E':'#0A0E22';
+  let svg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${bg}" stroke="#D4A24E" stroke-width="2"/>`;
+  // stars (only at night/twilight)
+  if(sc.sunAlt<0){
+    for(const s of sc.starPts){const[x,y]=project(s.alt,s.az,R,cx,cy);
+      const sz=Math.max(.6,2.4-s.mag*.55);
+      svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz.toFixed(1)}" fill="${s.nak?'#F0C868':'#C9CDE3'}" opacity="${s.nak?.95:.8}"/>`;
+      if(s.nak)svg+=`<text x="${(x+4).toFixed(1)}" y="${(y-3).toFixed(1)}" font-size="7" fill="#D4A24E" font-family="Work Sans">${s.nak}</text>`;
+    }
+  }
+  // bodies
+  for(const b of sc.bodies){
+    if(b.alt<=-1)continue;
+    const[x,y]=project(b.alt,b.az,R,cx,cy);
+    if(b.ghost){
+      svg+=`<circle class="sky-body" data-k="${b.key}" cx="${x}" cy="${y}" r="${b.r}" fill="none" stroke="#9A94B8" stroke-dasharray="3 2" stroke-width="1.5" opacity=".8"/>
+      <text x="${x+8}" y="${y+3}" font-size="8" fill="#9A94B8" font-family="Work Sans">${b.key}</text>`;
+    }else if(b.moon){
+      const ill=(1-cosd(b.elong))/2, waxing=b.elong<180;
+      svg+=`<circle class="sky-body" data-k="${b.key}" cx="${x}" cy="${y}" r="${b.r}" fill="#E8EAF2"/>`;
+      if(ill<.97)svg+=`<ellipse cx="${x+(waxing?-1:1)*b.r*(1-ill)*.7}" cy="${y}" rx="${b.r*Math.max(.05,Math.abs(cosd(b.elong)))}" ry="${b.r}" fill="${bg}" opacity=".92" pointer-events="none"/>`;
+      svg+=`<text x="${x+10}" y="${y+3}" font-size="9" fill="#E8EAF2" font-family="Work Sans">Moon</text>`;
+    }else{
+      svg+=`<circle class="sky-body" data-k="${b.key}" cx="${x}" cy="${y}" r="${b.r}" fill="${b.fill}" stroke="#00000033"/>
+      <text x="${x+b.r+3}" y="${y+3}" font-size="9" fill="${b.fill}" font-family="Work Sans">${b.key}</text>`;
+    }
+  }
+  // horizon labels — N top, E left (this is a looking-UP map)
+  svg+=`<text x="${cx}" y="14" text-anchor="middle" font-size="11" fill="#E8C887" font-family="Eczar">N</text>
+   <text x="${cx}" y="${W-5}" text-anchor="middle" font-size="11" fill="#E8C887" font-family="Eczar">S</text>
+   <text x="8" y="${cy+4}" font-size="11" fill="#E8C887" font-family="Eczar">E</text>
+   <text x="${W-14}" y="${cy+4}" font-size="11" fill="#E8C887" font-family="Eczar">W</text>`;
+  document.getElementById('sky-holder').innerHTML=
+   `<svg class="sky-svg" viewBox="0 0 ${W} ${W}" id="sky-svg" role="img" aria-label="Live sky map">${svg}</svg>`;
+  document.getElementById('sky-svg').addEventListener('click',skyTap);
+  const dt=sc.date;
+  document.getElementById('sky-time').textContent=
+    (sky.anchor==='birth'&&sky.offsetMin===0?'✨ The sky at your birth · ':'')+
+    dt.toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('sky-loc').textContent='above '+state.birth.place.name.split(',')[0]+' · hold phone up & match N to north';
+  sky._last=sc;
+}
+function skyTap(ev){
+  const t=ev.target.closest('.sky-body'); if(!t||!sky._last)return;
+  const b=sky._last.bodies.find(x=>x.key===t.dataset.k); if(!b)return;
+  const sign=RASHI[sidSign(b.sid)];
+  let line;
+  if(b.ghost){line=`${b.label} — an invisible point in the sky, not a real object. Astrologers track it because eclipses happen here. Right now it sits in ${sign[0]} (${sign[1]}).`;}
+  else{
+    const vis=b.alt>0?`It is ${heightWord(b.alt)} in the ${dirWord(b.az)} right now — ${b.alt>10&&sky._last.sunAlt<-3?'go out and you can see it!':'hard to spot in this light.'}`:`It is below the horizon right now, so you cannot see it.`;
+    line=`${b.label} is in ${sign[0]} (${sign[1]}) — ${nakOf(b.sid)} nakshatra. ${vis}`;
+  }
+  document.getElementById('sky-info').textContent=line;
+}
+function skySlide(v){sky.offsetMin=+v;renderSky();}
+function skyNow(){sky.anchor='now';sky.offsetMin=0;document.getElementById('sky-slider').value=0;renderSky();}
+function skyBirth(){sky.anchor='birth';sky.offsetMin=0;document.getElementById('sky-slider').value=0;renderSky();
+  document.getElementById('sky-info').textContent='This is exactly how the sky looked above '+state.birth.place.name.split(',')[0]+' at the moment you were born. Drag the slider to watch it move.';}
+function askSkyAI(){
+  sendQuestion('Look at tonight\'s sky and my chart together: which planets are visible above me tonight, and what does today\'s planetary sky mean for me personally? Explain simply.',true);
+  document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});
+}
+/* nicer pickers: open native calendar/clock on click */
+document.addEventListener('click',e=>{
+  const i=e.target;
+  if(i.tagName==='INPUT'&&(i.type==='date'||i.type==='time')){try{i.showPicker&&i.showPicker();}catch(err){}}
+});
+
 </script>
 </body>
 </html>
