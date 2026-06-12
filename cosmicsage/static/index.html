@@ -277,7 +277,7 @@
           <div class="topics" id="topics"></div>
         </div>
         <div class="card chat-card">
-          <h3>Ask your chart</h3>
+          <h3 style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">Ask your chart <span class="pill" id="quota-pill">—</span></h3>
           <div class="chat-log" id="chat-log">
             <div class="msg astro"><span class="who">COSMICSAGE</span>Your Kundali is ready. Tap a topic above or type any question — I'll read your placements, current dasha and today's transits before answering.</div>
           </div>
@@ -353,6 +353,21 @@
       </div>
     </div>
   </section>
+</div>
+
+<!-- ============ UNLOCK MODAL (₹69 → 9 questions) ============ -->
+<div class="overlay hidden" id="modal-pay">
+  <div class="modal">
+    <h3>Unlock 9 more questions · ₹69</h3>
+    <p>You've used your 3 free questions. Pay ₹69 to the QR below from any UPI app, then enter the 12-digit UTR / transaction ID from your payment receipt — your questions unlock instantly.</p>
+    <div class="qr-frame"><img src="/static/qr.png" alt="UPI payment QR code" onerror="this.parentElement.innerHTML='<span style=\'color:#666;font-size:.8rem\'>Add your QR image as static/qr.png</span>'"></div>
+    <div class="scan-note">Scan & pay ₹69, then enter your UTR:</div>
+    <input id="utr-input" type="text" inputmode="numeric" maxlength="12" placeholder="12-digit UTR (e.g. 416912345678)" style="text-align:center;letter-spacing:2px">
+    <div class="geo-result err" id="utr-msg" style="min-height:18px;text-align:center"></div>
+    <button class="btn full" onclick="claimUTR()">Unlock my 9 questions</button>
+    <button class="btn ghost full" style="margin-top:10px" onclick="hide('modal-pay')">Maybe later</button>
+    <div class="field-hint" style="margin-top:10px;text-align:center">Find the UTR in your UPI app: open the payment → details → "UTR" or "Transaction ID".</div>
+  </div>
 </div>
 
 <!-- ============ DONATION MODAL ============ -->
@@ -635,6 +650,46 @@ function renderKundali(chart){
     Object.entries(GLYPH).map(([k,v])=>`<span><b>${v}</b> ${k}</span>`).join('')+`<span><b>1–12</b> rāśi numbers (1 = Mesha/Aries)</span>`;
 }
 
+/* ===== UNIQUE ID (name+dob+tob+place hash) & QUOTA ===== */
+async function computeUid(name,dob,tob,place){
+  const raw=[name.toLowerCase().trim().replace(/\s+/g,' '),dob,tob,place.lat.toFixed(1),place.lon.toFixed(1)].join('|');
+  try{
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40);
+  }catch(e){ // very old browsers / non-secure context fallback
+    let h1=5381,h2=52711;
+    for(const ch of raw){const c=ch.charCodeAt(0);h1=(h1*33+c)>>>0;h2=(h2*31+c)>>>0;}
+    return (h1.toString(16)+h2.toString(16)).padStart(16,'0');
+  }
+}
+function updateQuotaPill(s){
+  state.quota=s;
+  const el=document.getElementById('quota-pill'); if(!el)return;
+  if(s.credits>0){el.textContent=`✦ ${s.credits} paid question${s.credits===1?'':'s'} left`;el.style.color='var(--gold-soft)';el.onclick=null;}
+  else if(s.free_left>0){el.textContent=`${s.free_left} free question${s.free_left===1?'':'s'} left`;el.style.color='';el.onclick=null;}
+  else{el.textContent=`Unlock ${s.pack_questions} questions · ₹${s.pack_price}`;el.style.color='var(--gold-soft)';el.style.cursor='pointer';el.onclick=()=>show('modal-pay');}
+}
+async function refreshStatus(){
+  if(!state.uid)return;
+  try{const r=await fetch('/api/status?uid='+state.uid);const s=await r.json();if(r.ok)updateQuotaPill(s);}catch(e){}
+}
+async function claimUTR(){
+  const utr=document.getElementById('utr-input').value.replace(/\D/g,'');
+  const msg=document.getElementById('utr-msg');
+  if(utr.length!==12){msg.textContent='UTR must be exactly 12 digits.';return;}
+  if(!state.uid){msg.textContent='Generate your chart first so we know whom to credit.';return;}
+  msg.textContent='Verifying…';msg.className='geo-result';
+  try{
+    const r=await fetch('/api/claim',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({uid:state.uid,utr:utr})});
+    const d=await r.json();
+    if(!r.ok){msg.textContent=d.error||'Could not verify.';msg.className='geo-result err';return;}
+    updateQuotaPill(d.status);hide('modal-pay');
+    document.getElementById('utr-input').value='';msg.textContent='';
+    addMsg('astro',d.message,'COSMICSAGE');
+  }catch(e){msg.textContent='Network error — please try again.';msg.className='geo-result err';}
+}
+
 /* ===== APP STATE / GEOCODING / VIEWS ===== */
 const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100};
 const show=id=>document.getElementById(id).classList.remove('hidden');
@@ -763,6 +818,7 @@ function generateChart(){
   if(+dob.slice(0,4)<1900||new Date(dob)>new Date()){alert('Please check the date of birth — year must be between 1900 and today.');return;}
   place.tz=resolveTZ(place,dob); // DST- and history-correct offset for the birth date
   state.birth={name,dob,tob,place};
+  computeUid(name,dob,tob,place).then(uid=>{state.uid=uid;refreshStatus();});
   state.chart=computeChart(dob,tob,place);
   state.dasha=computeDasha(state.chart,dob,tob);
   document.getElementById('g-name').textContent=name.split(' ')[0];
@@ -834,10 +890,17 @@ async function sendQuestion(q,showUserMsg){
   state.busy=true;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:chartSummary(),history:state.history})});
+      body:JSON.stringify({chart:chartSummary(),history:state.history,uid:state.uid||''})});
     const data=await r.json();
+    if(r.status===402){
+      think.remove();state.history.pop();
+      addMsg('astro',data.message||'You\'ve used your free questions — unlock more for ₹69.','COSMICSAGE');
+      if(data.status)updateQuotaPill(data.status);
+      show('modal-pay');return;
+    }
     if(!r.ok)throw new Error(data.error||'Request failed');
     state.history.push({role:'assistant',content:data.answer});
+    if(data.status)updateQuotaPill(data.status);
     think.innerHTML=`<span class="who">COSMICSAGE</span>`+data.answer.replace(/</g,'&lt;');
     think.classList.remove('thinking');
     state.answers++;if(state.answers===3)show('donate-nudge');
@@ -897,6 +960,10 @@ function runMatch(){
 async function askMatchAI(){
   if(!lastMatch||state.busy)return;
   const {A,B,cA,cB,g}=lastMatch;
+  if(!state.uid){ // user came straight to matching — identify by partner 1's birth details
+    state.uid=await computeUid(A.name,A.dob,A.tob,A.place);
+    await refreshStatus();
+  }
   const holder=document.getElementById('match-ai');
   holder.innerHTML='<div class="msg astro thinking" style="max-width:100%">Reading both charts together…</div>';
   state.busy=true;
@@ -907,9 +974,15 @@ Guna Milan total: ${g.total}/36. Breakdown: ${g.rows.map(r=>r[0]+' '+r[2]+'/'+r[
 Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:summary,history:[{role:'user',content:'Give a balanced, kind reading of this match: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
+      body:JSON.stringify({chart:summary,uid:state.uid||'',history:[{role:'user',content:'Give a balanced, kind reading of this match: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
     const data=await r.json();
+    if(r.status===402){
+      holder.innerHTML='<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>'+(data.message||'Unlock more questions to get the match reading.')+'</div>';
+      if(data.status)updateQuotaPill(data.status);
+      show('modal-pay');return;
+    }
     if(!r.ok)throw new Error(data.error||'failed');
+    if(data.status)updateQuotaPill(data.status);
     holder.innerHTML=`<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>${data.answer.replace(/</g,'&lt;')}</div>`;
   }catch(e){holder.innerHTML='<div class="msg astro" style="max-width:100%">Could not fetch the reading — please try again.</div>';}
   finally{state.busy=false;}
