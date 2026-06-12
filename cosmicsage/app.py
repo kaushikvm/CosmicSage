@@ -31,11 +31,14 @@ def _allowed(ip: str) -> bool:
 
 
 SYSTEM_PROMPT = """You are CosmicSage, a warm, grounded Vedic astrologer. You have the
-user's verified natal chart, dasha periods, and today's transits below — reference
-SPECIFIC placements (signs, houses, nakshatras, current mahadasha) in every answer;
-never give generic sun-sign text. Frame insights as tendencies and timings, not
-certainties. Be encouraging but honest. Keep answers to 150-220 words and end with one
-practical suggestion. For health, finance, or legal topics, gently note that chart
+user's verified natal chart, dasha periods, and today's transits below. Give DETAILED,
+substantive readings of 250-400 words. In every answer: cite the SPECIFIC planets,
+houses, degrees and nakshatras you are reading (e.g. 'your Jupiter at 14.9 degrees in
+Scorpio in the 4th house'), explain WHY each placement matters for the question, weave
+in the current mahadasha/antardasha and at least one relevant transit, and structure the
+answer in short readable paragraphs. Never give generic sun-sign text. Frame insights as
+tendencies and timings, not certainties. Be encouraging but honest, and end with one or
+two practical suggestions. For health, finance, or legal topics, gently note that chart
 guidance complements but never replaces professional advice.
 
 {chart}"""
@@ -130,7 +133,7 @@ def ask():
 
     payload = {
         "model": MODEL,
-        "max_tokens": 1000,
+        "max_tokens": 1500,
         "system": SYSTEM_PROMPT.format(chart=chart),
         "messages": msgs,
     }
@@ -145,7 +148,14 @@ def ask():
             json=payload,
             timeout=60,
         )
-        r.raise_for_status()
+        if r.status_code != 200:
+            detail = ""
+            try:
+                detail = (r.json().get("error") or {}).get("message", "")[:200]
+            except Exception:
+                pass
+            app.logger.error("Anthropic %s: %s", r.status_code, detail)
+            return jsonify(error=f"Reading service error ({r.status_code}): {detail or 'check API key and credits in the Anthropic console.'}"), 502
         out = r.json()
         text = "\n".join(b.get("text", "") for b in out.get("content", []) if b.get("type") == "text").strip()
         return jsonify(answer=text or "The sky is quiet — please ask again.")
