@@ -7,6 +7,13 @@
 <meta name="description" content="Free Vedic Kundali from real planetary positions, 36-point kundali matching, dasha timeline, numerology and AI-powered readings. No sign-up.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23F6C453'/%3E%3Cstop offset='1' stop-color='%23E2702A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='22' r='15' fill='none' stroke='%23E2702A' stroke-width='2.5' opacity='.55'/%3E%3Ccircle cx='32' cy='20' r='7' fill='url(%23g)'/%3E%3Cpath d='M32 28 C25 30 21 37 21 46 L43 46 C43 37 39 30 32 28 Z' fill='url(%23g)'/%3E%3Cellipse cx='32' cy='49' rx='17' ry='5.5' fill='url(%23g)'/%3E%3C/svg%3E">
+<style>
+  .sage-logo{display:inline-block; vertical-align:middle;}
+  .pill.support{background:linear-gradient(135deg,#F6C453,#E2702A); border:none; color:#3a1d05;
+    font-weight:700; font-size:.92rem; padding:9px 20px; box-shadow:0 3px 14px rgba(226,112,42,.35);}
+  .pill.support:hover{transform:translateY(-1px); box-shadow:0 5px 18px rgba(226,112,42,.5);}
+</style>
 <style>
   :root{
     --night:#100E23; --panel:#1A1734; --panel2:#221E42; --line:#34305C;
@@ -112,9 +119,27 @@
   .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
   @media (max-width:800px){.match-grid{grid-template-columns:1fr;}}
   .score-hero{text-align:center; padding:10px 0 4px;}
-  .score-hero .big{font-family:'Eczar',serif; font-size:3rem; color:var(--gold);}
-  .score-hero .of{color:var(--muted);}
-  .score-hero .verdict{margin-top:4px; font-size:.95rem; color:var(--gold-soft); font-weight:600;}
+  .ring-wrap{position:relative; width:150px; height:150px; margin:0 auto 8px;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-num{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .ring-num .big{font-family:'Eczar',serif; font-size:2.2rem; color:var(--gold); line-height:1;}
+  .ring-num .of{color:var(--muted); font-size:.8rem;}
+  .score-hero .verdict{margin-top:4px; font-size:1rem; font-weight:600;}
+  .partner-chips{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:14px 0 18px;}
+  .pchip{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px 16px; font-size:.82rem; text-align:left;}
+  .pchip b{color:var(--gold-soft); display:block; font-size:.9rem;}
+  .pchip span{color:var(--muted);}
+  .koota-row{margin:10px 0;}
+  .koota-top{display:flex; justify-content:space-between; font-size:.86rem; margin-bottom:4px;}
+  .koota-top .nm{color:var(--gold-soft); font-weight:600;}
+  .koota-top .meas{color:var(--muted); font-size:.76rem;}
+  .koota-bar{height:7px; background:var(--night); border-radius:99px; overflow:hidden; border:1px solid var(--line);}
+  .koota-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,#F6C453,#E2702A); transition:width .8s ease;}
+  .koota-fill.zero{background:var(--sindoor); min-width:6px; opacity:.7;}
+  /* footer support section */
+  .support-foot{text-align:center; padding:34px 0 10px;}
+  .support-foot .wlcs{font-family:'Eczar',serif; color:var(--gold); font-size:1.15rem; margin:10px 0 4px;}
+  .support-foot p{color:var(--muted); font-size:.85rem; max-width:440px; margin:0 auto 14px;}
   /* donation modal */
   .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
   .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:430px; width:100%; padding:28px; text-align:center;}
@@ -145,13 +170,13 @@
 
   <div class="topbar">
     <div class="brand" onclick="switchView('view-landing')">
-      <svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#D4A24E" stroke-width="2"/><path d="M20 5 L26 20 L20 35 L14 20 Z" fill="#C8472F"/></svg>
+      <svg class="sage-logo" width="34" height="34" viewBox="0 0 64 64"><defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="32" cy="22" r="15" fill="none" stroke="#E2702A" stroke-width="2.5" opacity=".55"/><circle cx="32" cy="20" r="7" fill="url(#sg1)"/><path d="M32 28 C25 30 21 37 21 46 L43 46 C43 37 39 30 32 28 Z" fill="url(#sg1)"/><ellipse cx="32" cy="49" rx="17" ry="5.5" fill="url(#sg1)"/></svg>
       <h1>CosmicSage</h1>
     </div>
     <div class="now-strip">
       <span class="pill" id="now-clock">—</span>
       <span class="pill">Today's nakshatra: <b id="now-nak">—</b></span>
-      <span class="pill btn-like" onclick="show('modal-donate')">♥ Support us</span>
+      <span class="pill btn-like support" onclick="show('modal-donate')">♥ Support us</span>
     </div>
   </div>
 
@@ -169,6 +194,12 @@
       <h3>🪔 Hindu festivals this month</h3>
       <div id="fest-list">Computing the panchang…</div>
       <div class="field-hint" style="margin-top:10px">Dates computed from tithi & the Sun's sidereal position — approximate; confirm with your local panchang.</div>
+    </div>
+    <div class="support-foot" style="padding-bottom:50px">
+      <svg class="sage-logo" width="52" height="52" viewBox="0 0 64 64"><defs><linearGradient id="sg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="32" cy="22" r="15" fill="none" stroke="#E2702A" stroke-width="2.5" opacity=".55"/><circle cx="32" cy="20" r="7" fill="url(#sg3)"/><path d="M32 28 C25 30 21 37 21 46 L43 46 C43 37 39 30 32 28 Z" fill="url(#sg3)"/><ellipse cx="32" cy="49" rx="17" ry="5.5" fill="url(#sg3)"/></svg>
+      <div class="wlcs">#WeLoveCosmicSage</div>
+      <p>This page is made with love from Kaushik. If a reading helps you, please donate and help us grow better.</p>
+      <button class="pill btn-like support" onclick="show('modal-donate')">♥ Support us</button>
     </div>
   </section>
 
@@ -200,7 +231,6 @@
       <div class="greet">
         <h2>Namaste, <em id="g-name"></em></h2>
         <div class="actions">
-          <button class="btn ghost" onclick="goMatch()">💞 Match kundali</button>
           <button class="btn ghost" onclick="window.print()">⬇ Save as PDF</button>
         </div>
       </div>
@@ -222,6 +252,7 @@
             <div class="num-tile"><div class="n" id="num-name">–</div><div class="l">Name Number</div></div>
             <div class="num-tile"><div class="n" id="num-bday">–</div><div class="l">Birth Day</div></div>
           </div>
+          <div class="status-line" id="celebs" style="margin-top:12px"></div>
         </div>
         <div class="card">
           <h3>Vimshottari Dasha</h3>
@@ -256,7 +287,14 @@
         </div>
       </div>
     </div>
-    <div class="footer">CosmicSage offers astrological perspectives for reflection. It is not a substitute for professional medical, financial, or legal advice.<br>Planetary math: Keplerian elements with Lahiri ayanāṁśa. Matching uses the classical Ashta-Koota system (Yoni & Vashya simplified). Your birth details are processed in your browser.</div>
+    <div class="footer">
+      <div class="support-foot">
+        <svg class="sage-logo" width="52" height="52" viewBox="0 0 64 64"><defs><linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="32" cy="22" r="15" fill="none" stroke="#E2702A" stroke-width="2.5" opacity=".55"/><circle cx="32" cy="20" r="7" fill="url(#sg2)"/><path d="M32 28 C25 30 21 37 21 46 L43 46 C43 37 39 30 32 28 Z" fill="url(#sg2)"/><ellipse cx="32" cy="49" rx="17" ry="5.5" fill="url(#sg2)"/></svg>
+        <div class="wlcs">#WeLoveCosmicSage</div>
+        <p>This page is made with love from Kaushik. If a reading helped you, please donate and help us grow better.</p>
+        <button class="pill btn-like support" onclick="show('modal-donate')">♥ Support us</button>
+      </div>
+      CosmicSage offers astrological perspectives for reflection. It is not a substitute for professional medical, financial, or legal advice.<br>Planetary math: Keplerian elements with Lahiri ayanāṁśa. Matching uses the classical Ashta-Koota system (Yoni & Vashya simplified). Your birth details are processed in your browser.</div>
   </section>
 
   <!-- ============ MATCHING ============ -->
@@ -287,8 +325,20 @@
       <button class="btn full" onclick="runMatch()">Match kundalis</button>
       <div id="match-result" class="hidden" style="margin-top:22px;">
         <div class="card">
-          <div class="score-hero"><span class="big" id="ms-score">–</span><span class="of"> / 36</span><div class="verdict" id="ms-verdict"></div></div>
-          <table class="pos"><thead><tr><th>Koota</th><th>Measures</th><th>Score</th><th>Max</th></tr></thead><tbody id="ms-body"></tbody></table>
+          <div class="score-hero">
+            <div class="ring-wrap">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <circle cx="75" cy="75" r="64" fill="none" stroke="var(--line)" stroke-width="11"/>
+                <circle id="ring-arc" cx="75" cy="75" r="64" fill="none" stroke="url(#ringGrad)" stroke-width="11"
+                  stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/>
+                <defs><linearGradient id="ringGrad"><stop offset="0%" stop-color="#F6C453"/><stop offset="100%" stop-color="#E2702A"/></linearGradient></defs>
+              </svg>
+              <div class="ring-num"><span class="big" id="ms-score">–</span><span class="of">out of 36 gunas</span></div>
+            </div>
+            <div class="verdict" id="ms-verdict"></div>
+          </div>
+          <div class="partner-chips" id="ms-chips"></div>
+          <div id="ms-bars"></div>
           <div class="status-line" id="ms-manglik" style="margin-top:14px"></div>
           <div class="status-line" id="ms-numero"></div>
           <button class="btn" style="margin-top:16px" onclick="askMatchAI()">Get the sage's reading of this match</button>
@@ -304,7 +354,7 @@
 <div class="overlay hidden" id="modal-donate">
   <div class="modal">
     <h3>Support CosmicSage</h3>
-    <p>We're helping everyone read their stars — free, with no sign-up and no paywall. Your donation goes directly toward keeping our servers running.</p>
+    <p>This page is made with love from Kaushik. We're helping everyone read their stars — free, with no sign-up and no paywall. Please donate and help us grow better; every rupee goes toward keeping our servers running.</p>
     <div class="amounts">
       <button class="amt" onclick="pickAmt(this,50)">₹50</button>
       <button class="amt sel" onclick="pickAmt(this,100)">₹100</button>
@@ -489,6 +539,24 @@ const reduceNum=n=>{while(n>9&&n!==11&&n!==22&&n!==33){n=String(n).split('').red
 const lifePath=s=>reduceNum(s.replace(/\D/g,'').split('').reduce((a,c)=>a+ +c,0));
 function nameNumber(name){const m={a:1,j:1,s:1,b:2,k:2,t:2,c:3,l:3,u:3,d:4,m:4,v:4,e:5,n:5,w:5,f:6,o:6,x:6,g:7,p:7,y:7,h:8,q:8,z:8,i:9,r:9};
   return reduceNum(name.toLowerCase().replace(/[^a-z]/g,'').split('').reduce((a,c)=>a+(m[c]||0),0));}
+/* Famous people who share each Life Path (computed from public birthdates) */
+const LP_CELEBS={
+ 1:["Steve Jobs","Amitabh Bachchan","Tom Hanks"],
+ 2:["W.A. Mozart (11/2)","Jennifer Aniston (11/2)","Madonna (11/2)"],
+ 3:["A.P.J. Abdul Kalam","A.R. Rahman","Sachin Tendulkar"],
+ 4:["Bill Gates","Oprah Winfrey","Lata Mangeshkar"],
+ 5:["Abraham Lincoln","Mark Zuckerberg","Steven Spielberg"],
+ 6:["Albert Einstein","M.S. Dhoni","Virat Kohli"],
+ 7:["Shah Rukh Khan","Leonardo DiCaprio","Princess Diana"],
+ 8:["Nelson Mandela","Pablo Picasso","Roger Federer"],
+ 9:["Mahatma Gandhi","Mother Teresa","Priyanka Chopra"],
+ 11:["W.A. Mozart","Jennifer Aniston","Madonna"],
+ 22:["Bill Gates (22/4)","Oprah Winfrey (22/4)"],
+ 33:["Albert Einstein (33/6)","M.S. Dhoni (33/6)"]};
+function celebLine(lp){
+  const list=LP_CELEBS[lp]||LP_CELEBS[reduceNum(lp)]||[];
+  return list.length?`<b>You share Life Path ${lp} with:</b> ${list.join(', ')} ✨`:'';
+}
 
 /* ===== GUNA MILAN ===== */
 const GANA=n=>[0,4,6,7,12,14,16,21,26].includes(n)?0:([2,8,9,13,15,17,18,22,23].includes(n)?2:1); //0 deva 1 manushya 2 rakshasa
@@ -623,7 +691,10 @@ const TOPICS=[
 function renderTopics(){
   document.getElementById('topics').innerHTML=TOPICS.map((t,i)=>
    `<button class="topic" onclick="topicAsk(${i})"><div class="ic" style="background:${t[3]}22;color:${t[3]}">${t[0]}</div>
-    <div class="t">${t[1]}</div><div class="s">${t[2]}</div></button>`).join('');
+    <div class="t">${t[1]}</div><div class="s">${t[2]}</div></button>`).join('')+
+   `<button class="topic" onclick="goMatch()" style="border-color:var(--sindoor)">
+    <div class="ic" style="background:rgba(200,71,47,.18);color:var(--sindoor)">💞</div>
+    <div class="t">Match Kundali</div><div class="s">36-guna compatibility</div></button>`;
 }
 function topicAsk(i){document.getElementById('q-input').value=TOPICS[i][4];askQuestion();
   document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});}
@@ -669,6 +740,7 @@ function generateChart(){
   document.getElementById('num-life').textContent=lifePath(dob);
   document.getElementById('num-name').textContent=nameNumber(name);
   document.getElementById('num-bday').textContent=reduceNum(+dob.split('-')[2]);
+  document.getElementById('celebs').innerHTML=celebLine(lifePath(dob));
   renderTopics();
   switchView('view-dash');
 }
@@ -713,7 +785,7 @@ async function askQuestion(){
     think.classList.remove('thinking');
     state.answers++;if(state.answers===3)show('donate-nudge');
   }catch(e){
-    think.innerHTML=`<span class="who">COSMICSAGE</span>`+(e.message.includes('limit')?e.message:'Something interrupted the reading. Please try again.');
+    think.innerHTML=`<span class="who">COSMICSAGE</span>`+(e.message&&e.message.length>5?e.message:'Something interrupted the reading. Please try again.').replace(/</g,'&lt;');
     think.classList.remove('thinking');state.history.pop();
   }finally{state.busy=false;}
 }
@@ -742,11 +814,22 @@ function runMatch(){
   const cA=computeChart(A.dob,A.tob,A.place),cB=computeChart(B.dob,B.tob,B.place);
   const g=gunaMilan(cA,cB);
   lastMatch={A,B,cA,cB,g};
+  const pct=g.total/36;
   document.getElementById('ms-score').textContent=g.total%1?g.total.toFixed(1):g.total;
-  document.getElementById('ms-verdict').textContent=
-    g.total>=28?'Excellent match':g.total>=24?'Very good match':g.total>=18?'Good — acceptable match':'Below the traditional threshold (18) — guidance advised';
-  document.getElementById('ms-body').innerHTML=g.rows.map(r=>
-    `<tr><td class="g">${r[0]}</td><td>${r[1]}</td><td>${r[2]%1?r[2].toFixed(1):r[2]}</td><td>${r[3]}</td></tr>`).join('');
+  const v=document.getElementById('ms-verdict');
+  v.textContent=g.total>=28?'✦ Excellent match':g.total>=24?'Very good match':g.total>=18?'Good — acceptable match':'Below the traditional threshold (18) — guidance advised';
+  v.style.color=g.total>=24?'#9BD489':g.total>=18?'var(--gold-soft)':'#E8917D';
+  document.getElementById('ms-chips').innerHTML=[[A,cA],[B,cB]].map(([p,c])=>
+   `<div class="pchip"><b>${p.name.split(' ')[0]}</b><span>Moon: ${RASHI[c.planets.Moon.sign][1]} · ${c.planets.Moon.nak}<br>Lagna: ${RASHI[c.asc.sign][1]} · ${GANA_N[GANA(c.planets.Moon.nakIdx)]} gana</span></div>`).join('');
+  document.getElementById('ms-bars').innerHTML=g.rows.map(r=>
+   `<div class="koota-row"><div class="koota-top"><span><span class="nm">${r[0]}</span> <span class="meas">· ${r[1]}</span></span><span>${r[2]%1?r[2].toFixed(1):r[2]}/${r[3]}</span></div>
+    <div class="koota-bar"><div class="koota-fill ${r[2]===0?'zero':''}" style="width:0%" data-w="${Math.max(r[2]/r[3]*100,r[2]===0?4:0)}"></div></div></div>`).join('');
+  show('match-result');
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll('.koota-fill').forEach(el=>el.style.width=el.dataset.w+'%');
+    const arc=document.getElementById('ring-arc'); arc.style.transition='stroke-dashoffset 1s ease';
+    arc.style.strokeDashoffset=402*(1-pct);
+  },60));
   const mA=manglik(cA),mB=manglik(cB);
   document.getElementById('ms-manglik').innerHTML=`<b>Manglik check:</b> ${A.name.split(' ')[0]} — ${mA?'Manglik':'Non-manglik'} · ${B.name.split(' ')[0]} — ${mB?'Manglik':'Non-manglik'}${mA!==mB?' · One partner manglik — traditionally reviewed with an astrologer; matching mangliks or remedies are common resolutions.':mA&&mB?' · Both manglik — dosha is traditionally considered cancelled.':''}`;
   const l1=lifePath(A.dob),l2=lifePath(B.dob);
