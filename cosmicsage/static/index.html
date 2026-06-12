@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CosmicSage — Free Vedic Birth Chart & Insights</title>
+<meta name="description" content="CosmicSage computes your Vedic Kundali from real planetary positions and answers your questions about career, relationships and more. Free for everyone.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#100E23; --panel:#1A1734; --panel2:#221E42; --line:#34305C;
+    --gold:#D4A24E; --gold-soft:#E8C887; --sindoor:#C8472F;
+    --ink:#EAE6F2; --muted:#9A94B8; --moon:#C9CDE3;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--night); color:var(--ink); font-family:'Work Sans',sans-serif; font-size:15px; line-height:1.55; overflow-x:hidden;}
+  h1,h2,h3{font-family:'Eczar',serif; font-weight:600; letter-spacing:.01em;}
+  button{font-family:'Work Sans',sans-serif; cursor:pointer; border:none;}
+  a{color:var(--gold-soft);}
+  #stars{position:fixed; inset:0; z-index:0; pointer-events:none;}
+  .star{position:absolute; background:var(--moon); border-radius:50%; opacity:.5; animation:tw 4s ease-in-out infinite;}
+  @keyframes tw{0%,100%{opacity:.18}50%{opacity:.6}}
+  @media (prefers-reduced-motion: reduce){ .star{animation:none; opacity:.3;} }
+  .shell{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 20px;}
+  .hidden{display:none !important;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:18px 0;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand h1{font-size:1.35rem; color:var(--gold);}
+  .pill{background:var(--panel2); border:1px solid var(--line); color:var(--moon); padding:5px 12px; border-radius:999px; font-size:.8rem;}
+  .pill.btn-like{cursor:pointer;}
+  .pill.btn-like:hover{border-color:var(--gold); color:var(--gold-soft);}
+  .hero{padding:60px 0 40px; text-align:center;}
+  .hero .eyebrow{color:var(--sindoor); text-transform:uppercase; letter-spacing:.22em; font-size:.75rem; font-weight:600;}
+  .hero h2{font-size:clamp(2rem,5vw,3.1rem); color:var(--ink); margin:14px auto 10px; max-width:680px; line-height:1.2;}
+  .hero h2 em{font-style:normal; color:var(--gold);}
+  .hero p{color:var(--muted); max-width:540px; margin:0 auto 30px;}
+  .btn{background:var(--gold); color:#241a06; padding:12px 24px; border-radius:8px; font-weight:600; font-size:.95rem;}
+  .btn:hover{background:var(--gold-soft);}
+  .btn.full{width:100%; margin-top:22px;}
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--moon);}
+  .hero .note{margin-top:14px; font-size:.78rem; color:var(--muted);}
+  .hero-points{display:flex; gap:24px; justify-content:center; margin-top:48px; flex-wrap:wrap;}
+  .hp{max-width:240px; text-align:left; border-left:2px solid var(--line); padding-left:14px;}
+  .hp b{color:var(--gold-soft); font-weight:600; display:block; margin-bottom:2px;}
+  .hp span{color:var(--muted); font-size:.85rem;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px;}
+  .form-wrap{max-width:480px; margin:48px auto;}
+  .form-wrap h2{color:var(--gold); margin-bottom:6px;}
+  .form-wrap .sub{color:var(--muted); margin-bottom:22px; font-size:.9rem;}
+  label{display:block; font-size:.8rem; color:var(--moon); margin:14px 0 6px; font-weight:500;}
+  input,select{width:100%; background:var(--night); border:1px solid var(--line); color:var(--ink); padding:11px 12px; border-radius:8px; font-size:.95rem; font-family:'Work Sans',sans-serif;}
+  input:focus,select:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:var(--gold);}
+  .field-hint{font-size:.74rem; color:var(--muted); margin-top:4px;}
+  .dash{display:grid; grid-template-columns:minmax(0,460px) minmax(0,1fr); gap:24px; padding:26px 0 60px;}
+  @media (max-width:900px){ .dash{grid-template-columns:1fr;} }
+  .greet{grid-column:1/-1; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; padding-top:8px;}
+  .greet h2{font-size:1.7rem;}
+  .greet h2 em{font-style:normal; color:var(--gold);}
+  .greet .meta{color:var(--muted); font-size:.85rem;}
+  .card h3{color:var(--gold); margin-bottom:14px; font-size:1.1rem;}
+  .kundali-svg{width:100%; height:auto; display:block;}
+  .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:14px; font-size:.76rem; color:var(--muted);}
+  .legend b{color:var(--gold-soft); font-weight:600;}
+  table.pos{width:100%; border-collapse:collapse; font-size:.84rem;}
+  table.pos th{color:var(--muted); text-align:left; font-weight:500; padding:6px 8px; border-bottom:1px solid var(--line); font-size:.74rem; text-transform:uppercase; letter-spacing:.06em;}
+  table.pos td{padding:7px 8px; border-bottom:1px solid rgba(52,48,92,.5);}
+  table.pos td.g{color:var(--gold-soft); font-weight:600;}
+  table.pos tr.now td{background:rgba(212,162,78,.08);}
+  table.pos tr.now td:first-child{color:var(--gold); font-weight:600;}
+  .numero{display:flex; gap:14px; margin-top:4px;}
+  .num-tile{flex:1; background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;}
+  .num-tile .n{font-family:'Eczar',serif; font-size:2rem; color:var(--gold);}
+  .num-tile .l{font-size:.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
+  .stack{display:flex; flex-direction:column; gap:24px;}
+  .chat-card{display:flex; flex-direction:column; min-height:420px;}
+  .chat-log{flex:1; overflow-y:auto; max-height:420px; display:flex; flex-direction:column; gap:12px; padding-right:4px;}
+  .msg{max-width:88%; padding:11px 14px; border-radius:12px; font-size:.92rem; white-space:pre-wrap;}
+  .msg.user{align-self:flex-end; background:var(--panel2); border:1px solid var(--line);}
+  .msg.astro{align-self:flex-start; background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.35);}
+  .msg.astro .who{color:var(--gold); font-weight:600; font-size:.76rem; display:block; margin-bottom:4px; letter-spacing:.04em;}
+  .msg.thinking{color:var(--muted); font-style:italic;}
+  .chat-input{display:flex; gap:10px; margin-top:14px;}
+  .chat-input input{flex:1;}
+  .suggests{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .suggests button{background:transparent; border:1px solid var(--line); color:var(--moon); border-radius:999px; padding:6px 12px; font-size:.78rem;}
+  .suggests button:hover{border-color:var(--gold); color:var(--gold-soft);}
+  .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
+  .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:420px; width:100%; padding:28px; text-align:center;}
+  .modal h3{color:var(--gold); font-size:1.3rem; margin-bottom:8px;}
+  .modal p{color:var(--muted); font-size:.9rem; margin-bottom:16px;}
+  .qr-frame{background:#fff; border-radius:12px; padding:14px; width:220px; margin:0 auto 16px;}
+  .qr-frame img{width:100%; display:block;}
+  .donate-nudge{background:rgba(212,162,78,.07); border:1px dashed rgba(212,162,78,.4); border-radius:12px;
+    padding:12px 14px; font-size:.84rem; color:var(--moon); margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  .footer{padding:30px 0 50px; color:var(--muted); font-size:.78rem; text-align:center; border-top:1px solid var(--line); margin-top:20px;}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#D4A24E" stroke-width="2"/><path d="M20 5 L26 20 L20 35 L14 20 Z" fill="#C8472F"/></svg>
+      <h1>CosmicSage</h1>
+    </div>
+    <span class="pill btn-like" onclick="show('modal-donate')">♥ Support this project</span>
+  </div>
+
+  <!-- ============ LANDING ============ -->
+  <section id="view-landing">
+    <div class="hero">
+      <div class="eyebrow">Vedic astrology · real ephemeris · Lahiri ayanāṁśa · free for everyone</div>
+      <h2>Your birth sky, drawn the moment you arrive. <em>Then ask it anything.</em></h2>
+      <p>CosmicSage computes your Kundali from real planetary positions — not canned sun-sign text — and answers your questions about career, relationships, health and more. No sign-up, no payment. If it helps you, a small donation keeps it running.</p>
+      <button class="btn" onclick="switchView('view-onboard')">Cast my chart — free</button>
+      <div class="note">No account needed. Your birth details stay in your browser; only your chart summary is sent for AI readings.</div>
+      <div class="hero-points">
+        <div class="hp"><b>Real ephemeris</b><span>Sidereal positions for all nine grahas, computed live for your birth moment and place.</span></div>
+        <div class="hp"><b>Dasha timeline</b><span>Your Vimshottari mahadasha periods — the timing backbone of Vedic readings.</span></div>
+        <div class="hp"><b>Ask, don't browse</b><span>A conversational guide that reads your chart and today's transits before answering.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ONBOARDING ============ -->
+  <section id="view-onboard" class="hidden">
+    <div class="form-wrap card">
+      <h2>Three details, one sky</h2>
+      <div class="sub">Your birth moment fixes the ascendant — the lens the whole chart is read through.</div>
+      <label for="f-name">Full name</label>
+      <input id="f-name" type="text" placeholder="e.g. Ananya Sharma" autocomplete="off">
+      <label for="f-dob">Date of birth</label>
+      <input id="f-dob" type="date">
+      <label for="f-tob">Time of birth</label>
+      <input id="f-tob" type="time" value="12:00">
+      <div class="field-hint">Not sure? Keep 12:00 — planets stay accurate; the ascendant becomes approximate.</div>
+      <label for="f-place">Place of birth</label>
+      <select id="f-place"></select>
+      <button class="btn full" onclick="generateChart()">Generate my Kundali</button>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="view-dash" class="hidden">
+    <div class="dash">
+      <div class="greet">
+        <h2>Namaste, <em id="g-name"></em></h2>
+        <div class="meta" id="g-meta"></div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <h3>Janma Kundali · North Indian style</h3>
+          <div id="kundali-holder"></div>
+          <div class="legend" id="kundali-legend"></div>
+        </div>
+        <div class="card">
+          <h3>Numerology</h3>
+          <div class="numero">
+            <div class="num-tile"><div class="n" id="num-life">–</div><div class="l">Life Path</div></div>
+            <div class="num-tile"><div class="n" id="num-name">–</div><div class="l">Name Number</div></div>
+            <div class="num-tile"><div class="n" id="num-bday">–</div><div class="l">Birth Day</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Vimshottari Mahadasha <span style="color:var(--muted);font-size:.75rem;font-family:'Work Sans'">(major life periods)</span></h3>
+          <table class="pos"><thead><tr><th>Lord</th><th>From</th><th>To</th></tr></thead><tbody id="dasha-body"></tbody></table>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <h3>Graha positions at birth <span style="color:var(--muted);font-size:.75rem;font-family:'Work Sans'">(sidereal · Lahiri)</span></h3>
+          <table class="pos"><thead><tr><th>Graha</th><th>Rāśi</th><th>Deg</th><th>Nakshatra</th><th>House</th></tr></thead><tbody id="pos-body"></tbody></table>
+        </div>
+        <div class="card chat-card">
+          <h3>Ask your chart</h3>
+          <div class="chat-log" id="chat-log">
+            <div class="msg astro"><span class="who">COSMICSAGE</span>Your Kundali is ready. Ask me about career, relationships, education, health, finances — anything. I'll read your birth placements, your current dasha, and today's transits before I answer.</div>
+          </div>
+          <div class="suggests">
+            <button onclick="prefill('What does my chart say about my career direction this year?')">Career this year</button>
+            <button onclick="prefill('What do my chart and current dasha suggest about relationships?')">Relationships</button>
+            <button onclick="prefill('Which strengths in my chart should I lean on right now?')">My strengths</button>
+          </div>
+          <div class="donate-nudge hidden" id="donate-nudge">
+            <span>Finding this helpful? CosmicSage is free — a small donation keeps the lights on. ♥</span>
+            <button class="btn ghost" onclick="show('modal-donate')">Donate</button>
+          </div>
+          <div class="chat-input">
+            <input id="q-input" type="text" placeholder="Type your question…" onkeydown="if(event.key==='Enter')askQuestion()">
+            <button class="btn" onclick="askQuestion()">Ask</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">CosmicSage offers astrological perspectives for reflection. It is not a substitute for professional medical, financial, or legal advice.<br>Planetary math: simplified Keplerian elements with Lahiri ayanāṁśa · accuracy within a fraction of a degree. Your birth details are processed in your browser.</div>
+  </section>
+</div>
+
+<!-- ============ DONATION MODAL ============ -->
+<div class="overlay hidden" id="modal-donate">
+  <div class="modal">
+    <h3>Support CosmicSage</h3>
+    <p>This site is free for everyone, forever. If a reading helped you, any amount via UPI keeps it running. Thank you. ♥</p>
+    <div class="qr-frame"><img src="/static/qr.png" alt="UPI donation QR code" onerror="this.parentElement.innerHTML='<span style=\'color:#666;font-size:.8rem\'>Add your QR image as static/qr.png</span>'"></div>
+    <button class="btn ghost full" onclick="hide('modal-donate')">Close</button>
+  </div>
+</div>
+
+<script>
+/* ===== STARFIELD ===== */
+(function(){const w=document.getElementById('stars');for(let i=0;i<90;i++){const s=document.createElement('div');s.className='star';const z=Math.random()*2+1;s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;`;w.appendChild(s);}})();
+
+/* ===== CITIES ===== */
+const CITIES=[
+ {n:"Mumbai, India",lat:19.076,lon:72.877,tz:5.5},{n:"Delhi, India",lat:28.704,lon:77.102,tz:5.5},
+ {n:"Bengaluru, India",lat:12.972,lon:77.594,tz:5.5},{n:"Chennai, India",lat:13.083,lon:80.270,tz:5.5},
+ {n:"Kolkata, India",lat:22.573,lon:88.364,tz:5.5},{n:"Hyderabad, India",lat:17.385,lon:78.487,tz:5.5},
+ {n:"Pune, India",lat:18.520,lon:73.857,tz:5.5},{n:"Ahmedabad, India",lat:23.023,lon:72.572,tz:5.5},
+ {n:"Jaipur, India",lat:26.912,lon:75.787,tz:5.5},{n:"Coimbatore, India",lat:11.017,lon:76.956,tz:5.5},
+ {n:"Kochi, India",lat:9.931,lon:76.267,tz:5.5},{n:"Lucknow, India",lat:26.847,lon:80.946,tz:5.5},
+ {n:"Chandigarh, India",lat:30.733,lon:76.779,tz:5.5},{n:"Bhopal, India",lat:23.260,lon:77.413,tz:5.5},
+ {n:"Dubai, UAE",lat:25.205,lon:55.271,tz:4},{n:"Singapore",lat:1.352,lon:103.820,tz:8},
+ {n:"London, UK",lat:51.507,lon:-0.128,tz:0},{n:"New York, USA",lat:40.713,lon:-74.006,tz:-5},
+ {n:"Sydney, Australia",lat:-33.869,lon:151.209,tz:10}
+];
+const sel=document.getElementById('f-place');
+CITIES.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.n;sel.appendChild(o);});
+
+/* ===== EPHEMERIS (Schlyter low-precision) ===== */
+const D2R=Math.PI/180, R2D=180/Math.PI;
+const rev=x=>((x%360)+360)%360;
+const sind=x=>Math.sin(x*D2R), cosd=x=>Math.cos(x*D2R), tand=x=>Math.tan(x*D2R);
+function julianDay(y,m,d,ut){ if(m<=2){y-=1;m+=12;} const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5+ut/24; }
+function keplerE(M,e){ let E=M+R2D*e*sind(M)*(1+e*cosd(M));
+  for(let i=0;i<8;i++){E=E-(E-R2D*e*sind(E)-M)/(1-e*cosd(E));} return E; }
+function helio(el,d){ const N=rev(el.N0+el.Nc*d),i=el.i0+el.ic*d,w=rev(el.w0+el.wc*d),
+  a=el.a0,e=el.e0+el.ec*d,M=rev(el.M0+el.Mc*d); const E=keplerE(M,e);
+  const xv=a*(cosd(E)-e),yv=a*Math.sqrt(1-e*e)*sind(E);
+  const v=rev(Math.atan2(yv,xv)*R2D),r=Math.sqrt(xv*xv+yv*yv);
+  return {x:r*(cosd(N)*cosd(v+w)-sind(N)*sind(v+w)*cosd(i)),
+          y:r*(sind(N)*cosd(v+w)+cosd(N)*sind(v+w)*cosd(i)), r:r}; }
+function sunPos(d){ const w=rev(282.9404+4.70935e-5*d),e=0.016709-1.151e-9*d,M=rev(356.0470+0.9856002585*d);
+  const E=keplerE(M,e); const xv=cosd(E)-e,yv=Math.sqrt(1-e*e)*sind(E);
+  const v=rev(Math.atan2(yv,xv)*R2D),r=Math.sqrt(xv*xv+yv*yv);
+  return {lon:rev(v+w),r:r,M:M,L:rev(M+w)}; }
+function moonPos(d,sun){ const N=rev(125.1228-0.0529538083*d),i=5.1454,w=rev(318.0634+0.1643573223*d),
+  a=60.2666,e=0.0549,M=rev(115.3654+13.0649929509*d); const E=keplerE(M,e);
+  const xv=a*(cosd(E)-e),yv=a*Math.sqrt(1-e*e)*sind(E); const v=rev(Math.atan2(yv,xv)*R2D);
+  const xh=cosd(N)*cosd(v+w)-sind(N)*sind(v+w)*cosd(i), yh=sind(N)*cosd(v+w)+cosd(N)*sind(v+w)*cosd(i);
+  let lon=rev(Math.atan2(yh,xh)*R2D);
+  const Lm=rev(N+w+M),D=rev(Lm-sun.L);
+  lon+=-1.274*sind(M-2*D)+0.658*sind(2*D)-0.186*sind(sun.M)-0.059*sind(2*M-2*D)
+      -0.057*sind(M-2*D+sun.M)+0.053*sind(M+2*D)+0.046*sind(2*D-sun.M)+0.041*sind(M-sun.M)
+      -0.035*sind(D)-0.031*sind(M+sun.M);
+  return {lon:rev(lon),node:N}; }
+const ELEM={
+ Mercury:{N0:48.3313,Nc:3.24587e-5,i0:7.0047,ic:5.0e-8,w0:29.1241,wc:1.01444e-5,a0:0.387098,e0:0.205635,ec:5.59e-10,M0:168.6562,Mc:4.0923344368},
+ Venus:{N0:76.6799,Nc:2.46590e-5,i0:3.3946,ic:2.75e-8,w0:54.8910,wc:1.38374e-5,a0:0.723330,e0:0.006773,ec:-1.302e-9,M0:48.0052,Mc:1.6021302244},
+ Mars:{N0:49.5574,Nc:2.11081e-5,i0:1.8497,ic:-1.78e-8,w0:286.5016,wc:2.92961e-5,a0:1.523688,e0:0.093405,ec:2.516e-9,M0:18.6021,Mc:0.5240207766},
+ Jupiter:{N0:100.4542,Nc:2.76854e-5,i0:1.3030,ic:-1.557e-7,w0:273.8777,wc:1.64505e-5,a0:5.20256,e0:0.048498,ec:4.469e-9,M0:19.8950,Mc:0.0830853001},
+ Saturn:{N0:113.6634,Nc:2.38980e-5,i0:2.4886,ic:-1.081e-7,w0:339.3939,wc:2.97661e-5,a0:9.55475,e0:0.055546,ec:-9.499e-9,M0:316.9670,Mc:0.0334442282}};
+function geoPlanetLon(name,d,sun){ const h=helio(ELEM[name],d);
+  const xg=h.x+sun.r*cosd(sun.lon), yg=h.y+sun.r*sind(sun.lon);
+  return rev(Math.atan2(yg,xg)*R2D); }
+function ayanamsa(jd){ return 23.853 + ((jd-2451545.0)/365.25)*(50.29/3600); }
+function ascendant(jd,lat,lonE){ const T=(jd-2451545.0)/36525;
+  const gmst=rev(280.46061837+360.98564736629*(jd-2451545.0)+0.000387933*T*T);
+  const lst=rev(gmst+lonE); const eps=23.4393-3.563e-7*(jd-2451543.5);
+  return rev(Math.atan2(cosd(lst),-(sind(lst)*cosd(eps)+tand(lat)*sind(eps)))*R2D); }
+
+/* ===== VEDIC TABLES ===== */
+const RASHI=[["Mesha","Aries"],["Vrishabha","Taurus"],["Mithuna","Gemini"],["Karka","Cancer"],["Simha","Leo"],["Kanya","Virgo"],["Tula","Libra"],["Vrischika","Scorpio"],["Dhanu","Sagittarius"],["Makara","Capricorn"],["Kumbha","Aquarius"],["Meena","Pisces"]];
+const NAK=["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
+const GLYPH={Sun:"Su",Moon:"Mo",Mars:"Ma",Mercury:"Me",Jupiter:"Ju",Venus:"Ve",Saturn:"Sa",Rahu:"Ra",Ketu:"Ke"};
+const sidSign=l=>Math.floor(l/30), sidDeg=l=>l%30, nakOf=l=>NAK[Math.floor(l/(360/27))];
+
+function computeChart(dateStr,timeStr,city){
+  const [Y,M,D]=dateStr.split('-').map(Number); const [hh,mm]=timeStr.split(':').map(Number);
+  const jd=julianDay(Y,M,D,hh+mm/60-city.tz); const d=jd-2451543.5;
+  const sun=sunPos(d), moon=moonPos(d,sun), ay=ayanamsa(jd);
+  const trop={Sun:sun.lon,Moon:moon.lon,Mercury:geoPlanetLon('Mercury',d,sun),Venus:geoPlanetLon('Venus',d,sun),
+    Mars:geoPlanetLon('Mars',d,sun),Jupiter:geoPlanetLon('Jupiter',d,sun),Saturn:geoPlanetLon('Saturn',d,sun),
+    Rahu:moon.node,Ketu:rev(moon.node+180)};
+  const planets={};
+  for(const k in trop){const s=rev(trop[k]-ay);planets[k]={lon:s,sign:sidSign(s),deg:sidDeg(s),nak:nakOf(s)};}
+  const ascSid=rev(ascendant(jd,city.lat,city.lon)-ay), ascSign=sidSign(ascSid);
+  for(const k in planets){planets[k].house=((planets[k].sign-ascSign+12)%12)+1;}
+  return {planets,asc:{lon:ascSid,sign:ascSign,deg:sidDeg(ascSid)},jd:jd};
+}
+
+/* ===== VIMSHOTTARI DASHA ===== */
+const DASHA=[["Ketu",7],["Venus",20],["Sun",6],["Moon",10],["Mars",7],["Rahu",18],["Jupiter",16],["Saturn",19],["Mercury",17]];
+function computeDasha(chart,dobStr,tobStr){
+  const mlon=chart.planets.Moon.lon, span=360/27;
+  const nakIdx=Math.floor(mlon/span), frac=(mlon%span)/span;
+  let idx=nakIdx%9;
+  const birth=new Date(dobStr+'T'+tobStr+':00');
+  const periods=[]; let start=new Date(birth);
+  let yrs=(1-frac)*DASHA[idx][1];
+  for(let i=0;i<9;i++){
+    const end=new Date(start.getTime()+yrs*365.25*86400000);
+    periods.push({lord:DASHA[idx][0],from:new Date(start),to:end});
+    start=end; idx=(idx+1)%9; yrs=DASHA[idx][1];
+  }
+  return periods;
+}
+const fdate=d=>d.toLocaleDateString('en-IN',{year:'numeric',month:'short'});
+
+/* ===== NUMEROLOGY ===== */
+const reduceNum=n=>{while(n>9&&n!==11&&n!==22&&n!==33){n=String(n).split('').reduce((a,c)=>a+ +c,0);}return n;};
+const lifePath=s=>reduceNum(s.replace(/\D/g,'').split('').reduce((a,c)=>a+ +c,0));
+function nameNumber(name){const m={a:1,j:1,s:1,b:2,k:2,t:2,c:3,l:3,u:3,d:4,m:4,v:4,e:5,n:5,w:5,f:6,o:6,x:6,g:7,p:7,y:7,h:8,q:8,z:8,i:9,r:9};
+  return reduceNum(name.toLowerCase().replace(/[^a-z]/g,'').split('').reduce((a,c)=>a+(m[c]||0),0));}
+
+/* ===== KUNDALI SVG ===== */
+function renderKundali(chart){
+  const W=420,H=420,m=8;
+  const P={1:[W/2,H*0.27],2:[W*0.27,H*0.13],3:[W*0.13,H*0.27],4:[W*0.30,H/2],5:[W*0.13,H*0.73],6:[W*0.27,H*0.87],7:[W/2,H*0.73],8:[W*0.73,H*0.87],9:[W*0.87,H*0.73],10:[W*0.70,H/2],11:[W*0.87,H*0.27],12:[W*0.73,H*0.13]};
+  const SN={1:[W/2,H*0.16],2:[W*0.20,H*0.075],3:[W*0.065,H*0.20],4:[W*0.20,H/2],5:[W*0.065,H*0.80],6:[W*0.20,H*0.925],7:[W/2,H*0.60],8:[W*0.80,H*0.925],9:[W*0.935,H*0.80],10:[W*0.80,H/2],11:[W*0.935,H*0.20],12:[W*0.80,H*0.075]};
+  const byHouse={}; for(let h=1;h<=12;h++)byHouse[h]=[];
+  for(const k in chart.planets)byHouse[chart.planets[k].house].push(k);
+  let inner='';
+  for(let h=1;h<=12;h++){
+    const sn=((chart.asc.sign+h-1)%12)+1;
+    inner+=`<text x="${SN[h][0]}" y="${SN[h][1]}" text-anchor="middle" font-size="11" fill="#7E78A6" font-family="Work Sans">${sn}</text>`;
+    const ps=byHouse[h];
+    ps.forEach((p,i)=>{const dy=(i-(ps.length-1)/2)*15;
+      inner+=`<text x="${P[h][0]}" y="${P[h][1]+dy+4}" text-anchor="middle" font-size="13.5" font-weight="600" fill="#E8C887" font-family="Eczar">${GLYPH[p]}</text>`;});
+  }
+  const g='#D4A24E';
+  document.getElementById('kundali-holder').innerHTML=
+   `<svg class="kundali-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="North Indian Kundali chart">
+    <rect x="${m}" y="${m}" width="${W-2*m}" height="${H-2*m}" fill="none" stroke="${g}" stroke-width="2"/>
+    <line x1="${m}" y1="${m}" x2="${W-m}" y2="${H-m}" stroke="${g}" stroke-width="1.4"/>
+    <line x1="${W-m}" y1="${m}" x2="${m}" y2="${H-m}" stroke="${g}" stroke-width="1.4"/>
+    <path d="M ${W/2} ${m} L ${W-m} ${H/2} L ${W/2} ${H-m} L ${m} ${H/2} Z" fill="none" stroke="${g}" stroke-width="1.4"/>
+    <text x="${W/2}" y="${H*0.355}" text-anchor="middle" font-size="10" fill="#C8472F" font-family="Work Sans" letter-spacing="1">LAGNA</text>${inner}</svg>`;
+  document.getElementById('kundali-legend').innerHTML=
+    Object.entries(GLYPH).map(([k,v])=>`<span><b>${v}</b> ${k}</span>`).join('')+`<span><b>1–12</b> rāśi numbers (1 = Mesha/Aries)</span>`;
+}
+
+/* ===== APP STATE ===== */
+const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false};
+const show=id=>document.getElementById(id).classList.remove('hidden');
+const hide=id=>document.getElementById(id).classList.add('hidden');
+function switchView(id){['view-landing','view-onboard','view-dash'].forEach(hide);show(id);}
+
+function generateChart(){
+  const name=document.getElementById('f-name').value.trim();
+  const dob=document.getElementById('f-dob').value;
+  const tob=document.getElementById('f-tob').value||'12:00';
+  if(!name||!dob){alert('Name and date of birth are needed to cast the chart.');return;}
+  const city=CITIES[+document.getElementById('f-place').value];
+  state.birth={name,dob,tob,city};
+  state.chart=computeChart(dob,tob,city);
+  state.dasha=computeDasha(state.chart,dob,tob);
+  document.getElementById('g-name').textContent=name.split(' ')[0];
+  const a=state.chart.asc;
+  document.getElementById('g-meta').textContent=`${dob} · ${tob} · ${city.n} — Lagna: ${RASHI[a.sign][0]} (${RASHI[a.sign][1]}) ${a.deg.toFixed(1)}°`;
+  renderKundali(state.chart);
+  const tb=document.getElementById('pos-body'); tb.innerHTML='';
+  for(const k in state.chart.planets){const p=state.chart.planets[k];
+    tb.innerHTML+=`<tr><td class="g">${k}</td><td>${RASHI[p.sign][0]}</td><td>${p.deg.toFixed(1)}°</td><td>${p.nak}</td><td>${p.house}</td></tr>`;}
+  const db=document.getElementById('dasha-body'); db.innerHTML='';
+  const now=new Date();
+  state.dasha.forEach(p=>{const cur=now>=p.from&&now<p.to;
+    db.innerHTML+=`<tr class="${cur?'now':''}"><td>${p.lord}${cur?' · now':''}</td><td>${fdate(p.from)}</td><td>${fdate(p.to)}</td></tr>`;});
+  document.getElementById('num-life').textContent=lifePath(dob);
+  document.getElementById('num-name').textContent=nameNumber(name);
+  document.getElementById('num-bday').textContent=reduceNum(+dob.split('-')[2]);
+  switchView('view-dash');
+}
+
+/* ===== CHART SUMMARY FOR AI ===== */
+function chartSummary(){
+  const c=state.chart,b=state.birth,now=new Date();
+  const lines=[`Ascendant (Lagna): ${RASHI[c.asc.sign][1]} ${c.asc.deg.toFixed(1)}°`];
+  for(const k in c.planets){const p=c.planets[k];
+    lines.push(`${k}: ${RASHI[p.sign][1]} ${p.deg.toFixed(1)}°, ${p.nak} nakshatra, house ${p.house}`);}
+  const cur=state.dasha.find(p=>now>=p.from&&now<p.to);
+  const dashaStr=state.dasha.map(p=>`${p.lord} ${fdate(p.from)}–${fdate(p.to)}`).join('; ');
+  const t=computeChart(now.toISOString().slice(0,10),now.toISOString().slice(11,16),{lat:b.city.lat,lon:b.city.lon,tz:0});
+  const tr=Object.entries(t.planets).map(([k,p])=>`${k} in ${RASHI[p.sign][1]} (natal house ${((p.sign-c.asc.sign+12)%12)+1})`).join('; ');
+  return `BIRTH DATA: ${b.name}, born ${b.dob} at ${b.tob} in ${b.city.n}.
+NATAL CHART (sidereal/Lahiri):\n${lines.join('\n')}
+Janma nakshatra (Moon): ${c.planets.Moon.nak}.
+VIMSHOTTARI DASHA: current mahadasha ${cur?cur.lord:'?'}${cur?` (until ${fdate(cur.to)})`:''}. Full sequence: ${dashaStr}.
+NUMEROLOGY: Life path ${lifePath(b.dob)}, name number ${nameNumber(b.name)}, birth day ${reduceNum(+b.dob.split('-')[2])}.
+CURRENT TRANSITS (today, sidereal): ${tr}.`;
+}
+
+/* ===== Q&A ===== */
+function prefill(t){const i=document.getElementById('q-input');i.value=t;i.focus();}
+function addMsg(cls,text,who){const log=document.getElementById('chat-log');
+  const d=document.createElement('div');d.className='msg '+cls;
+  d.innerHTML=(who?`<span class="who">${who}</span>`:'')+text.replace(/</g,'&lt;');
+  log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
+async function askQuestion(){
+  if(state.busy)return;
+  const input=document.getElementById('q-input');
+  const q=input.value.trim(); if(!q)return;
+  input.value=''; addMsg('user',q);
+  state.history.push({role:'user',content:q});
+  const think=addMsg('astro thinking','Reading your chart, dasha and today\'s sky…','COSMICSAGE');
+  state.busy=true;
+  try{
+    const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chart:chartSummary(),history:state.history})});
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Request failed');
+    state.history.push({role:'assistant',content:data.answer});
+    think.innerHTML=`<span class="who">COSMICSAGE</span>`+data.answer.replace(/</g,'&lt;');
+    think.classList.remove('thinking');
+    state.answers++;
+    if(state.answers===3) show('donate-nudge');
+  }catch(e){
+    think.innerHTML=`<span class="who">COSMICSAGE</span>`+(e.message.includes('limit')?e.message:'Something interrupted the reading. Please try again.');
+    think.classList.remove('thinking');
+    state.history.pop();
+  }finally{ state.busy=false; }
+}
+</script>
+</body>
+</html>
