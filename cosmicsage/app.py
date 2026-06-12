@@ -46,6 +46,58 @@ def index():
     return send_from_directory("static", "index.html")
 
 
+# Rough timezone offsets by country for birth-time conversion (no-DST simplification;
+# for multi-zone countries we fall back to longitude/15).
+TZ_BY_COUNTRY = {
+    "in": 5.5, "lk": 5.5, "np": 5.75, "bd": 6, "pk": 5, "ae": 4, "sa": 3,
+    "sg": 8, "my": 8, "hk": 8, "cn": 8, "jp": 9, "kr": 9, "th": 7, "id": 7,
+    "gb": 0, "ie": 0, "de": 1, "fr": 1, "it": 1, "es": 1, "nl": 1, "za": 2,
+    "ke": 3, "qa": 3, "om": 4, "mu": 4, "nz": 12,
+}
+
+
+@app.get("/api/geocode")
+def geocode():
+    q = (request.args.get("q") or "").strip()
+    if len(q) < 2:
+        return jsonify(error="Type a place name."), 400
+    # Primary: Open-Meteo geocoding (keyless, returns IANA timezone)
+    try:
+        r = requests.get(
+            "https://geocoding-api.open-meteo.com/v1/search",
+            params={"name": q, "count": 1, "language": "en", "format": "json"},
+            timeout=10,
+        )
+        r.raise_for_status()
+        results = (r.json() or {}).get("results") or []
+        if results:
+            h = results[0]
+            name = ", ".join(x for x in [h.get("name"), h.get("admin1"), h.get("country")] if x)
+            return jsonify(name=name, lat=h["latitude"], lon=h["longitude"],
+                           tzname=h.get("timezone", ""), tz=None)
+    except requests.RequestException:
+        pass
+    # Fallback: Nominatim (OpenStreetMap)
+    try:
+        r = requests.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": q, "format": "json", "limit": 1, "addressdetails": 1},
+            headers={"User-Agent": "CosmicSage/2.0 (free astrology site)"},
+            timeout=10,
+        )
+        r.raise_for_status()
+        results = r.json()
+        if not results:
+            return jsonify(error="Place not found — try adding the state or country."), 404
+        hit = results[0]
+        lat, lon = float(hit["lat"]), float(hit["lon"])
+        cc = (hit.get("address", {}).get("country_code") or "").lower()
+        tz = TZ_BY_COUNTRY.get(cc, round(lon / 15 * 2) / 2)
+        return jsonify(name=hit.get("display_name", q), lat=lat, lon=lon, tzname="", tz=tz)
+    except requests.RequestException:
+        return jsonify(error="Geocoding services unavailable — try again in a moment."), 502
+
+
 @app.get("/health")
 def health():
     return {"ok": True, "key_configured": bool(ANTHROPIC_API_KEY)}
