@@ -112,6 +112,11 @@
   .msg.thinking{color:var(--muted); font-style:italic;}
   .chat-input{display:flex; gap:10px; margin-top:14px;}
   .chat-input input{flex:1;}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .chip{background:var(--night); border:1px solid var(--gold); color:var(--gold-soft); border-radius:999px;
+    padding:7px 14px; font-size:.82rem; font-weight:500;}
+  .chip:hover{background:rgba(212,162,78,.15);}
+  .chip.skip{border-color:var(--line); color:var(--muted);}
   .donate-nudge{background:rgba(212,162,78,.07); border:1px dashed rgba(212,162,78,.4); border-radius:12px;
     padding:12px 14px; font-size:.84rem; color:var(--moon); margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
   /* match view */
@@ -696,8 +701,56 @@ function renderTopics(){
     <div class="ic" style="background:rgba(200,71,47,.18);color:var(--sindoor)">💞</div>
     <div class="t">Match Kundali</div><div class="s">36-guna compatibility</div></button>`;
 }
-function topicAsk(i){document.getElementById('q-input').value=TOPICS[i][4];askQuestion();
+function topicAsk(i){startIntake(i);
   document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});}
+
+/* ===== INTAKE: quick taps before the AI call — richer answer, one API call ===== */
+const INTAKE={
+ 0:[["What stage are you at?",["Student","Early career","Mid career","Business owner"]],
+    ["Main focus right now?",["Growth & promotion","Job change","New direction","Stability"]]],
+ 1:[["What level of study?",["School","Undergraduate","Postgraduate","Competitive exams"]],
+    ["Biggest concern?",["Focus & memory","Exam results","Choosing a stream","Studying abroad"]]],
+ 2:[["Current status?",["Single","In a relationship","Engaged","Married"]],
+    ["What matters most?",["Marriage timing","Compatibility","Strengthening the bond","Finding the right person"]]],
+ 3:[["Focus area?",["Energy & vitality","Stress & sleep","A chronic concern","General wellbeing"]],
+    ["Looking at…",["Right now","This year","Long term"]]],
+ 4:[["Main question?",["Income growth","Savings & investing","Loans or debt","Business finances"]],
+    ["Time frame?",["This year","Next 2–3 years","Long term"]]],
+ 5:[["Where's your focus?",["Parents","Children","Home harmony","Property & home"]]],
+ 6:[["Purpose?",["Work","Studies","Settling abroad","Travel"]],
+    ["When?",["This year","In 1–2 years","Someday"]]],
+ 7:[["What are you drawn toward?",["Meditation","Mantra & ritual","Service to others","Self-knowledge"]]]
+};
+let intake=null;
+function startIntake(topicIdx){
+  intake={topic:topicIdx,step:0,notes:[]};
+  addMsg('user',TOPICS[topicIdx][1]);
+  nextIntakeStep();
+}
+function nextIntakeStep(){
+  const steps=INTAKE[intake.topic]||[];
+  if(intake.step>=steps.length){finishIntake();return;}
+  const [q,opts]=steps[intake.step];
+  const log=document.getElementById('chat-log');
+  const d=document.createElement('div');d.className='msg astro';
+  d.innerHTML=`<span class="who">COSMICSAGE</span>${q}<div class="chip-row">`+
+    opts.map(o=>`<button class="chip" onclick="pickIntake(this,'${q.replace(/'/g,"\\'")}','${o.replace(/'/g,"\\'")}')">${o}</button>`).join('')+
+    `<button class="chip skip" onclick="pickIntake(this,'','')">Skip</button></div>`;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+function pickIntake(btn,q,o){
+  btn.parentElement.querySelectorAll('.chip').forEach(c=>{c.disabled=true;c.style.opacity=.45;});
+  btn.style.opacity=1;btn.style.background='rgba(212,162,78,.25)';
+  if(q&&o)intake.notes.push(q.replace(/\?$/,'')+': '+o);
+  intake.step++;nextIntakeStep();
+}
+function finishIntake(){
+  const base=TOPICS[intake.topic][4];
+  const ctx=intake.notes.length?`\n\nMy situation — ${intake.notes.join('; ')}. Please tailor the reading to this.`:'';
+  const composed=base+ctx;
+  intake=null;
+  sendQuestion(composed,false);
+}
 
 /* ===== CHART GENERATION ===== */
 function generateChart(){
@@ -769,9 +822,13 @@ function addMsg(cls,text,who){const log=document.getElementById('chat-log');
   d.innerHTML=(who?`<span class="who">${who}</span>`:'')+text.replace(/</g,'&lt;');
   log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
 async function askQuestion(){
-  if(state.busy)return;
   const input=document.getElementById('q-input');const q=input.value.trim();if(!q)return;
-  input.value='';addMsg('user',q);
+  input.value='';
+  sendQuestion(q,true);
+}
+async function sendQuestion(q,showUserMsg){
+  if(state.busy)return;
+  if(showUserMsg)addMsg('user',q);
   state.history.push({role:'user',content:q});
   const think=addMsg('astro thinking','Reading your chart, dasha and today\'s sky…','COSMICSAGE');
   state.busy=true;
