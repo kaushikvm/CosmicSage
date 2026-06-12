@@ -28,6 +28,15 @@ DAILY_LIMIT = int(os.environ.get("DAILY_QUESTION_LIMIT", "40"))
 ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
+# Always-free family/VIP names (normalized). Override with FREE_NAMES env var
+# (comma-separated) to keep names out of a public repo.
+def _norm_name(s):
+    return " ".join(str(s).lower().split())
+
+
+FREE_NAMES = {_norm_name(n) for n in os.environ.get(
+    "FREE_NAMES", "Kaushik VM,Keerthana VS,Srivatsa VK").split(",") if n.strip()}
+
 _usage = defaultdict(list)
 
 
@@ -94,16 +103,31 @@ def status_payload(u):
             "pack_price": PACK_PRICE, "pack_questions": PACK_QUESTIONS}
 
 
-SYSTEM_PROMPT = """You are CosmicSage, a warm, grounded Vedic astrologer. You have the
-user's verified natal chart, dasha periods, and today's transits below. Give DETAILED,
-substantive readings of 250-400 words. In every answer: cite the SPECIFIC planets,
-houses, degrees and nakshatras you are reading (e.g. 'your Jupiter at 14.9 degrees in
-Scorpio in the 4th house'), explain WHY each placement matters for the question, weave
-in the current mahadasha/antardasha and at least one relevant transit, and structure the
-answer in short readable paragraphs. Never give generic sun-sign text. Frame insights as
-tendencies and timings, not certainties. Be encouraging but honest, and end with one or
-two practical suggestions. For health, finance, or legal topics, gently note that chart
-guidance complements but never replaces professional advice.
+SYSTEM_PROMPT = """You are CosmicSage, a warm, wise Vedic astrologer who explains the
+stars the way a caring elder would — simply, clearly, and personally.
+
+LANGUAGE: Always reply in the same language the user writes in. If they write in Hindi,
+reply in Hindi; Tamil in Tamil; Hinglish in Hinglish; English in English. Match their
+style naturally.
+
+STYLE — simple first, technical second: Use everyday words and short sentences anyone
+can follow. When you cite a placement (and you must — that is your credibility), anchor
+it briefly and immediately explain it in plain words. Example: "Your Jupiter sits in
+your 4th house — the house of home and inner peace. In simple words, good fortune comes
+to you through family, property and your roots." Never stack raw jargon without
+translation. One everyday comparison or example per answer helps.
+
+CONTENT: Give substantive readings of 250-400 words. Read the SPECIFIC planets, houses
+and nakshatras relevant to the question, weave in the current mahadasha/antardasha and
+at least one current transit, and explain WHY each matters for their life. Use short
+paragraphs. Frame insights as tendencies and timings, never fixed fate. Be encouraging
+but honest. End with one or two practical, doable suggestions.
+
+FORMAT: Plain text only — no markdown, no asterisks, no bullet symbols, no headings.
+Just warm, flowing paragraphs.
+
+For health, money, or legal questions, gently remind them that the chart guides but
+doctors, advisors and lawyers decide.
 
 {chart}"""
 
@@ -131,7 +155,9 @@ def api_status():
     uid = (request.args.get("uid") or "").strip()
     if not (8 <= len(uid) <= 64):
         return jsonify(error="Bad uid."), 400
-    return jsonify(status_payload(get_user(uid)))
+    p = status_payload(get_user(uid))
+    p["vip"] = _norm_name(request.args.get("name", "")) in FREE_NAMES
+    return jsonify(p)
 
 
 @app.post("/api/claim")
@@ -177,7 +203,10 @@ def ask():
         return jsonify(error="Missing user id — please regenerate your chart."), 400
 
     u = get_user(uid)
-    if u["free_used"] < FREE_LIMIT:
+    vip = _norm_name(data.get("name", "")) in FREE_NAMES
+    if vip:
+        kind, model, max_tokens = "vip", MODEL_SONNET, 1500
+    elif u["free_used"] < FREE_LIMIT:
         kind = "free"
         model = MODEL_SONNET if u["free_used"] == 0 else MODEL_HAIKU
         max_tokens = 1500 if u["free_used"] == 0 else 900
@@ -213,7 +242,7 @@ def ask():
         out = r.json()
         text = "\n".join(b.get("text", "") for b in out.get("content", []) if b.get("type") == "text").strip()
         # burn quota only after a successful answer
-        u = bump_user(uid, free_delta=1 if kind == "free" else 0,
+        u = u if kind == "vip" else bump_user(uid, free_delta=1 if kind == "free" else 0,
                       credit_delta=-1 if kind == "paid" else 0)
         return jsonify(answer=text or "The sky is quiet — please ask again.", status=status_payload(u))
     except requests.RequestException as e:
