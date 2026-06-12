@@ -665,13 +665,14 @@ async function computeUid(name,dob,tob,place){
 function updateQuotaPill(s){
   state.quota=s;
   const el=document.getElementById('quota-pill'); if(!el)return;
-  if(s.credits>0){el.textContent=`✦ ${s.credits} paid question${s.credits===1?'':'s'} left`;el.style.color='var(--gold-soft)';el.onclick=null;}
+  if(s.vip){el.textContent='✦ Free forever ♥';el.style.color='var(--gold-soft)';el.onclick=null;}
+  else if(s.credits>0){el.textContent=`✦ ${s.credits} paid question${s.credits===1?'':'s'} left`;el.style.color='var(--gold-soft)';el.onclick=null;}
   else if(s.free_left>0){el.textContent=`${s.free_left} free question${s.free_left===1?'':'s'} left`;el.style.color='';el.onclick=null;}
   else{el.textContent=`Unlock ${s.pack_questions} questions · ₹${s.pack_price}`;el.style.color='var(--gold-soft)';el.style.cursor='pointer';el.onclick=()=>show('modal-pay');}
 }
 async function refreshStatus(){
   if(!state.uid)return;
-  try{const r=await fetch('/api/status?uid='+state.uid);const s=await r.json();if(r.ok)updateQuotaPill(s);}catch(e){}
+  try{const r=await fetch('/api/status?uid='+state.uid+'&name='+encodeURIComponent(state.birth?state.birth.name:''));const s=await r.json();if(r.ok)updateQuotaPill(s);}catch(e){}
 }
 async function claimUTR(){
   const utr=document.getElementById('utr-input').value.replace(/\D/g,'');
@@ -890,7 +891,7 @@ async function sendQuestion(q,showUserMsg){
   state.busy=true;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:chartSummary(),history:state.history,uid:state.uid||''})});
+      body:JSON.stringify({chart:chartSummary(),history:state.history,uid:state.uid||'',name:state.birth?state.birth.name:''})});
     const data=await r.json();
     if(r.status===402){
       think.remove();state.history.pop();
@@ -974,7 +975,7 @@ Guna Milan total: ${g.total}/36. Breakdown: ${g.rows.map(r=>r[0]+' '+r[2]+'/'+r[
 Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:summary,uid:state.uid||'',history:[{role:'user',content:'Give a balanced, kind reading of this match: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
+      body:JSON.stringify({chart:summary,uid:state.uid||'',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a balanced, kind reading of this match: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
     const data=await r.json();
     if(r.status===402){
       holder.innerHTML='<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>'+(data.message||'Unlock more questions to get the match reading.')+'</div>';
