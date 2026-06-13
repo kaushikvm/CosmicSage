@@ -78,6 +78,13 @@
   .birth-grid .k{color:var(--muted); font-size:.74rem; text-transform:uppercase; letter-spacing:.06em;}
   .birth-grid .v{color:var(--ink);}
   .kundali-svg{width:100%; height:auto; display:block;}
+  .kundali-ctrl{display:flex; flex-direction:column; gap:10px; margin-bottom:12px;}
+  .style-chips{display:flex; gap:8px;}
+  .kstyle{flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--moon); border-radius:8px; padding:8px; font-size:.84rem;}
+  .kstyle.active{border-color:var(--gold); color:var(--gold-soft); background:rgba(212,162,78,.12);}
+  .varga-cap{font-size:.84rem; color:var(--muted); margin-top:10px; line-height:1.5; text-align:center;}
+  .varga-cap b{color:var(--gold-soft);}
+  .varga-score{display:inline-block; background:rgba(212,162,78,.14); border:1px solid rgba(212,162,78,.4); color:var(--gold-soft); border-radius:99px; padding:2px 10px; font-size:.78rem; margin-left:4px; white-space:nowrap;}
   .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:12px; font-size:.76rem; color:var(--muted);}
   .legend b{color:var(--gold-soft);}
   table.pos{width:100%; border-collapse:collapse; font-size:.84rem;}
@@ -334,8 +341,22 @@
           <div class="birth-grid" id="birth-grid"></div>
         </div>
         <div class="card">
-          <h3>Janma Kundali · North Indian style</h3>
+          <h3>Janma Kundali</h3>
+          <div class="kundali-ctrl">
+            <div class="style-chips">
+              <button class="kstyle active" id="kstyle-north" onclick="setChartStyle('north')">North Indian</button>
+              <button class="kstyle" id="kstyle-south" onclick="setChartStyle('south')">South Indian</button>
+            </div>
+            <select id="varga-sel" onchange="setVarga(this.value)">
+              <option value="1">Rashi (D1) · Birth chart</option>
+              <option value="9">Navamsa (D9) · Marriage & destiny ⭐</option>
+              <option value="10">Dasamsa (D10) · Career ⭐</option>
+              <option value="2">Hora (D2) · Wealth</option>
+              <option value="7">Saptamsa (D7) · Children</option>
+            </select>
+          </div>
           <div id="kundali-holder"></div>
+          <div class="varga-cap" id="varga-cap"></div>
           <div class="legend" id="kundali-legend"></div>
         </div>
         <div class="card">
@@ -496,6 +517,7 @@
 <div class="overlay hidden" id="modal-donate">
   <div class="modal">
     <h3>Support CosmicSage</h3>
+    <p id="exit-note" style="display:none;background:rgba(212,162,78,.1);border:1px solid rgba(212,162,78,.35);border-radius:10px;padding:10px 13px;color:var(--gold-soft)">Leaving so soon? 🙏 If CosmicSage helped you today, a small gift keeps it free for everyone ♥</p>
     <p>This page is made with love from Kaushik. We're helping everyone read their stars — free, with no sign-up and no paywall. Please donate and help us grow better; every rupee goes toward keeping our servers running.</p>
     <div class="amounts">
       <button class="amt" onclick="pickAmt(this,50)">₹50</button>
@@ -1032,29 +1054,118 @@ function shareScorecard(){
 }
 
 /* ===== KUNDALI SVG ===== */
-function renderKundali(chart){
-  const W=420,H=420,m=8;
-  const P={1:[W/2,H*0.27],2:[W*0.27,H*0.13],3:[W*0.13,H*0.27],4:[W*0.30,H/2],5:[W*0.13,H*0.73],6:[W*0.27,H*0.87],7:[W/2,H*0.73],8:[W*0.73,H*0.87],9:[W*0.87,H*0.73],10:[W*0.70,H/2],11:[W*0.87,H*0.27],12:[W*0.73,H*0.13]};
-  const SN={1:[W/2,H*0.16],2:[W*0.20,H*0.075],3:[W*0.065,H*0.20],4:[W*0.20,H/2],5:[W*0.065,H*0.80],6:[W*0.20,H*0.925],7:[W/2,H*0.60],8:[W*0.80,H*0.925],9:[W*0.935,H*0.80],10:[W*0.80,H/2],11:[W*0.935,H*0.20],12:[W*0.80,H*0.075]};
+/* ===== DIVISIONAL CHARTS (vargas) — all from sidereal longitude ===== */
+/* returns the sign (0-11) a longitude maps to in the given division */
+function vargaSign(lon, D){
+  const sign=Math.floor(lon/30), deg=lon%30;
+  if(D===1) return sign;
+  if(D===2){ // Hora: 0-15 -> Sun/Moon hora. Odd signs: 0-15 Sun(Leo=4),15-30 Moon(Cancer=3); even reversed
+    const odd=(sign%2===0); const firstHalf=deg<15;
+    return (odd? (firstHalf?4:3) : (firstHalf?3:4));
+  }
+  if(D===3){ // Drekkana: 0-10 same sign, 10-20 +4th, 20-30 +8th
+    const part=Math.floor(deg/10); return (sign + part*4)%12;
+  }
+  if(D===7){ // Saptamsa: odd signs start same sign; even signs start 7th
+    const part=Math.floor(deg/(30/7)); const start=(sign%2===0)? sign : (sign+6)%12;
+    return (start+part)%12;
+  }
+  if(D===9){ // Navamsa: 9 parts of 3°20'; start depends on element
+    const part=Math.floor(deg/(30/9));
+    const starts=[0,9,6,3]; // fire->Aries,earth->Cap,air->Libra,water->Cancer
+    const start=starts[sign%4];
+    return (start+part)%12;
+  }
+  if(D===10){ // Dasamsa: 10 parts; odd start same sign, even start 9th
+    const part=Math.floor(deg/3); const start=(sign%2===0)? sign : (sign+8)%12;
+    return (start+part)%12;
+  }
+  return sign;
+}
+function vargaChart(chart, D){
+  const planets={};
+  for(const k in chart.planets){const s=vargaSign(chart.planets[k].lon,D);
+    planets[k]={sign:s, lon:chart.planets[k].lon, deg:chart.planets[k].deg, nak:chart.planets[k].nak, nakIdx:chart.planets[k].nakIdx};}
+  const ascSign=vargaSign(chart.asc.lon,D);
+  for(const k in planets){planets[k].house=((planets[k].sign-ascSign+12)%12)+1;}
+  return {planets, asc:{sign:ascSign, lon:chart.asc.lon, deg:chart.asc.deg}};
+}
+/* a 0-100 strength for a varga: average dignity/house of its key planets */
+function vargaScore(vch, keyPlanets){
+  let s=0,n=0;
+  for(const k of keyPlanets){const p=vch.planets[k];if(!p)continue;
+    let v=5;
+    if(EXALT[k]===p.sign)v+=3; else if(EXALT[k]!==undefined&&(EXALT[k]+6)%12===p.sign)v-=2.5;
+    else if(OWN[k]&&OWN[k].includes(p.sign))v+=2;
+    if([1,4,7,10].includes(p.house))v+=1.3; else if([5,9].includes(p.house))v+=1; else if([6,8,12].includes(p.house))v-=1.2;
+    s+=v;n++;}
+  return Math.round(Math.max(45,Math.min(96,(s/n)/10*100+8)));
+}
+const VARGAS={
+  D1:{name:'Rashi (D1)',sig:'Your main birth chart — the whole life at a glance.',keys:['Sun','Moon']},
+  D9:{name:'Navamsa (D9)',sig:'Marriage, spouse, inner destiny & the true strength of every planet. The most important chart after D1.',keys:['Venus','Jupiter','Moon']},
+  D10:{name:'Dasamsa (D10)',sig:'Career, profession, status and achievement in the world.',keys:['Sun','Saturn','Mercury']},
+  D2:{name:'Hora (D2)',sig:'Wealth, income and financial prosperity.',keys:['Jupiter','Venus','Moon']},
+  D7:{name:'Saptamsa (D7)',sig:'Children, progeny and creative legacy.',keys:['Jupiter','Venus']},
+};
+
+/* ===== KUNDALI RENDER (North & South styles, any varga) ===== */
+function buildKundaliSVG(chart,style){
+  const W=420,H=420,m=8,g='#D4A24E';
   const byHouse={};for(let h=1;h<=12;h++)byHouse[h]=[];
   for(const k in chart.planets)byHouse[chart.planets[k].house].push(k);
+  if(style==='south'){
+    // fixed 4x4 grid, signs in fixed boxes (Pisces top-left, clockwise). Center 2x2 empty.
+    const cell=(W-2*m)/4;
+    // sign -> [col,row] in the classic South Indian layout (sign index 0=Aries)
+    const POS={11:[0,0],0:[1,0],1:[2,0],2:[3,0],10:[0,1],3:[3,1],9:[0,2],4:[3,2],8:[0,3],7:[1,3],6:[2,3],5:[3,3]};
+    let cells='';
+    for(let s=0;s<12;s++){
+      const [c,r]=POS[s];const x=m+c*cell,y=m+r*cell;
+      const isAsc=(s===chart.asc.sign);
+      cells+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="${isAsc?'rgba(212,162,78,.12)':'none'}" stroke="${g}" stroke-width="1.2"/>`;
+      cells+=`<text x="${x+4}" y="${y+13}" font-size="9" fill="#7E78A6" font-family="Work Sans">${RASHI[s][1].slice(0,3)}</text>`;
+      if(isAsc)cells+=`<text x="${x+cell-4}" y="${y+13}" text-anchor="end" font-size="8" fill="#C8472F" font-family="Work Sans">ASC</text>`;
+      byHouse[((s-chart.asc.sign+12)%12)+1].forEach((p,i)=>{
+        cells+=`<text x="${x+cell/2}" y="${y+26+i*15}" text-anchor="middle" font-size="13" font-weight="600" fill="#E8C887" font-family="Eczar">${GLYPH[p]}</text>`;});
+    }
+    return `<svg class="kundali-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="South Indian chart">${cells}</svg>`;
+  }
+  // North Indian (diamond)
+  const P={1:[W/2,H*0.27],2:[W*0.27,H*0.13],3:[W*0.13,H*0.27],4:[W*0.30,H/2],5:[W*0.13,H*0.73],6:[W*0.27,H*0.87],7:[W/2,H*0.73],8:[W*0.73,H*0.87],9:[W*0.87,H*0.73],10:[W*0.70,H/2],11:[W*0.87,H*0.27],12:[W*0.73,H*0.13]};
+  const SN={1:[W/2,H*0.16],2:[W*0.20,H*0.075],3:[W*0.065,H*0.20],4:[W*0.20,H/2],5:[W*0.065,H*0.80],6:[W*0.20,H*0.925],7:[W/2,H*0.60],8:[W*0.80,H*0.925],9:[W*0.935,H*0.80],10:[W*0.80,H/2],11:[W*0.935,H*0.20],12:[W*0.80,H*0.075]};
   let inner='';
   for(let h=1;h<=12;h++){
     inner+=`<text x="${SN[h][0]}" y="${SN[h][1]}" text-anchor="middle" font-size="11" fill="#7E78A6" font-family="Work Sans">${((chart.asc.sign+h-1)%12)+1}</text>`;
     byHouse[h].forEach((p,i)=>{const dy=(i-(byHouse[h].length-1)/2)*15;
       inner+=`<text x="${P[h][0]}" y="${P[h][1]+dy+4}" text-anchor="middle" font-size="13.5" font-weight="600" fill="#E8C887" font-family="Eczar">${GLYPH[p]}</text>`;});
   }
-  const g='#D4A24E';
-  document.getElementById('kundali-holder').innerHTML=
-   `<svg class="kundali-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="North Indian Kundali chart">
+  return `<svg class="kundali-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="North Indian chart">
     <rect x="${m}" y="${m}" width="${W-2*m}" height="${H-2*m}" fill="none" stroke="${g}" stroke-width="2"/>
     <line x1="${m}" y1="${m}" x2="${W-m}" y2="${H-m}" stroke="${g}" stroke-width="1.4"/>
     <line x1="${W-m}" y1="${m}" x2="${m}" y2="${H-m}" stroke="${g}" stroke-width="1.4"/>
     <path d="M ${W/2} ${m} L ${W-m} ${H/2} L ${W/2} ${H-m} L ${m} ${H/2} Z" fill="none" stroke="${g}" stroke-width="1.4"/>
     <text x="${W/2}" y="${H*0.355}" text-anchor="middle" font-size="10" fill="#C8472F" font-family="Work Sans" letter-spacing="1">LAGNA</text>${inner}</svg>`;
-  document.getElementById('kundali-legend').innerHTML=
-    Object.entries(GLYPH).map(([k,v])=>`<span><b>${v}</b> ${k}</span>`).join('')+`<span><b>1–12</b> rāśi numbers (1 = Mesha/Aries)</span>`;
 }
+function renderKundali(){
+  const baseChart=state.chart;if(!baseChart)return;
+  const D=state.vargaD||1, style=state.chartStyle||'north';
+  const vch=D===1?baseChart:vargaChart(baseChart,D);
+  document.getElementById('kundali-holder').innerHTML=buildKundaliSVG(vch,style);
+  const v=VARGAS['D'+D];
+  const score=D===1?null:vargaScore(vch,v.keys);
+  document.getElementById('kundali-legend').innerHTML=
+    Object.entries(GLYPH).map(([k,vv])=>`<span><b>${vv}</b> ${k}</span>`).join('')+
+    (style==='north'?`<span><b>1–12</b> rāśi numbers</span>`:`<span>fixed-sign South Indian layout · ASC = ascendant</span>`);
+  const cap=document.getElementById('varga-cap');
+  if(cap)cap.innerHTML=`<b>${v?v.name:'Rashi (D1)'}</b> — ${v?v.sig:'Your main birth chart.'}`+
+    (score!==null?` <span class="varga-score">Strength: ${score}/100</span>`:'');
+}
+function setChartStyle(s){state.chartStyle=s;
+  document.getElementById('kstyle-north').classList.toggle('active',s==='north');
+  document.getElementById('kstyle-south').classList.toggle('active',s==='south');
+  renderKundali();}
+function setVarga(d){state.vargaD=+d;renderKundali();}
 
 /* ===== UNIQUE ID (name+dob+tob+place hash) & QUOTA ===== */
 async function computeUid(name,dob,tob,place){
@@ -1116,7 +1227,7 @@ async function claimUTR(){
 }
 
 /* ===== APP STATE / GEOCODING / VIEWS ===== */
-const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100,lang:'en'};
+const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100,lang:'en',chartStyle:'north',vargaD:1};
 const show=id=>document.getElementById(id).classList.remove('hidden');
 const hide=id=>document.getElementById(id).classList.add('hidden');
 function switchView(id){['view-landing','view-onboard','view-dash','view-match'].forEach(hide);show(id);window.scrollTo(0,0);}
@@ -1366,7 +1477,7 @@ function generateChart(){
     <div><div class="k">Coordinates</div><div class="v">${place.lat.toFixed(4)}° N/S, ${place.lon.toFixed(4)}° E/W · UTC${place.tz>=0?'+':''}${place.tz}</div></div>
     <div><div class="k">Lagna (Ascendant)</div><div class="v">${RASHI[a.sign][0]} (${RASHI[a.sign][1]}) ${a.deg.toFixed(1)}°</div></div>
     <div><div class="k">Janma Nakshatra</div><div class="v">${state.chart.planets.Moon.nak}</div></div>`;
-  renderKundali(state.chart);
+  renderKundali();
   const tb=document.getElementById('pos-body');tb.innerHTML='';
   for(const k in state.chart.planets){const p=state.chart.planets[k];
     let dig='';
@@ -1907,6 +2018,28 @@ document.addEventListener('click',e=>{
   const i=e.target;
   if(i.tagName==='INPUT'&&(i.type==='date'||i.type==='time')){try{i.showPicker&&i.showPicker();}catch(err){}}
 });
+
+/* ===== Exit-intent support nudge (desktop only, once per session, gentle) ===== */
+(function(){
+  // skip on touch/mobile devices — no mouse, and it would only annoy
+  const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints>0 || window.innerWidth<820;
+  if(isTouch) return;
+  let shown=false;
+  function maybeShow(e){
+    if(shown) return;
+    // only when the cursor leaves upward (toward tab bar / close button)
+    if(e.clientY>0) return;
+    // don't interrupt if a modal is already open
+    const anyOpen=['modal-pay','modal-donate','modal-google'].some(id=>{
+      const el=document.getElementById(id); return el && !el.classList.contains('hidden');});
+    if(anyOpen) return;
+    shown=true;
+    const note=document.getElementById('exit-note');
+    if(note) note.style.display='block';
+    show('modal-donate');
+  }
+  document.addEventListener('mouseout',e=>{ if(!e.relatedTarget && !e.toElement) maybeShow(e); });
+})();
 
 </script>
 </body>
