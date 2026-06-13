@@ -106,28 +106,31 @@ def status_payload(u):
 SYSTEM_PROMPT = """You are CosmicSage, a warm, wise Vedic astrologer who explains the
 stars the way a caring elder would — simply, clearly, and personally.
 
-LANGUAGE: Always reply in the same language the user writes in. If they write in Hindi,
-reply in Hindi; Tamil in Tamil; Hinglish in Hinglish; English in English. Match their
-style naturally.
+LANGUAGE: Reply ONLY in this language: {language}. If it is not English, write naturally
+in that language's own script. Keep graha names recognisable (Guru/Jupiter, Shani/Saturn).
 
-STYLE — simple first, technical second: Use everyday words and short sentences anyone
-can follow. When you cite a placement (and you must — that is your credibility), anchor
-it briefly and immediately explain it in plain words. Example: "Your Jupiter sits in
-your 4th house — the house of home and inner peace. In simple words, good fortune comes
-to you through family, property and your roots." Never stack raw jargon without
-translation. One everyday comparison or example per answer helps.
+DEPTH — this is critical, never be generic: You have the person's exact chart below. Every
+claim you make MUST be tied to a SPECIFIC placement you can see in their data — a named
+planet in a named house or sign or nakshatra, their current mahadasha/antardasha, a dosha,
+or a live transit. If you cannot tie a statement to their actual chart, do not say it. Two
+different people must never be able to receive the same reading. Read the combinations
+(e.g. 5th-house lord placement for children, 10th lord and Saturn for career, Venus and
+7th house for marriage), not single planets in isolation.
 
-CONTENT: Give substantive readings of 250-400 words. Read the SPECIFIC planets, houses
-and nakshatras relevant to the question, weave in the current mahadasha/antardasha and
-at least one current transit, and explain WHY each matters for their life. Use short
-paragraphs. Frame insights as tendencies and timings, never fixed fate. Be encouraging
-but honest. End with one or two practical, doable suggestions.
+FORMAT — easy to read:
+- Open with one warm sentence naming what their chart shows on this topic.
+- Then 4-7 short bullet points. Start each bullet with "• ". Each bullet states ONE
+  insight and names the placement behind it in plain words, e.g.
+  "• Your 10th house is ruled by Mars, sitting strong in your 1st house — leadership and
+  initiative come naturally; you do best when you lead rather than follow."
+- Close with 1-2 practical, doable suggestions, each on a "• " bullet.
+- Keep total length 200-320 words. No markdown stars, no headings — just the opening line
+  and "• " bullets.
 
-FORMAT: Plain text only — no markdown, no asterisks, no bullet symbols, no headings.
-Just warm, flowing paragraphs.
-
-For health, money, or legal questions, gently remind them that the chart guides but
-doctors, advisors and lawyers decide.
+Frame everything as tendencies and timing, never fixed fate. Be encouraging and honest.
+For health, money, or legal topics, add a gentle bullet noting the chart guides but
+doctors, advisors and lawyers decide. For any remedy, prefer simple, free or low-cost
+practices (mantra, charity, discipline) and never use fear.
 
 {chart}"""
 
@@ -225,8 +228,11 @@ def ask():
     if not msgs or msgs[-1]["role"] != "user":
         return jsonify(error="Last message must be a user question."), 400
 
+    langs = {"en": "English", "kn": "Kannada", "te": "Telugu", "ta": "Tamil",
+             "hi": "Hindi", "mr": "Marathi"}
+    language = langs.get(str(data.get("lang", "en")), "English")
     payload = {"model": model, "max_tokens": max_tokens,
-               "system": SYSTEM_PROMPT.format(chart=chart), "messages": msgs}
+               "system": SYSTEM_PROMPT.format(chart=chart, language=language), "messages": msgs}
     try:
         r = requests.post(ANTHROPIC_URL, json=payload, timeout=60, headers={
             "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01",
@@ -294,33 +300,42 @@ def admin_revoke():
 
 @app.get("/api/geocode")
 def geocode():
+    """Return up to 6 matches, best first, so the user picks the right city.
+    Open-Meteo gives population + IANA timezone; we sort by population so big
+    cities (Bangalore, Karnataka) outrank tiny namesakes (Bangalore Town, Sindh)."""
     q = (request.args.get("q") or "").strip()
     if len(q) < 2:
         return jsonify(error="Type a place name."), 400
+    matches = []
     try:
         r = requests.get("https://geocoding-api.open-meteo.com/v1/search",
-                         params={"name": q, "count": 1, "language": "en", "format": "json"}, timeout=10)
+                         params={"name": q, "count": 10, "language": "en", "format": "json"}, timeout=10)
         r.raise_for_status()
         results = (r.json() or {}).get("results") or []
-        if results:
-            h = results[0]
+        results.sort(key=lambda h: h.get("population") or 0, reverse=True)
+        for h in results[:6]:
             name = ", ".join(x for x in [h.get("name"), h.get("admin1"), h.get("country")] if x)
-            return jsonify(name=name, lat=h["latitude"], lon=h["longitude"],
-                           tzname=h.get("timezone", ""), tz=None)
+            matches.append({"name": name, "lat": h["latitude"], "lon": h["longitude"],
+                            "tzname": h.get("timezone", ""), "tz": None,
+                            "pop": h.get("population") or 0})
     except requests.RequestException:
         pass
+    if matches:
+        return jsonify(matches=matches)
+    # fallback: Nominatim (knows tiny villages Open-Meteo misses)
     try:
         r = requests.get("https://nominatim.openstreetmap.org/search",
-                         params={"q": q, "format": "json", "limit": 1},
-                         headers={"User-Agent": "CosmicSage/4.0 (free astrology site)"}, timeout=10)
+                         params={"q": q, "format": "json", "limit": 6, "addressdetails": 1},
+                         headers={"User-Agent": "CosmicSage/5.0 (free astrology site)"}, timeout=10)
         r.raise_for_status()
         results = r.json()
         if not results:
             return jsonify(error="Place not found — try adding the state or country."), 404
-        hit = results[0]
-        lon = float(hit["lon"])
-        return jsonify(name=hit.get("display_name", q), lat=float(hit["lat"]), lon=lon,
-                       tzname="", tz=round(lon / 15 * 2) / 2)
+        for hit in results:
+            lon = float(hit["lon"])
+            matches.append({"name": hit.get("display_name", q), "lat": float(hit["lat"]), "lon": lon,
+                            "tzname": "", "tz": round(lon / 15 * 2) / 2, "pop": 0})
+        return jsonify(matches=matches)
     except requests.RequestException:
         return jsonify(error="Geocoding services unavailable — try again in a moment."), 502
 
