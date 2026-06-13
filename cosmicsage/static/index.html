@@ -110,6 +110,12 @@
   .msg.astro{align-self:flex-start; background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.35);}
   .msg.astro .who{color:var(--gold); font-weight:600; font-size:.76rem; display:block; margin-bottom:4px;}
   .msg.thinking{color:var(--muted); font-style:italic;}
+  .ans-list{margin:6px 0 6px 2px; padding:0; list-style:none;}
+  .ans-list li{position:relative; padding:4px 0 4px 18px; font-size:.9rem;}
+  .ans-list li::before{content:"✦"; position:absolute; left:0; color:var(--gold); font-size:.8rem;}
+  .wa-share{display:inline-flex; align-items:center; gap:6px; margin-top:10px; background:#25D366; color:#fff;
+    border-radius:8px; padding:7px 14px; font-size:.82rem; font-weight:600; cursor:pointer; border:none;}
+  .wa-share:hover{background:#1da851;}
   .chat-input{display:flex; gap:10px; margin-top:14px;}
   .chat-input input{flex:1;}
   .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
@@ -117,6 +123,15 @@
     padding:7px 14px; font-size:.82rem; font-weight:500;}
   .chip:hover{background:rgba(212,162,78,.15);}
   .chip.skip{border-color:var(--line); color:var(--muted);}
+  .cat-grid{display:flex; flex-direction:column; gap:8px;}
+  .cat{background:var(--panel2); border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+  .cat-head{width:100%; display:flex; align-items:center; gap:11px; background:transparent; padding:12px 14px; text-align:left;}
+  .cat-head .ic{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex-shrink:0;}
+  .cat-name{flex:1; font-weight:600; font-size:.92rem; color:var(--ink);}
+  .cat-caret{color:var(--muted); font-size:.85rem; transition:transform .2s;}
+  .cat.open .cat-caret{transform:rotate(180deg);}
+  .cat-subs{display:none; flex-wrap:wrap; gap:8px; padding:0 14px 14px 14px;}
+  .cat.open .cat-subs{display:flex;}
   .donate-nudge{background:rgba(212,162,78,.07); border:1px dashed rgba(212,162,78,.4); border-radius:12px;
     padding:12px 14px; font-size:.84rem; color:var(--moon); margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
   /* match view */
@@ -141,7 +156,9 @@
   .koota-bar{height:7px; background:var(--night); border-radius:99px; overflow:hidden; border:1px solid var(--line);}
   .koota-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,#F6C453,#E2702A); transition:width .8s ease;}
   .koota-fill.zero{background:var(--sindoor); min-width:6px; opacity:.7;}
-  .sky-controls{display:flex; gap:8px; margin-top:12px;}
+  .sky-controls{display:flex; gap:8px; margin-top:10px;}
+  .sky-canvas{width:100%; border-radius:14px; display:block; touch-action:none; cursor:grab; background:#0A0E22;}
+  .sky-canvas:active{cursor:grabbing;}
   .sky-btn{flex:1; padding:8px 10px; font-size:.82rem;}
   .sky-time{text-align:center; color:var(--gold-soft); font-size:.84rem; margin-top:6px; font-weight:500;}
   .sky-info{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 13px;
@@ -264,6 +281,17 @@
             <button class="btn ghost sky-btn" onclick="skyNow()">Tonight</button>
             <button class="btn ghost sky-btn" onclick="skyBirth()">Sky when you were born</button>
           </div>
+          <div class="sky-controls">
+            <button class="btn ghost sky-btn" id="mode-dome" onclick="setSkyMode('dome')" style="border-color:var(--gold);color:var(--gold-soft)">⬤ Whole sky</button>
+            <button class="btn ghost sky-btn" id="mode-window" onclick="setSkyMode('window')">🔭 Look around</button>
+          </div>
+          <div class="sky-controls" style="align-items:center">
+            <select id="find-sel" style="flex:1" onchange="findGraha(this.value)">
+              <option value="">🔍 Find a graha…</option>
+              <option>Sun</option><option>Moon</option><option>Mercury</option><option>Venus</option>
+              <option>Mars</option><option>Jupiter</option><option>Saturn</option><option>Rahu</option><option>Ketu</option>
+            </select>
+          </div>
           <input type="range" id="sky-slider" min="-720" max="720" value="0" step="10" style="width:100%;margin-top:10px" oninput="skySlide(this.value)">
           <div class="sky-time" id="sky-time"></div>
           <div class="sky-info" id="sky-info">Tap any planet to know where it is in simple words.</div>
@@ -297,6 +325,17 @@
         </div>
         <div class="card chat-card">
           <h3 style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">Ask your chart <span class="pill" id="quota-pill">—</span></h3>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-size:.78rem;color:var(--muted)">🗣 Answer in:</span>
+            <select id="lang-sel" style="flex:1" onchange="setLang(this.value)">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="kn">ಕನ್ನಡ (Kannada)</option>
+              <option value="te">తెలుగు (Telugu)</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="mr">मराठी (Marathi)</option>
+            </select>
+          </div>
           <div class="chat-log" id="chat-log">
             <div class="msg astro"><span class="who">COSMICSAGE</span>Your Kundali is ready. Tap a topic above or type any question — I'll read your placements, current dasha and today's transits before answering.</div>
           </div>
@@ -557,6 +596,7 @@ function currentAntardasha(md){
   return null;
 }
 const fdate=d=>d.toLocaleDateString('en-IN',{year:'numeric',month:'short'});
+function to12h(t){const[h,m]=t.split(':').map(Number);const ap=h<12?'AM':'PM';const h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} ${ap}`;}
 
 /* ===== SADE SATI ===== */
 function sadeSati(chart){
@@ -711,7 +751,7 @@ async function claimUTR(){
 }
 
 /* ===== APP STATE / GEOCODING / VIEWS ===== */
-const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100};
+const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100,lang:'en'};
 const show=id=>document.getElementById(id).classList.remove('hidden');
 const hide=id=>document.getElementById(id).classList.add('hidden');
 function switchView(id){['view-landing','view-onboard','view-dash','view-match'].forEach(hide);show(id);window.scrollTo(0,0);}
@@ -720,23 +760,33 @@ async function findPlace(prefix){
   const out=document.getElementById(prefix+'-geo');
   if(q.length<2){out.textContent='Type a place name first.';out.className='geo-result err';return;}
   out.textContent='Searching…';out.className='geo-result';
-  let d=null;
-  try{ // primary: our backend (Open-Meteo + Nominatim fallback)
+  let matches=null;
+  try{
     const r=await fetch('/api/geocode?q='+encodeURIComponent(q));
     const j=await r.json();
-    if(r.ok)d=j; else if(r.status===404){out.textContent='✗ '+j.error;out.className='geo-result err';state.places[prefix]=null;return;}
-  }catch(e){/* backend unreachable — fall through to direct call */}
-  if(!d){
-    try{ // fallback: call Open-Meteo straight from the browser (CORS-enabled, keyless)
-      const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name='+encodeURIComponent(q));
+    if(r.ok&&j.matches)matches=j.matches;
+    else if(r.status===404){out.textContent='✗ '+j.error;out.className='geo-result err';state.places[prefix]=null;return;}
+  }catch(e){/* backend down — browser fallback */}
+  if(!matches){
+    try{
+      const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name='+encodeURIComponent(q));
       const j=await r.json();
-      const h=(j.results||[])[0];
-      if(h)d={name:[h.name,h.admin1,h.country].filter(Boolean).join(', '),lat:h.latitude,lon:h.longitude,tzname:h.timezone||'',tz:null};
+      matches=(j.results||[]).sort((a,b)=>(b.population||0)-(a.population||0)).slice(0,6)
+        .map(h=>({name:[h.name,h.admin1,h.country].filter(Boolean).join(', '),lat:h.latitude,lon:h.longitude,tzname:h.timezone||'',tz:null,pop:h.population||0}));
     }catch(e){}
   }
-  if(!d){out.textContent='✗ Place not found — try the nearest larger town, or add the state.';out.className='geo-result err';state.places[prefix]=null;return;}
+  if(!matches||!matches.length){out.textContent='✗ Place not found — try the nearest larger town, or add the state.';out.className='geo-result err';state.places[prefix]=null;return;}
+  if(matches.length===1){selectPlace(prefix,matches[0]);return;}
+  // multiple matches — let the user pick the right one
+  out.className='geo-result';
+  out.innerHTML='Which one? '+matches.map((m,i)=>
+    `<button class="chip" style="margin:4px 4px 0 0" onclick='selectPlace("${prefix}",${JSON.stringify(m).replace(/'/g,"&#39;")})'>${m.name}</button>`).join('');
+}
+function selectPlace(prefix,d){
   state.places[prefix]={name:d.name.split(',').slice(0,3).join(','),lat:d.lat,lon:d.lon,tzname:d.tzname||'',tz:d.tz};
+  const out=document.getElementById(prefix+'-geo');
   const tzShow=d.tzname||('UTC'+(d.tz>=0?'+':'')+d.tz);
+  out.className='geo-result';
   out.textContent=`✓ ${state.places[prefix].name} (${d.lat.toFixed(3)}, ${d.lon.toFixed(3)}) · ${tzShow}`;
 }
 /* DST- and history-correct UTC offset for an IANA timezone at a given date, via the browser */
@@ -759,51 +809,153 @@ function pickAmt(btn,v){document.querySelectorAll('.amt').forEach(b=>b.classList
   state.donAmt=v;document.getElementById('scan-note').textContent=`Scan with any UPI app and enter ₹${v}. Thank you! ♥`;}
 
 /* ===== TOPICS (ilovepdf-style cards) ===== */
-const TOPICS=[
- ["💼","Career","Job, growth, timing","var(--sky)","Give me a deep reading of my career: which fields suit my chart, my current professional phase per my dasha, and timing for growth or change."],
- ["🎓","Education","Studies & exams","var(--violet)","Analyse my chart for education: my learning strengths, suitable streams, and how my current dasha supports studies or exams."],
- ["❤","Love & Marriage","Relationships","var(--rose)","What do my 7th house, Venus and current dasha say about love, marriage timing and the kind of partner who suits me?"],
- ["🩺","Health","Vitality & care","var(--leaf)","Read my chart for health: constitutional strengths, areas to care for, and what my current dasha and transits suggest. (I know this complements, not replaces, doctors.)"],
- ["💰","Finance","Wealth & savings","var(--amber)","Analyse my 2nd and 11th houses, Jupiter and current dasha for finances: earning style, wealth phases and money habits to build."],
- ["👪","Family","Home & parents","var(--teal)","What does my chart say about family life, relationship with parents, and domestic happiness, considering my 4th house and Moon?"],
- ["✈","Foreign & Travel","Relocation","var(--sky)","Does my chart support foreign travel, education or settlement? Read my 9th and 12th houses, Rahu and current dasha."],
- ["🕉","Spirituality","Inner path","var(--violet)","Guide me on my spiritual path per my chart: my Ketu, Jupiter and 9th house, and practices that suit my nature."]];
+/* ===== CATEGORIES (accordion) → sub-topics → intake → deep query ===== */
+/* each sub-topic: [label, baseQuery]; categories carry icon, color, name, subs */
+const CATS=[
+ ["💼","Career & Profession","var(--sky)",[
+   ["Career direction","Read my 10th house, its lord, Saturn and the Sun for my ideal career direction and natural professional strengths."],
+   ["Job change / switch","Looking at my 10th house lord, current mahadasha and antardasha, and Saturn/Jupiter transits — is this a supportive time to change jobs, and when?"],
+   ["Promotion & growth","Analyse my 10th and 11th houses and current dasha for promotion, raises and professional growth timing."],
+   ["Job vs business","Compare my 10th house (service) against 7th house and Mars/Mercury (enterprise) to advise whether job or business suits me better."],
+ ]],
+ ["🎓","Education","var(--violet)",[
+   ["Learning strengths","Read my 4th and 5th houses, Mercury and Jupiter for my learning style and academic strengths."],
+   ["Best stream / subjects","From my 5th house, its lord, Mercury and Jupiter, suggest the streams and subjects that suit my chart."],
+   ["Exams & competition","Analyse my current dasha, Mercury and the 5th/3rd houses for exam performance and competitive success."],
+   ["Higher / foreign study","Read my 9th and 12th houses, Jupiter and Rahu for higher education and studying abroad."],
+ ]],
+ ["❤","Love & Marriage","var(--rose)",[
+   ["Marriage timing","Read my 7th house, its lord, Venus/Jupiter and current dasha to indicate likely marriage timing windows."],
+   ["Kind of partner","From my 7th house, its lord and Venus, describe the nature of the partner who suits me."],
+   ["Love & relationships","Analyse Venus, the 5th and 7th houses for my romantic nature and current relationship phase."],
+   ["Marriage harmony","Read the 7th, 2nd and 4th houses and Venus/Moon for harmony, and any care points in married life."],
+ ]],
+ ["🩺","Health & Wellbeing","var(--leaf)",[
+   ["Constitution & vitality","Read my Lagna, its lord, the Sun and Moon for my constitutional strengths and overall vitality. (Chart guides; doctors decide.)"],
+   ["Areas to care for","From the 6th house, its lord and afflicted planets, what bodily areas should I care for preventively? (Not a diagnosis.)"],
+   ["Stress & mental peace","Read my Moon, 4th house and Mercury for mental peace, stress patterns and what soothes me."],
+   ["Healthy period ahead","Looking at current dasha and transits, what does the coming phase suggest for health and energy?"],
+ ]],
+ ["💰","Wealth & Finance","var(--amber)",[
+   ["Earning style","Read my 2nd, 11th houses, their lords and Jupiter for how I earn and build wealth best."],
+   ["Wealth periods","From my current and upcoming dashas, when are my stronger financial windows?"],
+   ["Savings vs investment","Analyse the 2nd (savings) vs 5th/8th (investments, gains) houses to advise my money approach."],
+   ["Salary vs business income","Compare indicators for steady income (10th, Saturn) vs business gains (7th, 11th, Mars) in my chart."],
+ ]],
+ ["🏠","Property & Real Estate","var(--teal)",[
+   ["Buying a house","Read my 4th house, its lord, Mars and current dasha for home-buying prospects and timing."],
+   ["Selling property","Analyse the 4th and 10th houses and current transits for a supportive time to sell."],
+   ["Land investment","From the 4th house and Mars/Saturn, assess land investment prospects in my chart."],
+   ["House construction timing","Suggest supportive periods for construction (bhoomi/foundation) from my 4th house and current dasha."],
+ ]],
+ ["👶","Children","var(--rose)",[
+   ["Childbirth prospects","Read my 5th house, its lord, Jupiter and current dasha for prospects and timing of children."],
+   ["Child's education & future","From the 5th house and its lord, what does my chart suggest about my children's path?"],
+   ["Parent–child bond","Analyse the 5th and 4th houses, Jupiter and Moon for the parent-child relationship."],
+ ]],
+ ["💼","Business & Enterprise","var(--sky)",[
+   ["Starting a business","Read my 7th, 10th, 11th houses, Mars and Mercury for entrepreneurial aptitude and a good start window."],
+   ["Best industries","From my planetary strengths and house lords, which business sectors suit me?"],
+   ["Partnership compatibility","Analyse my 7th house and its lord for business-partnership suitability and what to watch for."],
+   ["Expansion timing","From current and upcoming dashas, when is expansion favoured?"],
+ ]],
+ ["⚖️","Legal & Court Matters","var(--amber)",[
+   ["Court case outlook","Read my 6th house (disputes), its lord and current dasha for the general outlook and approach in legal matters. (Chart guides; lawyers decide.)"],
+   ["Property disputes","Analyse the 4th and 6th houses for property-dispute matters and constructive handling."],
+   ["Government approvals","From the 10th house, Sun and current transits, assess timing for approvals and official matters."],
+ ]],
+ ["🌍","Relocation & Immigration","var(--sky)",[
+   ["Moving abroad","Read my 12th and 9th houses, Rahu and current dasha for foreign settlement prospects."],
+   ["PR / citizenship","Analyse the 12th house, Rahu and dasha for long-term settlement and residency timing."],
+   ["Job abroad","From the 10th, 12th houses and current transits, assess overseas work prospects and timing."],
+ ]],
+ ["🚗","Vehicle & Luxury","var(--violet)",[
+   ["Vehicle purchase timing","Read my 4th house (vehicles), Venus and current dasha for a good period to buy a vehicle."],
+   ["Luxury asset timing","From Venus, the 2nd and 4th houses, assess timing for luxury purchases."],
+ ]],
+ ["⭐","Daily Life Guidance","var(--gold)",[
+   ["Today for me","Using today's transits against my chart, what does today hold across work, money, health and mood? Keep it specific to my placements."],
+   ["This week ahead","From this week's transits to my natal planets, what are the themes and best focus areas?"],
+   ["This month","Read this month's key transits against my chart for the month's opportunities and care points."],
+   ["This year","From my current dasha and the year's major transits, what are this year's big themes for me?"],
+ ]],
+ ["⏰","Muhurat (Timing)","var(--leaf)",[
+   ["Marriage muhurat","Given my chart and current transits, what kinds of periods are favourable for marriage ceremonies? (General guidance, not a substitute for a priest's panchang.)"],
+   ["Housewarming (Griha Pravesh)","Suggest the nature of favourable windows for housewarming based on my chart and current transits."],
+   ["Vehicle / business start","Advise generally favourable timing themes for starting a vehicle purchase or new venture from my chart."],
+   ["Bhoomi pooja / foundation","From my 4th house and current transits, what timing themes favour a foundation ceremony?"],
+ ]],
+ ["🔮","Remedies & Solutions","var(--rose)",[
+   ["Gemstone guidance","Based on my Lagna lord and beneficial planets, what gemstone is traditionally suggested for me — and is it even necessary? Prefer simple options first."],
+   ["Mantras & practices","Suggest simple, free daily mantras and practices suited to my strongest and weakest planets."],
+   ["Planetary remedies","For my most challenged planet, give gentle, low-cost traditional remedies (charity, discipline, mantra) — never fear-based."],
+   ["Rudraksha guidance","Which rudraksha is traditionally associated with my beneficial planets, and how essential is it?"],
+ ]],
+ ["📈","Dasha & Transit","var(--sky)",[
+   ["My current Mahadasha","Explain my current mahadasha lord, what life areas it activates for me, and how to make the most of it."],
+   ["Antardasha now","Read my current antardasha within the mahadasha and its near-term effects for me."],
+   ["Sade Sati status","Explain my Sade Sati status, what phase (if any) I'm in, and grounded ways to navigate it without fear."],
+   ["Saturn / Jupiter transit","How are the current Saturn and Jupiter transits touching my natal chart, and what should I focus on?"],
+ ]],
+ ["🧘","Karma & Past Life","var(--violet)",[
+   ["Karmic lessons","Read my Ketu, Saturn and 12th house for the karmic lessons my chart points to. Frame this reflectively, for contemplation."],
+   ["Soul purpose","From my Atmakaraka, Ketu and 9th house, reflect on the soul-direction my chart suggests."],
+   ["Spiritual growth","Read Ketu, Jupiter and the 12th house for my path of inner growth and the practices that help."],
+ ]],
+ ["🎯","Lucky Elements","var(--amber)",[
+   ["My lucky elements","From my Lagna lord and beneficial planets, give my lucky numbers, colours, days and directions — and how to use them simply."],
+ ]],
+];
+let openCat=-1;
 function renderTopics(){
-  document.getElementById('topics').innerHTML=TOPICS.map((t,i)=>
-   `<button class="topic" onclick="topicAsk(${i})"><div class="ic" style="background:${t[3]}22;color:${t[3]}">${t[0]}</div>
-    <div class="t">${t[1]}</div><div class="s">${t[2]}</div></button>`).join('')+
-   `<button class="topic" onclick="goMatch()" style="border-color:var(--sindoor)">
-    <div class="ic" style="background:rgba(200,71,47,.18);color:var(--sindoor)">💞</div>
-    <div class="t">Match Kundali</div><div class="s">36-guna compatibility</div></button>`;
+  const host=document.getElementById('topics');
+  host.classList.add('cat-grid');
+  let html=CATS.map((c,ci)=>{
+    const head=`<button class="cat-head" onclick="toggleCat(${ci})">
+      <span class="ic" style="background:${c[2]}22;color:${c[2]}">${c[0]}</span>
+      <span class="cat-name">${c[1]}</span><span class="cat-caret" id="caret-${ci}">▾</span></button>`;
+    const subs=`<div class="cat-subs" id="subs-${ci}">`+
+      c[3].map((s,si)=>`<button class="chip" onclick="subAsk(${ci},${si})">${s[0]}</button>`).join('')+`</div>`;
+    return `<div class="cat ${openCat===ci?'open':''}">${head}${subs}</div>`;
+  }).join('');
+  html+=`<div class="cat"><button class="cat-head" style="border-color:var(--sindoor)" onclick="goMatch()">
+    <span class="ic" style="background:rgba(200,71,47,.18);color:var(--sindoor)">💞</span>
+    <span class="cat-name">Match Kundali</span><span class="cat-caret">→</span></button></div>`;
+  host.innerHTML=html;
 }
-function topicAsk(i){startIntake(i);
+function toggleCat(ci){openCat=openCat===ci?-1:ci;
+  document.querySelectorAll('.cat').forEach((el,i)=>el.classList.toggle('open',i===openCat&&i<CATS.length));
+}
+function subAsk(ci,si){startIntake(ci,si);
   document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});}
 
 /* ===== INTAKE: quick taps before the AI call — richer answer, one API call ===== */
+/* generic intake by category index; transit/daily/dasha categories skip intake */
 const INTAKE={
- 0:[["What stage are you at?",["Student","Early career","Mid career","Business owner"]],
-    ["Main focus right now?",["Growth & promotion","Job change","New direction","Stability"]]],
- 1:[["What level of study?",["School","Undergraduate","Postgraduate","Competitive exams"]],
-    ["Biggest concern?",["Focus & memory","Exam results","Choosing a stream","Studying abroad"]]],
- 2:[["Current status?",["Single","In a relationship","Engaged","Married"]],
-    ["What matters most?",["Marriage timing","Compatibility","Strengthening the bond","Finding the right person"]]],
- 3:[["Focus area?",["Energy & vitality","Stress & sleep","A chronic concern","General wellbeing"]],
-    ["Looking at…",["Right now","This year","Long term"]]],
- 4:[["Main question?",["Income growth","Savings & investing","Loans or debt","Business finances"]],
-    ["Time frame?",["This year","Next 2–3 years","Long term"]]],
- 5:[["Where's your focus?",["Parents","Children","Home harmony","Property & home"]]],
- 6:[["Purpose?",["Work","Studies","Settling abroad","Travel"]],
-    ["When?",["This year","In 1–2 years","Someday"]]],
- 7:[["What are you drawn toward?",["Meditation","Mantra & ritual","Service to others","Self-knowledge"]]]
+ 0:[["What stage are you at?",["Student","Early career","Mid career","Business owner"]],["Main focus?",["Growth","Job change","New direction","Stability"]]],
+ 1:[["Level of study?",["School","Undergraduate","Postgraduate","Competitive exams"]],["Biggest concern?",["Focus","Results","Choosing stream","Abroad"]]],
+ 2:[["Current status?",["Single","In a relationship","Engaged","Married"]],["What matters most?",["Timing","Compatibility","Strengthening bond","Finding someone"]]],
+ 3:[["Focus area?",["Energy","Stress & sleep","A concern","General"]],["Looking at?",["Now","This year","Long term"]]],
+ 4:[["Main question?",["Income growth","Savings","Loans/debt","Business money"]],["Time frame?",["This year","2–3 years","Long term"]]],
+ 5:[["Purpose?",["Buy","Sell","Invest","Build"]],["When?",["This year","1–2 years","Someday"]]],
+ 6:[["About?",["Having children","Their future","Our bond"]]],
+ 7:[["Stage?",["Idea stage","Just started","Established","Scaling"]],["Focus?",["Should I start","Right sector","Partnership","Expansion"]]],
+ 8:[["Matter type?",["Court case","Property dispute","Govt approval"]]],
+ 9:[["Goal?",["Move abroad","PR/citizenship","Job abroad","Study abroad"]],["When?",["This year","1–2 years","Someday"]]],
+ 10:[["Buying?",["Vehicle","Luxury asset"]],["When?",["Now","This year","Planning ahead"]]],
+ 12:[["Occasion?",["Marriage","Housewarming","Vehicle/business","Foundation"]]],
+ 13:[["Concern?",["General wellbeing","Career","Relationships","Health"]]],
+ 14:[["Interest?",["Mahadasha","Antardasha","Sade Sati","Sat/Jup transit"]]],
+ 15:[["Drawn toward?",["Lessons","Soul purpose","Growth practices"]]],
 };
 let intake=null;
-function startIntake(topicIdx){
-  intake={topic:topicIdx,step:0,notes:[]};
-  addMsg('user',TOPICS[topicIdx][1]);
+function startIntake(ci,si){
+  intake={ci,si,step:0,notes:[]};
+  addMsg('user',CATS[ci][3][si][0]);
   nextIntakeStep();
 }
 function nextIntakeStep(){
-  const steps=INTAKE[intake.topic]||[];
+  const steps=INTAKE[intake.ci]||[];
   if(intake.step>=steps.length){finishIntake();return;}
   const [q,opts]=steps[intake.step];
   const log=document.getElementById('chat-log');
@@ -820,11 +972,10 @@ function pickIntake(btn,q,o){
   intake.step++;nextIntakeStep();
 }
 function finishIntake(){
-  const base=TOPICS[intake.topic][4];
-  const ctx=intake.notes.length?`\n\nMy situation — ${intake.notes.join('; ')}. Please tailor the reading to this.`:'';
-  const composed=base+ctx;
+  const base=CATS[intake.ci][3][intake.si][1];
+  const ctx=intake.notes.length?`\n\nMy situation — ${intake.notes.join('; ')}. Please tailor the reading specifically to this.`:'';
   intake=null;
-  sendQuestion(composed,false);
+  sendQuestion(base+ctx,false);
 }
 
 /* ===== CHART GENERATION ===== */
@@ -845,7 +996,7 @@ function generateChart(){
   const a=state.chart.asc;
   document.getElementById('birth-grid').innerHTML=
    `<div><div class="k">Name</div><div class="v">${name}</div></div>
-    <div><div class="k">Date of birth</div><div class="v">${new Date(dob).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})} · ${tob}</div></div>
+    <div><div class="k">Date of birth</div><div class="v">${new Date(dob).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})} · ${to12h(tob)}</div></div>
     <div><div class="k">Place of birth</div><div class="v">${place.name}</div></div>
     <div><div class="k">Coordinates</div><div class="v">${place.lat.toFixed(4)}° N/S, ${place.lon.toFixed(4)}° E/W · UTC${place.tz>=0?'+':''}${place.tz}</div></div>
     <div><div class="k">Lagna (Ascendant)</div><div class="v">${RASHI[a.sign][0]} (${RASHI[a.sign][1]}) ${a.deg.toFixed(1)}°</div></div>
@@ -894,10 +1045,26 @@ DASHA: ${cur?cur.lord+' Mahadasha (until '+fdate(cur.to)+')':''}${ad?', '+ad.lor
 NUMEROLOGY: Life path ${lifePath(b.dob)}, name number ${nameNumber(b.name)}, birth day ${reduceNum(+b.dob.split('-')[2])}.
 CURRENT TRANSITS (sidereal): ${tr}.`;
 }
+function fmtAnswer(text){ // escape, then render "• " bullets as a clean list
+  const esc=text.replace(/</g,'&lt;').replace(/\*\*/g,'');
+  const lines=esc.split('\n').map(l=>l.trim()).filter(Boolean);
+  let html='',inList=false;
+  for(const l of lines){
+    if(l.startsWith('•')){ if(!inList){html+='<ul class="ans-list">';inList=true;} html+='<li>'+l.replace(/^•\s*/,'')+'</li>'; }
+    else { if(inList){html+='</ul>';inList=false;} html+='<p style="margin:6px 0">'+l+'</p>'; }
+  }
+  if(inList)html+='</ul>';
+  return html;
+}
+function shareWhatsApp(text,title){
+  const msg=`${title||'My CosmicSage reading'} ✨\n\n${text}\n\n— via CosmicSage`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
 function addMsg(cls,text,who){const log=document.getElementById('chat-log');
   const d=document.createElement('div');d.className='msg '+cls;
   d.innerHTML=(who?`<span class="who">${who}</span>`:'')+text.replace(/</g,'&lt;');
   log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
+function setLang(v){state.lang=v;}
 async function askQuestion(){
   const input=document.getElementById('q-input');const q=input.value.trim();if(!q)return;
   input.value='';
@@ -911,7 +1078,7 @@ async function sendQuestion(q,showUserMsg){
   state.busy=true;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:chartSummary(),history:state.history,uid:state.uid||'',name:state.birth?state.birth.name:''})});
+      body:JSON.stringify({chart:chartSummary(),history:state.history,uid:state.uid||'',name:state.birth?state.birth.name:'',lang:state.lang||'en'})});
     const data=await r.json();
     if(r.status===402){
       think.remove();state.history.pop();
@@ -922,7 +1089,8 @@ async function sendQuestion(q,showUserMsg){
     if(!r.ok)throw new Error(data.error||'Request failed');
     state.history.push({role:'assistant',content:data.answer});
     if(data.status)updateQuotaPill(data.status);
-    think.innerHTML=`<span class="who">COSMICSAGE</span>`+data.answer.replace(/</g,'&lt;');
+    think.innerHTML=`<span class="who">COSMICSAGE</span>`+fmtAnswer(data.answer)+
+      `<button class="wa-share" onclick='shareWhatsApp(${JSON.stringify(data.answer)},"My CosmicSage reading")'>📲 Share on WhatsApp</button>`;
     think.classList.remove('thinking');
     state.answers++;if(state.answers===3)show('donate-nudge');
   }catch(e){
@@ -995,7 +1163,7 @@ Guna Milan total: ${g.total}/36. Breakdown: ${g.rows.map(r=>r[0]+' '+r[2]+'/'+r[
 Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:summary,uid:state.uid||'',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a balanced, kind reading of this match: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
+      body:JSON.stringify({chart:summary,uid:state.uid||'',lang:state.lang||'en',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a balanced, kind reading of this match in bullet points: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
     const data=await r.json();
     if(r.status===402){
       holder.innerHTML='<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>'+(data.message||'Unlock more questions to get the match reading.')+'</div>';
@@ -1004,7 +1172,7 @@ Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
     }
     if(!r.ok)throw new Error(data.error||'failed');
     if(data.status)updateQuotaPill(data.status);
-    holder.innerHTML=`<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>${data.answer.replace(/</g,'&lt;')}</div>`;
+    holder.innerHTML=`<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>${fmtAnswer(data.answer)}<button class="wa-share" onclick='shareWhatsApp(${JSON.stringify((lastMatch.A.name.split(" ")[0])+" & "+(lastMatch.B.name.split(" ")[0])+" — "+lastMatch.g.total+"/36 guna match.\n\n"+data.answer)},"Our Kundali match")'>📲 Share on WhatsApp</button></div>`;
   }catch(e){holder.innerHTML='<div class="msg astro" style="max-width:100%">Could not fetch the reading — please try again.</div>';}
   finally{state.busy=false;}
 }
@@ -1092,15 +1260,30 @@ function project(alt,az,R,cx,cy){const r=(90-alt)/90*R;
 function renderSky(){
   if(!state.birth)return;
   const sc=computeSky(skyDate());
+  sky._last=sc;
+  if(sky.mode==='window'){renderWindow(sc);}else{renderDome(sc);}
+  const dt=sc.date;
+  document.getElementById('sky-time').textContent=
+    (sky.anchor==='birth'&&sky.offsetMin===0?'✨ The sky at your birth · ':'')+
+    dt.toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('sky-loc').textContent='above '+state.birth.place.name.split(',')[0]+(sky.mode==='window'?' · drag to look around, pinch/scroll to zoom':' · hold phone up & match N to north');
+}
+function renderDome(sc){
   const W=380,R=170,cx=W/2,cy=W/2;
   // sky background by sun altitude
   const bg=sc.sunAlt>0?'#27406B':sc.sunAlt>-6?'#1C2C52':sc.sunAlt>-12?'#141E3E':'#0A0E22';
-  let svg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${bg}" stroke="#D4A24E" stroke-width="2"/>`;
+  let svg=SKY_DEFS+`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${bg}" stroke="#D4A24E" stroke-width="2"/>`;
+  svg+=`<clipPath id="domeclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath><g clip-path="url(#domeclip)">`;
+  if(sc.sunAlt<0){
+    svg+=galaxyPath(sc,(a,z)=>project(a,z,R,cx,cy));
+    svg+=constellationPaths(sc,(a,z)=>project(a,z,R,cx,cy),'#5B5687',.9);
+  }
+  svg+=eclipticPath(sc,(a,z)=>project(a,z,R,cx,cy));
   // stars (only at night/twilight)
   if(sc.sunAlt<0){
     for(const s of sc.starPts){const[x,y]=project(s.alt,s.az,R,cx,cy);
       const sz=Math.max(.6,2.4-s.mag*.55);
-      svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz.toFixed(1)}" fill="${s.nak?'#F0C868':'#C9CDE3'}" opacity="${s.nak?.95:.8}"/>`;
+      svg+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz.toFixed(1)}" fill="${s.nak?'#F0C868':'#C9CDE3'}" opacity="${s.nak?.95:.8}"${s.mag<1.6?' filter="url(#glow)"':''}/>`;
       if(s.nak)svg+=`<text x="${(x+4).toFixed(1)}" y="${(y-3).toFixed(1)}" font-size="7" fill="#D4A24E" font-family="Work Sans">${s.nak}</text>`;
     }
   }
@@ -1117,10 +1300,13 @@ function renderSky(){
       if(ill<.97)svg+=`<ellipse cx="${x+(waxing?-1:1)*b.r*(1-ill)*.7}" cy="${y}" rx="${b.r*Math.max(.05,Math.abs(cosd(b.elong)))}" ry="${b.r}" fill="${bg}" opacity=".92" pointer-events="none"/>`;
       svg+=`<text x="${x+10}" y="${y+3}" font-size="9" fill="#E8EAF2" font-family="Work Sans">Moon</text>`;
     }else{
-      svg+=`<circle class="sky-body" data-k="${b.key}" cx="${x}" cy="${y}" r="${b.r}" fill="${b.fill}" stroke="#00000033"/>
-      <text x="${x+b.r+3}" y="${y+3}" font-size="9" fill="${b.fill}" font-family="Work Sans">${b.key}</text>`;
+      svg+=planetArtSVG(b,x,y)+`<text x="${x+b.r+4}" y="${y+3}" font-size="9" fill="${b.fill}" font-family="Work Sans">${b.key}</text>`;
     }
   }
+  if(sky.target){const tb=sc.bodies.find(b=>b.key===sky.target);
+    if(tb&&tb.alt>-1){const[tx,ty]=project(tb.alt,tb.az,R,cx,cy);
+      svg+=`<circle cx="${tx}" cy="${ty}" r="${tb.r+7}" fill="none" stroke="#F6C453" stroke-width="2" opacity=".9"><animate attributeName="r" values="${tb.r+5};${tb.r+11};${tb.r+5}" dur="1.6s" repeatCount="indefinite"/></circle>`;}}
+  svg+='</g>';
   // horizon labels — N top, E left (this is a looking-UP map)
   svg+=`<text x="${cx}" y="14" text-anchor="middle" font-size="11" fill="#E8C887" font-family="Eczar">N</text>
    <text x="${cx}" y="${W-5}" text-anchor="middle" font-size="11" fill="#E8C887" font-family="Eczar">S</text>
@@ -1129,12 +1315,6 @@ function renderSky(){
   document.getElementById('sky-holder').innerHTML=
    `<svg class="sky-svg" viewBox="0 0 ${W} ${W}" id="sky-svg" role="img" aria-label="Live sky map">${svg}</svg>`;
   document.getElementById('sky-svg').addEventListener('click',skyTap);
-  const dt=sc.date;
-  document.getElementById('sky-time').textContent=
-    (sky.anchor==='birth'&&sky.offsetMin===0?'✨ The sky at your birth · ':'')+
-    dt.toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('sky-loc').textContent='above '+state.birth.place.name.split(',')[0]+' · hold phone up & match N to north';
-  sky._last=sc;
 }
 function skyTap(ev){
   const t=ev.target.closest('.sky-body'); if(!t||!sky._last)return;
@@ -1156,6 +1336,197 @@ function askSkyAI(){
   sendQuestion('Look at tonight\'s sky and my chart together: which planets are visible above me tonight, and what does today\'s planetary sky mean for me personally? Explain simply.',true);
   document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});
 }
+
+/* ============ SKYVIEW-STYLE PACKAGE: art, lines, window view, finder ============ */
+const CLINES=[[[31.0,42.3],[17.4,35.6],[9.8,30.9],[2.1,29.1]],[[14.3,23.4],[11.8,24.3],[9.6,29.3],[9.8,30.9],[9.2,33.7],[354.5,43.3],[345.5,42.3]],[[354.5,43.3],[355.1,44.3],[354.4,46.5]],[[17.4,35.6],[14.2,38.5],[12.5,41.1],[17.4,47.2],[24.5,48.6]],[[355.1,44.3],[356.5,46.4]],[[142.3,-36.0],[156.8,-31.1],[164.2,-37.1]],[[222.0,-79.0],[245.1,-78.7],[250.8,-77.5],[248.4,-78.9]],[[311.9,-9.5],[313.2,-9.0],[322.9,-5.6],[331.4,-0.3],[335.4,-1.4],[337.2,-0.0],[338.8,-0.1],[343.2,-7.6],[349.5,-9.2],[347.4,-21.2]],[[322.9,-5.6],[331.6,-13.9]],[[331.4,-0.3],[334.2,-7.8]],[[337.2,-0.0],[336.3,1.4]],[[350.7,-20.1],[349.5,-9.2],[355.4,-17.8]],[[296.6,10.6],[297.7,8.9],[298.8,6.4],[302.8,-0.8],[298.1,1.0],[291.4,3.1],[286.4,13.9],[297.7,8.9],[291.4,3.1],[286.6,-4.9]],[[261.3,-56.4],[262.8,-60.7],[252.4,-59.0],[254.7,-56.0],[254.9,-53.2],[263.0,-49.9],[261.3,-55.5]],[[42.5,27.3],[31.8,23.5],[28.7,20.8],[28.4,19.3]],[[89.9,44.9],[79.2,46.0],[76.6,41.2],[74.2,33.2],[81.6,28.6],[89.9,37.2],[89.9,44.9],[89.9,54.3],[79.2,46.0],[75.5,43.8],[75.6,41.1]],[[206.8,17.5],[208.7,18.4],[213.9,19.2],[218.0,30.4],[218.0,38.3],[225.5,40.4],[228.9,33.3],[221.2,27.1],[213.9,19.2],[220.3,13.7]],[[218.0,38.3],[214.1,46.1],[213.4,51.8],[216.3,51.9],[214.1,46.1]],[[67.7,-45.0],[70.1,-41.9],[70.5,-37.1],[76.1,-35.5]],[[74.3,53.8],[75.9,60.4],[73.5,66.3],[57.6,71.3],[57.4,65.5],[52.3,59.9]],[[73.5,66.3],[94.7,69.3],[105.0,77.0]],[[134.6,11.9],[131.2,18.2],[130.8,21.5],[131.7,28.8]],[[131.2,18.2],[124.1,9.2]],[[194.0,38.3],[188.4,41.4]],[[95.7,-18.0],[101.3,-16.7],[105.8,-23.8],[107.1,-26.4],[105.4,-27.9],[104.7,-29.0],[95.1,-30.1]],[[111.0,-29.3],[107.1,-26.4]],[[101.3,-16.7],[104.0,-17.1],[105.9,-15.6],[103.5,-12.0],[104.0,-17.1]],[[114.8,5.2],[111.8,8.3]],[[304.4,-12.5],[305.3,-14.8],[307.2,-17.8],[311.5,-25.3],[313.0,-26.9],[321.7,-22.4],[326.8,-16.1],[325.0,-16.7],[320.6,-16.8],[316.5,-17.2],[304.4,-12.5]],[[99.4,-43.2],[96.0,-52.7],[138.3,-69.7],[153.4,-70.0],[160.7,-64.4],[158.0,-61.7],[154.3,-61.3],[139.3,-59.3],[125.6,-59.5],[119.2,-53.0],[122.4,-47.3],[131.2,-54.7],[139.3,-59.3]],[[160.7,-64.4],[166.6,-62.4],[167.1,-61.9],[168.2,-60.3],[167.1,-59.0],[163.4,-58.9],[158.0,-61.7]],[[28.6,63.7],[21.5,60.2],[14.2,60.7],[10.1,56.5],[2.3,59.1]],[[170.3,-54.5],[182.1,-50.7],[187.0,-50.2],[190.4,-49.0],[205.0,-53.5],[208.9,-47.3],[207.4,-42.5],[207.4,-41.7],[211.7,-36.4],[218.9,-42.2],[224.8,-42.1]],[[207.4,-41.7],[200.1,-36.7]],[[219.9,-60.8],[205.0,-53.5],[211.0,-60.4]],[[187.0,-50.2],[182.9,-52.4],[172.9,-59.4]],[[307.4,63.0],[311.3,61.8],[319.6,62.6],[325.9,58.8],[333.8,57.0],[332.7,58.2],[337.3,58.4],[342.4,66.2],[354.8,77.6],[322.2,70.6],[319.6,62.6]],[[322.2,70.6],[342.4,66.2]],[[40.8,3.2],[39.0,5.6],[37.0,8.5],[41.2,10.1],[44.9,8.9],[45.6,4.1],[40.8,3.2],[39.9,0.3],[34.8,-3.0],[27.9,-10.3],[26.0,-15.9],[10.9,-18.0],[4.9,-8.8],[17.1,-10.2],[21.0,-8.2],[27.9,-10.3]],[[124.6,-76.9],[158.9,-78.6],[161.3,-80.5],[184.6,-79.3],[179.9,-78.2],[158.9,-78.6]],[[229.4,-58.8],[220.6,-65.0],[230.8,-59.3]],[[95.5,-33.4],[87.7,-35.8],[84.9,-34.1],[82.8,-35.5]],[[87.7,-35.8],[89.8,-42.8]],[[197.5,17.5],[198.0,27.9],[186.7,28.3]],[[284.7,-37.1],[286.6,-37.1],[287.4,-37.9],[287.5,-39.3],[287.1,-40.5],[285.8,-42.1],[282.4,-43.4],[278.4,-42.3]],[[233.2,31.4],[232.0,29.1],[233.7,26.7],[235.7,26.3],[237.4,26.1],[239.4,26.9],[240.4,29.9]],[[182.1,-24.7],[182.5,-22.6],[184.0,-17.5],[187.5,-16.5],[188.6,-23.4],[182.5,-22.6]],[[174.2,-9.8],[171.2,-10.9],[169.8,-14.8],[164.9,-18.3],[167.9,-22.8],[170.8,-18.8],[171.2,-17.7],[176.2,-18.4],[179.0,-17.2]],[[169.8,-14.8],[171.2,-17.7]],[[191.9,-59.7],[183.8,-58.7]],[[186.6,-63.1],[187.8,-57.1]],[[318.2,30.2],[311.6,34.0],[305.6,40.3],[296.2,45.1],[292.4,51.7],[289.3,53.4]],[[310.4,45.3],[305.6,40.3],[299.1,35.1],[292.7,28.0]],[[308.3,11.3],[309.4,14.6],[309.9,15.9],[311.7,16.1],[310.9,15.1],[309.4,14.6]],[[64.0,-51.5],[68.5,-55.0],[83.4,-62.5],[86.2,-65.7],[88.5,-63.1],[83.4,-62.5],[76.4,-57.5],[68.5,-55.0]],[[268.4,56.9],[269.2,51.5],[262.6,52.3],[263.1,55.2],[268.4,56.9],[288.1,67.7],[275.2,71.3],[257.2,65.7],[246.0,61.5],[240.5,58.6],[231.2,59.0],[211.1,64.4],[188.4,69.8],[172.9,69.3]],[[275.2,71.3],[275.3,72.7]],[[288.1,67.7],[297.0,70.3]],[[319.0,5.2],[318.6,10.0],[317.6,10.1]],[[77.0,-5.1],[71.4,-3.3],[69.1,-3.4],[63.0,-6.8],[59.5,-13.5],[56.5,-12.1],[55.8,-9.8],[53.2,-9.5],[44.1,-8.9],[41.0,-13.9],[41.3,-18.6],[45.6,-23.6],[49.9,-21.8],[53.4,-21.6],[56.7,-23.2],[68.9,-30.6],[66.0,-34.0],[64.5,-33.8],[57.4,-36.2],[54.3,-40.3],[50.0,-43.1],[44.6,-40.3],[40.2,-39.9],[36.7,-47.7],[34.1,-51.5],[29.0,-51.6],[24.4,-57.2]],[[48.0,-29.0],[42.3,-32.4],[31.1,-29.3]],[[93.7,22.5],[95.7,22.5],[101.0,25.1],[107.8,30.2],[113.6,31.9],[116.3,28.0],[114.0,26.9],[110.0,22.0],[106.0,20.6],[99.4,16.4],[101.3,12.9]],[[110.0,22.0],[109.5,16.5]],[[345.2,-52.8],[342.1,-51.3],[340.7,-46.9],[337.4,-43.7],[332.1,-47.0],[340.7,-46.9]],[[337.3,-43.5],[333.9,-41.3],[331.5,-39.5],[328.5,-37.4]],[[245.5,19.2],[247.6,21.5],[250.3,31.6],[250.7,38.9],[248.5,42.4],[244.9,46.3],[242.2,44.9],[238.2,42.5]],[[250.3,31.6],[255.1,30.9]],[[250.7,38.9],[258.8,36.8]],[[269.1,37.3],[260.9,37.1],[258.8,36.8],[255.1,30.9],[258.8,24.8],[266.6,27.7],[269.4,29.2],[271.9,28.8]],[[258.7,14.4],[247.6,21.5]],[[63.5,-42.3],[40.6,-50.8],[39.4,-52.5],[40.2,-54.5],[45.9,-59.7],[44.7,-64.1]],[[131.7,6.4],[132.1,5.8],[130.8,3.4],[129.7,3.3],[129.4,5.7],[131.7,6.4],[133.8,5.9],[138.6,2.3],[145.0,-1.1],[141.9,-8.7],[147.9,-14.8],[152.6,-12.4],[156.5,-16.8],[162.4,-16.2],[173.3,-31.9],[178.2,-33.9],[199.7,-23.2],[211.6,-26.7],[222.6,-28.0]],[[6.4,-77.3],[56.8,-74.2],[39.9,-68.3],[35.4,-68.7],[28.7,-67.6],[29.7,-61.6]],[[309.4,-47.3],[311.0,-51.9],[313.7,-58.5],[329.5,-55.0],[320.0,-53.4],[309.4,-47.3]],[[335.9,52.2],[337.8,50.3],[337.4,47.7],[335.3,46.5],[337.6,43.1],[340.1,44.3],[337.4,47.7],[336.1,49.5],[335.9,52.2]],[[337.6,43.1],[333.5,39.7],[334.0,37.7]],[[152.1,12.0],[151.8,16.8],[155.0,19.8],[168.5,20.5],[177.3,14.6],[168.6,15.4],[152.1,12.0]],[[155.0,19.8],[154.2,23.4],[148.2,26.0],[146.5,23.8]],[[151.9,35.2],[156.5,33.8],[163.3,34.2],[157.0,36.7],[151.9,35.2],[143.6,36.4]],[[91.5,-14.9],[89.1,-14.2],[86.7,-14.8],[83.2,-17.8],[78.2,-16.2],[76.4,-22.4],[82.1,-20.8],[86.1,-22.4],[87.8,-20.9]],[[78.3,-12.9],[78.2,-16.2],[79.9,-13.2]],[[226.0,-25.3],[222.7,-16.0],[229.3,-9.4],[233.9,-14.8],[234.3,-28.1],[234.7,-29.8]],[[222.7,-16.0],[233.9,-14.8]],[[237.7,-33.6],[234.9,-34.4],[230.5,-36.3],[230.3,-40.6],[224.6,-43.1],[220.5,-47.4],[228.1,-52.1],[229.6,-47.9],[230.7,-44.7],[233.8,-41.2],[240.0,-38.4],[241.6,-36.8]],[[230.3,-40.6],[233.8,-41.2]],[[94.9,59.0],[104.3,58.4],[111.7,49.2],[125.7,43.2],[135.2,41.8],[139.7,36.8],[140.3,34.4]],[[281.2,37.6],[281.1,39.6],[279.2,38.8],[281.2,37.6],[283.6,36.9],[284.7,32.7],[282.5,33.4],[281.2,37.6]],[[92.6,-74.8],[83.0,-76.3],[73.8,-74.9],[75.7,-71.3]],[[312.5,-33.8],[312.1,-44.0],[320.2,-40.8],[319.5,-32.2],[315.3,-32.3],[312.5,-33.8]],[[115.3,-9.6],[122.1,-3.0],[108.0,-0.5],[97.2,-7.0],[93.7,-6.3]],[[108.0,-0.5],[102.0,2.4],[95.9,4.6],[98.2,7.3],[100.2,9.9]],[[176.4,-66.7],[184.4,-68.0],[189.3,-69.1],[191.6,-68.1],[195.6,-71.5],[188.1,-72.1],[189.3,-69.1]],[[241.6,-45.2],[246.8,-47.6],[245.0,-50.2],[240.8,-49.2],[241.6,-45.2]],[[216.7,-83.7],[341.5,-81.4],[325.4,-77.4],[216.7,-83.7]],[[269.8,-9.8],[267.0,2.7],[265.9,4.6],[263.7,12.6],[254.4,9.4],[247.7,2.0],[243.6,-3.7],[244.6,-4.7],[249.3,-10.6],[257.6,-15.7]],[[254.4,9.4],[249.3,-10.6],[247.8,-16.6],[246.8,-18.5],[246.0,-20.0],[246.4,-23.4]],[[265.9,4.6],[257.6,-15.7],[260.5,-25.0],[261.8,-29.9]],[[91.9,14.8],[88.6,20.3],[91.0,20.1],[93.0,14.2],[90.6,9.6],[88.8,7.4],[81.3,6.3],[73.7,10.2]],[[74.6,1.7],[73.6,2.4],[72.8,5.6],[72.5,7.0],[72.7,8.9],[73.7,10.2],[74.1,13.5],[76.1,15.4],[77.4,15.6]],[[78.6,-8.2],[81.1,-2.4],[83.0,-0.3],[81.3,6.3],[83.8,9.9],[88.8,7.4],[85.2,-1.9],[86.9,-9.7]],[[85.2,-1.9],[84.1,-1.2],[83.0,-0.3]],[[306.4,-56.7],[311.2,-66.2],[302.2,-66.2],[283.1,-62.2],[275.8,-61.5],[272.1,-63.7],[266.4,-64.7],[280.8,-71.4],[300.1,-72.9],[311.2,-66.2],[321.6,-65.4]],[[332.5,33.2],[340.8,30.2],[345.9,28.1],[2.1,29.1],[3.3,15.2],[346.2,15.2],[341.7,12.2],[340.4,10.8],[332.5,6.2],[326.0,9.9]],[[346.2,15.2],[345.9,28.1],[342.5,24.6],[341.6,23.6],[331.8,25.3],[326.2,25.6]],[[56.1,32.3],[58.5,31.9],[59.7,35.8],[59.5,40.0],[56.3,42.6],[55.7,47.8],[54.1,48.2],[51.1,49.9],[46.2,53.5],[42.7,55.9],[43.6,52.8],[47.3,49.6],[47.4,44.9],[47.0,41.0],[47.8,39.6],[46.3,38.8],[44.7,39.7],[44.9,41.0],[47.0,41.0]],[[61.6,50.4],[63.7,48.4],[62.2,47.7],[55.7,47.8]],[[47.3,49.6],[41.0,49.2],[25.9,50.7]],[[6.6,-42.3],[16.5,-46.7],[22.1,-43.3],[22.8,-49.1],[17.1,-55.2],[16.5,-46.7],[2.4,-45.7],[6.6,-42.3]],[[102.0,-61.9],[87.5,-56.2],[86.8,-51.1]],[[18.4,24.6],[17.9,30.1],[19.9,27.3],[18.4,24.6],[17.9,21.0],[22.9,15.3],[26.3,9.2],[30.5,2.8],[28.4,3.2],[25.4,5.5],[22.5,6.1],[18.4,7.6],[15.7,7.9],[12.2,7.6],[359.8,6.9],[355.0,5.6],[352.0,6.4],[350.1,5.4],[349.3,3.3],[351.7,1.3],[355.5,1.8],[356.6,3.5],[355.0,5.6]],[[349.3,3.3],[346.0,3.8]],[[340.2,-27.0],[344.4,-29.6],[344.0,-32.5],[343.1,-32.9],[337.9,-32.3],[332.1,-33.0],[326.2,-33.0],[326.9,-30.9],[332.1,-33.0],[340.2,-27.0]],[[99.4,-43.2],[109.3,-37.1],[113.8,-28.4],[114.7,-26.8],[117.3,-24.9],[119.2,-22.9],[121.9,-24.3],[120.9,-40.0],[122.4,-47.3]],[[117.3,-24.9],[117.0,-25.9],[116.0,-29.0],[113.8,-28.4]],[[120.9,-40.0],[130.0,-35.3],[130.9,-33.2],[132.6,-27.7]],[[63.6,-62.5],[64.1,-59.3],[59.7,-61.4],[56.0,-64.8],[63.6,-62.5]],[[295.0,18.0],[296.8,18.5],[299.7,19.5]],[[295.3,17.5],[296.8,18.5]],[[274.4,-36.8],[276.0,-34.4],[275.2,-29.8],[277.0,-25.4],[273.4,-21.1]],[[290.7,-44.5],[291.0,-40.6],[285.7,-29.9],[281.4,-27.0],[277.0,-25.4]],[[298.8,-41.9],[299.9,-35.3],[299.0,-26.3],[294.2,-24.9],[291.3,-24.5],[288.9,-25.3],[283.8,-26.3],[281.4,-27.0],[275.2,-29.8],[271.5,-30.4],[276.0,-34.4],[285.7,-29.9],[286.7,-27.7],[283.8,-26.3],[286.2,-21.7],[287.4,-21.0],[289.4,-19.0],[290.4,-17.8],[290.4,-16.0]],[[286.2,-21.7],[284.4,-21.1],[283.5,-22.7],[283.8,-26.3]],[[239.7,-26.1],[240.1,-22.6],[241.4,-19.8]],[[240.1,-22.6],[245.3,-25.6],[247.4,-26.4],[249.0,-28.2],[252.5,-34.3],[253.0,-38.0],[253.6,-42.4],[258.0,-43.2],[264.3,-43.0],[266.9,-40.1],[265.6,-39.0],[263.4,-37.1]],[[14.7,-29.4],[357.2,-28.1],[349.7,-32.5],[353.2,-37.8]],[[278.8,-8.2],[281.8,-4.7],[280.6,-9.1],[277.3,-14.6],[278.8,-8.2]],[[236.5,15.4],[235.4,19.7],[237.2,18.1],[239.1,15.7],[236.5,15.4],[233.7,10.5],[236.1,6.4],[237.7,4.5],[243.6,-3.7]],[[257.6,-15.7],[264.4,-15.4],[269.8,-9.8],[270.8,-8.2],[275.3,-2.9],[284.1,4.2]],[[152.0,-0.4],[148.1,-8.1],[157.4,-2.7],[157.6,-0.6]],[[84.4,21.1],[69.0,16.5],[67.2,15.9],[64.9,15.6],[65.7,17.5],[67.2,19.2],[81.6,28.6]],[[64.9,15.6],[60.2,12.5],[51.8,9.7],[60.8,6.0]],[[51.8,9.7],[51.2,9.0],[54.2,0.4]],[[272.8,-46.0],[276.7,-46.0],[277.2,-49.1]],[[28.3,29.6],[32.4,35.0],[34.3,33.8],[28.3,29.6]],[[252.2,-69.0],[238.8,-63.4],[229.7,-68.7],[252.2,-69.0]],[[334.6,-60.3],[349.4,-58.2],[7.9,-63.0],[5.0,-64.9],[360.0,-65.6],[336.8,-65.0],[334.6,-60.3]],[[183.9,57.0],[165.9,61.8],[165.5,56.4],[178.5,53.7],[183.9,57.0],[193.5,56.0],[201.0,54.9],[206.9,49.3]],[[178.5,53.7],[176.5,47.8],[169.6,33.1],[169.5,31.5]],[[176.5,47.8],[167.4,44.5],[155.6,41.5]],[[167.4,44.5],[154.3,42.9]],[[165.9,61.8],[142.9,63.1],[127.6,60.7],[147.7,59.0],[165.5,56.4]],[[165.5,56.4],[148.0,54.1],[143.2,51.7],[134.8,48.0]],[[135.9,47.2],[143.2,51.7]],[[236.0,77.8],[244.4,75.8],[230.2,71.8],[222.7,74.2],[236.0,77.8],[251.5,82.0],[263.1,86.6],[38.0,89.3]],[[131.2,-54.7],[140.5,-55.0],[149.2,-54.6],[161.7,-49.4],[153.7,-42.1],[142.7,-40.5],[137.0,-43.4],[122.4,-47.3]],[[176.5,6.5],[177.7,1.8],[185.0,-0.7],[190.4,-1.4],[197.5,-5.5],[201.3,-11.2],[214.0,-6.0],[220.8,-5.7]],[[195.5,11.0],[193.9,3.4],[190.4,-1.4]],[[197.5,-5.5],[203.7,-0.6],[210.4,1.5],[221.6,1.9]],[[135.6,-66.4],[126.4,-66.1],[122.0,-68.6],[109.2,-68.0],[107.2,-70.5],[122.0,-68.6],[135.6,-66.4]],[[289.1,21.4],[292.2,24.7],[298.4,24.1],[300.3,27.8],[303.9,27.8]]];
+const SKY_DEFS=`<defs>
+ <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <radialGradient id="gSun"><stop offset="0%" stop-color="#FFF6CF"/><stop offset="55%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F0A532"/></radialGradient>
+ <radialGradient id="gVen"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#E8E2C2"/></radialGradient>
+ <linearGradient id="gJup" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F2E3BC"/><stop offset="45%" stop-color="#D9B98C"/><stop offset="60%" stop-color="#C49A6C"/><stop offset="100%" stop-color="#E8D3A8"/></linearGradient>
+ <radialGradient id="gMar"><stop offset="0%" stop-color="#F09A6E"/><stop offset="100%" stop-color="#C05A36"/></radialGradient>
+ <radialGradient id="gSat"><stop offset="0%" stop-color="#F0E3BC"/><stop offset="100%" stop-color="#CDB686"/></radialGradient>
+</defs>`;
+function planetArtSVG(b,x,y){
+  const r=b.r,k=b.key,cls=`class="sky-body" data-k="${k}"`;
+  if(k==='Sun')return `<circle ${cls} cx="${x}" cy="${y}" r="${r}" fill="url(#gSun)" filter="url(#glow)"/>`;
+  if(k==='Venus')return `<circle ${cls} cx="${x}" cy="${y}" r="${r}" fill="url(#gVen)" filter="url(#glow)"/>`;
+  if(k==='Mercury')return `<circle ${cls} cx="${x}" cy="${y}" r="${r}" fill="#C8CFDB" filter="url(#glow)"/>`;
+  if(k==='Mars')return `<circle ${cls} cx="${x}" cy="${y}" r="${r}" fill="url(#gMar)" filter="url(#glow)"/>`;
+  if(k==='Jupiter')return `<g ${cls}><circle cx="${x}" cy="${y}" r="${r}" fill="url(#gJup)" filter="url(#glow)"/>
+    <path d="M ${x-r*.95} ${y-r*.3} q ${r} ${r*.18} ${r*1.9} 0" stroke="#B07F4F" stroke-width="1.1" fill="none" opacity=".8"/>
+    <path d="M ${x-r*.9} ${y+r*.25} q ${r} ${r*.18} ${r*1.8} 0" stroke="#B07F4F" stroke-width="1.3" fill="none" opacity=".8"/></g>`;
+  if(k==='Saturn')return `<g ${cls}><ellipse cx="${x}" cy="${y}" rx="${r*1.9}" ry="${r*.62}" fill="none" stroke="#D9C28C" stroke-width="1.6" transform="rotate(-18 ${x} ${y})" opacity=".95"/>
+    <circle cx="${x}" cy="${y}" r="${r}" fill="url(#gSat)" filter="url(#glow)"/>
+    <ellipse cx="${x}" cy="${y}" rx="${r*1.9}" ry="${r*.62}" fill="none" stroke="#B89A60" stroke-width=".7" transform="rotate(-18 ${x} ${y})" stroke-dasharray="0 ${r*3.2} ${r*3.4}"/></g>`;
+  return `<circle ${cls} cx="${x}" cy="${y}" r="${r}" fill="${b.fill}"/>`;
+}
+function constellationPaths(sc,proj,color,width){
+  let out='';
+  for(const line of CLINES){
+    let d='',pen=false;
+    for(const[ra,dec]of line){
+      const aa=altAz(ra,dec,sc.lst,state.birth.place.lat);
+      if(aa.alt>-2){const[x,y]=proj(aa.alt,aa.az);d+=(pen?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);pen=true;}
+      else pen=false;
+    }
+    if(d)out+=`<path d="${d}" stroke="${color}" stroke-width="${width}" fill="none" opacity=".55"/>`;
+  }
+  return out;
+}
+function eclipticPath(sc,proj){
+  let d='',pen=false;
+  for(let L=0;L<=360;L+=4){
+    const eq=eclToEq(L,0,sc.eps);const aa=altAz(eq.ra,eq.dec,sc.lst,state.birth.place.lat);
+    if(aa.alt>-2){const[x,y]=proj(aa.alt,aa.az);d+=(pen?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);pen=true;}else pen=false;
+  }
+  return d?`<path d="${d}" stroke="#D4A24E" stroke-width="1" stroke-dasharray="4 5" fill="none" opacity=".5"/>`:'';
+}
+function galaxyPath(sc,proj){ // soft Milky Way band along the galactic equator
+  let d='',pen=false;
+  for(let gl=0;gl<=360;gl+=5){
+    // galactic (l, b=0) -> equatorial (J2000): NGP ra 192.859, dec 27.128, node 122.932
+    const dec=Math.asin(cosd(27.128)*cosd(0)*sind(gl-32.932)*0+sind(27.128)*0+cosd(27.128)*sind(gl-32.932)*0+ // placeholder guard
+      sind(0)*sind(27.128)+cosd(0)*cosd(27.128)*sind(gl-32.932))*R2D;
+    const y1=cosd(0)*cosd(gl-32.932), x1=sind(0)*cosd(27.128)-cosd(0)*sind(27.128)*sind(gl-32.932);
+    const ra=rev(Math.atan2(y1,x1)*R2D+192.859-90+90); // simplified
+    const aa=altAz(ra,dec,sc.lst,state.birth.place.lat);
+    if(aa.alt>-2){const[x,y]=proj(aa.alt,aa.az);d+=(pen?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);pen=true;}else pen=false;
+  }
+  return d?`<path d="${d}" stroke="#3A3A66" stroke-width="14" stroke-linecap="round" fill="none" opacity=".35" filter="url(#glow)"/>`:'';
+}
+/* ---------- WINDOW MODE (Tier B): drag-to-look, pinch/scroll zoom ---------- */
+Object.assign(sky,{mode:'dome',target:'',view:{alt:25,az:90,fov:70}});
+function vecOf(alt,az){return[cosd(alt)*sind(az),cosd(alt)*cosd(az),sind(alt)];} //[E,N,Up]
+function setSkyMode(m){
+  sky.mode=m;
+  document.getElementById('mode-dome').style.cssText=m==='dome'?'border-color:var(--gold);color:var(--gold-soft)':'';
+  document.getElementById('mode-window').style.cssText=m==='window'?'border-color:var(--gold);color:var(--gold-soft)':'';
+  renderSky();
+  if(m==='window')document.getElementById('sky-info').textContent='Drag to look around the sky, pinch or scroll to zoom. East is to your right when facing north — just like standing outside.';
+}
+function renderWindow(sc){
+  const holder=document.getElementById('sky-holder');
+  let cv=document.getElementById('sky-cv');
+  if(!cv){holder.innerHTML='<canvas id="sky-cv" class="sky-canvas"></canvas>';cv=document.getElementById('sky-cv');bindWindowEvents(cv);}
+  const Wpx=holder.clientWidth||360,Hpx=Math.round(Wpx*0.75);
+  cv.width=Wpx*2;cv.height=Hpx*2;cv.style.height=Hpx+'px';
+  const g=cv.getContext('2d');g.scale(2,2);
+  const v=sky.view,F=vecOf(v.alt,v.az);
+  const Rv=[(F[1]),-F[0],0];const rn=Math.hypot(Rv[0],Rv[1])||1;Rv[0]/=rn;Rv[1]/=rn; // right = F x worldUp (E,N,Up)
+  const Uc=[Rv[1]*F[2]-0,0-Rv[0]*F[2],Rv[0]*F[1]-Rv[1]*F[0]]; // up = R x F
+  const scale=(Wpx/2)/Math.tan(v.fov/2*D2R), cx=Wpx/2, cy=Hpx/2, lim=cosd(Math.min(v.fov*0.9,88));
+  const P=(alt,az)=>{const V=vecOf(alt,az);const c=F[0]*V[0]+F[1]*V[1]+F[2]*V[2];
+    if(c<lim)return null;
+    const px=(Rv[0]*V[0]+Rv[1]*V[1])/c, py=(Uc[0]*V[0]+Uc[1]*V[1]+Uc[2]*V[2])/c;
+    return[cx+px*scale,cy-py*scale];};
+  // background by sun altitude
+  const bg=sc.sunAlt>0?'#27406B':sc.sunAlt>-6?'#1C2C52':sc.sunAlt>-12?'#141E3E':'#0A0E22';
+  g.fillStyle=bg;g.fillRect(0,0,Wpx,Hpx);
+  // ground below horizon
+  g.fillStyle='#121024';
+  for(let x=0;x<=Wpx;x+=8){ /* horizon curve fill via sampling az along view */ }
+  // horizon line + cardinal ticks
+  g.strokeStyle='#D4A24E';g.globalAlpha=.8;g.beginPath();let pen=false;
+  for(let az=0;az<=360;az+=2){const p=P(0,az);if(p){pen?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);pen=true;}else pen=false;}
+  g.stroke();g.globalAlpha=1;
+  g.fillStyle='#E8C887';g.font='12px Eczar,serif';
+  [['N',0],['E',90],['S',180],['W',270]].forEach(([t,az])=>{const p=P(2,az);if(p)g.fillText(t,p[0]-4,p[1]-4);});
+  // milky way + constellations (night only)
+  if(sc.sunAlt<0){
+    g.strokeStyle='#5B5687';g.lineWidth=1;g.globalAlpha=.55;
+    for(const line of CLINES){g.beginPath();let pn=false;
+      for(const[ra,dec]of line){const aa=altAz(ra,dec,sc.lst,state.birth.place.lat);const p=aa.alt>-2?P(aa.alt,aa.az):null;
+        if(p){pn?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);pn=true;}else pn=false;}
+      g.stroke();}
+    g.globalAlpha=1;
+    // stars
+    for(const s of sc.starPts){const p=P(s.alt,s.az);if(!p)continue;
+      const sz=Math.max(.7,(2.6-s.mag*.55))*(70/v.fov);
+      g.shadowBlur=s.mag<1.6?8:0;g.shadowColor='#C9CDE3';
+      g.fillStyle=s.nak?'#F0C868':'#C9CDE3';g.beginPath();g.arc(p[0],p[1],sz,0,7);g.fill();g.shadowBlur=0;
+      if((s.nak||s.name)&&v.fov<55){g.fillStyle=s.nak?'#D4A24E':'#8E89B0';g.font='10px Work Sans';g.fillText(s.nak||s.name,p[0]+5,p[1]-4);}
+    }
+  }
+  // ecliptic
+  g.strokeStyle='#D4A24E';g.setLineDash([4,5]);g.globalAlpha=.5;g.beginPath();pen=false;
+  for(let L=0;L<=360;L+=3){const eq=eclToEq(L,0,sc.eps);const aa=altAz(eq.ra,eq.dec,sc.lst,state.birth.place.lat);
+    const p=aa.alt>-2?P(aa.alt,aa.az):null;if(p){pen?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);pen=true;}else pen=false;}
+  g.stroke();g.setLineDash([]);g.globalAlpha=1;
+  // planets with art
+  sky._hit=[];
+  for(const b of sc.bodies){const p=b.alt>-1?P(b.alt,b.az):null;if(!p)continue;
+    drawPlanetCanvas(g,b,p[0],p[1],Math.max(1,(70/v.fov)));
+    sky._hit.push({x:p[0],y:p[1],b});
+    g.fillStyle=b.ghost?'#9A94B8':(b.fill||'#E8EAF2');g.font='11px Work Sans';g.fillText(b.key,p[0]+b.r*(70/v.fov)+5,p[1]+3);
+    if(sky.target===b.key){g.strokeStyle='#F6C453';g.lineWidth=2;g.beginPath();g.arc(p[0],p[1],b.r*(70/v.fov)+8,0,7);g.stroke();g.lineWidth=1;}
+  }
+  // guidance arrow to target if off-screen
+  if(sky.target){const tb=sc.bodies.find(x=>x.key===sky.target);
+    if(tb){const p=tb.alt>-1?P(tb.alt,tb.az):null;
+      if(!p){drawGuideArrow(g,tb,F,Rv,Uc,cx,cy,Wpx,Hpx);}}}
+}
+function drawPlanetCanvas(g,b,x,y,z){
+  const r=b.r*z;
+  g.shadowBlur=10;g.shadowColor=b.fill||'#fff';
+  if(b.ghost){g.shadowBlur=0;g.strokeStyle='#9A94B8';g.setLineDash([3,2]);g.beginPath();g.arc(x,y,r,0,7);g.stroke();g.setLineDash([]);return;}
+  if(b.key==='Saturn'){g.strokeStyle='#D9C28C';g.lineWidth=1.6;g.save();g.translate(x,y);g.rotate(-0.31);
+    g.beginPath();g.ellipse(0,0,r*1.9,r*.62,0,0,7);g.stroke();g.restore();}
+  let fill=b.fill;
+  if(b.key==='Sun')fill='#FFD75E'; if(b.key==='Mars')fill='#D96B42'; if(b.key==='Jupiter')fill='#E3C893';
+  g.fillStyle=fill||'#E8EAF2';g.beginPath();g.arc(x,y,r,0,7);g.fill();
+  if(b.key==='Jupiter'){g.strokeStyle='#B07F4F';g.globalAlpha=.8;
+    g.beginPath();g.moveTo(x-r*.9,y-r*.3);g.quadraticCurveTo(x,y-r*.12,x+r*.9,y-r*.3);g.stroke();
+    g.beginPath();g.moveTo(x-r*.85,y+r*.25);g.quadraticCurveTo(x,y+r*.43,x+r*.85,y+r*.25);g.stroke();g.globalAlpha=1;}
+  if(b.moon&&b.elong!==undefined){const ill=(1-cosd(b.elong))/2;
+    if(ill<.97){g.fillStyle='rgba(10,14,34,.92)';g.beginPath();
+      g.ellipse(x+(b.elong<180?-1:1)*r*(1-ill)*.7,y,r*Math.max(.05,Math.abs(cosd(b.elong))),r,0,0,7);g.fill();}}
+  g.shadowBlur=0;
+}
+function drawGuideArrow(g,tb,F,Rv,Uc,cx,cy,W,H){
+  const V=vecOf(Math.max(tb.alt,-5),tb.az);
+  const px=Rv[0]*V[0]+Rv[1]*V[1], py=Uc[0]*V[0]+Uc[1]*V[1]+Uc[2]*V[2];
+  const ang=Math.atan2(-py,px);
+  const ex=cx+Math.cos(ang)*(W/2-26), ey=cy+Math.sin(ang)*(H/2-26);
+  g.save();g.translate(ex,ey);g.rotate(ang);
+  g.fillStyle='#F6C453';g.beginPath();g.moveTo(14,0);g.lineTo(-8,-8);g.lineTo(-8,8);g.closePath();g.fill();g.restore();
+  g.fillStyle='#F6C453';g.font='11px Work Sans';
+  const hint=tb.alt<=0?tb.key+' is below the horizon':'Turn to find '+tb.key;
+  g.fillText(hint,Math.min(Math.max(ex-40,8),W-110),Math.min(Math.max(ey+22,16),H-8));
+}
+function bindWindowEvents(cv){
+  let drag=null,pinch=null;
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,alt:sky.view.alt,az:sky.view.az};cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;
+    const w=cv.clientWidth,f=sky.view.fov;
+    sky.view.az=rev(drag.az-(e.clientX-drag.x)/w*f*1.2);
+    sky.view.alt=Math.min(88,Math.max(-8,drag.alt+(e.clientY-drag.y)/w*f*1.2));
+    renderSky();});
+  cv.addEventListener('pointerup',()=>drag=null);
+  cv.addEventListener('wheel',e=>{e.preventDefault();sky.view.fov=Math.min(100,Math.max(18,sky.view.fov*(e.deltaY>0?1.1:0.9)));renderSky();},{passive:false});
+  cv.addEventListener('touchstart',e=>{if(e.touches.length===2){pinch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);drag=null;}},{passive:true});
+  cv.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    sky.view.fov=Math.min(100,Math.max(18,sky.view.fov*pinch/d));pinch=d;renderSky();}},{passive:true});
+  cv.addEventListener('touchend',()=>pinch=null);
+  cv.addEventListener('click',e=>{if(!sky._hit)return;const r=cv.getBoundingClientRect();
+    const mx=e.clientX-r.left,my=e.clientY-r.top;
+    const hit=sky._hit.find(h=>Math.hypot(h.x-mx,h.y-my)<16);
+    if(hit){const fake={target:{closest:()=>({dataset:{k:hit.b.key}})}};skyTap(fake);}});
+}
+function findGraha(k){
+  sky.target=k;
+  if(!k){renderSky();return;}
+  const sc=sky._last||computeSky(skyDate());
+  const b=sc.bodies.find(x=>x.key===k);
+  if(sky.mode==='window'&&b){sky.view.az=b.az;sky.view.alt=Math.max(5,Math.min(80,b.alt));}
+  renderSky();
+  if(b){const sign=RASHI[sidSign(b.sid)];
+    document.getElementById('sky-info').textContent=
+      b.alt>0?`${b.label}: ${heightWord(b.alt)} in the ${dirWord(b.az)}. Turn that way and ${b.ghost?'know it sits there invisibly':'look — that bright point is it'}. It is in ${sign[0]} (${sign[1]}).`
+      :`${b.label} is below the horizon right now — drag the time slider forward to see when it rises in the ${dirWord(b.az)}.`;}
+}
+
 /* nicer pickers: open native calendar/clock on click */
 document.addEventListener('click',e=>{
   const i=e.target;
