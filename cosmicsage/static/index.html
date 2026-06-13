@@ -237,14 +237,15 @@
   .dosha-detail{display:none;} .dosha-detail.open{display:table-row;}
   .dosha-detail td{padding:4px 10px 12px; font-size:.85rem; color:var(--muted); line-height:1.55;}
   /* donation modal */
-  .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
-  .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:400px; width:100%; padding:20px 22px; text-align:center; max-height:92vh; overflow-y:auto;}
+  .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; overflow-y:auto;}
+  .modal-title-row{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:8px;}
+  .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:380px; width:100%; padding:18px 20px; text-align:center;}
   .modal h3{color:var(--gold); font-size:1.2rem; margin-bottom:6px;}
   .modal p{color:var(--muted); font-size:.85rem; margin-bottom:12px; line-height:1.5;}
   .amounts{display:flex; gap:8px; justify-content:center; margin-bottom:12px; flex-wrap:wrap;}
   .amt{background:var(--panel2); border:1.5px solid var(--line); color:var(--ink); border-radius:10px; padding:10px 18px; font-weight:600; font-size:.95rem;}
   .amt.sel{border-color:var(--gold); color:var(--gold-soft); background:rgba(212,162,78,.12);}
-  .qr-frame{background:#fff; border-radius:10px; padding:10px; width:160px; margin:0 auto 6px;}
+  .qr-frame{background:#fff; border-radius:10px; padding:9px; width:142px; margin:0 auto 6px;}
   .qr-frame img{width:100%; display:block;}
   .scan-note{font-size:.8rem; color:var(--gold-soft); margin-bottom:14px;}
   .footer{padding:28px 0 50px; color:var(--muted); font-size:.78rem; text-align:center; border-top:1px solid var(--line); margin-top:20px;}
@@ -553,10 +554,9 @@
 <!-- ============ DONATION MODAL ============ -->
 <div class="overlay hidden" id="modal-donate">
   <div class="modal">
-    <svg class="sage-logo-full" style="width:auto;height:46px;margin:0 auto 2px;display:block" viewBox="0 0 160 180"><defs><radialGradient id="orbM" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D8"/><stop offset="40%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F6A93B" stop-opacity="0"/></radialGradient><linearGradient id="threadM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#F6A93B"/></linearGradient><linearGradient id="robeM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><radialGradient id="auraM" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F6C453" stop-opacity=".4"/><stop offset="100%" stop-color="#F6C453" stop-opacity="0"/></radialGradient></defs><circle cx="80" cy="20" r="22" fill="url(#orbM)"/><circle cx="80" cy="20" r="8" fill="#FFF6D8"/><path d="M80 28 q-7 22 0 40 q7 18 0 38 q-5 14 0 26" stroke="url(#threadM)" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="80" cy="138" r="40" fill="url(#auraM)"/><g fill="url(#robeM)"><circle cx="80" cy="118" r="9"/><path d="M80 110 q-3 -6 0 -10 q3 4 0 10z" fill="#FFE9A8"/><path d="M80 127 C66 130 58 144 58 160 L102 160 C102 144 94 130 80 127 Z"/><ellipse cx="80" cy="162" rx="34" ry="9"/></g><path d="M72 128 q8 14 16 0" stroke="#8B3A1E" stroke-width="2.2" fill="none" stroke-dasharray="0.5 3" stroke-linecap="round"/></svg>
-    <h3>Support CosmicSage</h3>
+    <div class="modal-title-row"><svg class="sage-logo-full" style="width:auto;height:40px;flex:none" viewBox="0 0 160 180"><defs><radialGradient id="orbM" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D8"/><stop offset="40%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F6A93B" stop-opacity="0"/></radialGradient><linearGradient id="threadM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#F6A93B"/></linearGradient><linearGradient id="robeM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><radialGradient id="auraM" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F6C453" stop-opacity=".4"/><stop offset="100%" stop-color="#F6C453" stop-opacity="0"/></radialGradient></defs><circle cx="80" cy="20" r="22" fill="url(#orbM)"/><circle cx="80" cy="20" r="8" fill="#FFF6D8"/><path d="M80 28 q-7 22 0 40 q7 18 0 38 q-5 14 0 26" stroke="url(#threadM)" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="80" cy="138" r="40" fill="url(#auraM)"/><g fill="url(#robeM)"><circle cx="80" cy="118" r="9"/><path d="M80 110 q-3 -6 0 -10 q3 4 0 10z" fill="#FFE9A8"/><path d="M80 127 C66 130 58 144 58 160 L102 160 C102 144 94 130 80 127 Z"/><ellipse cx="80" cy="162" rx="34" ry="9"/></g><path d="M72 128 q8 14 16 0" stroke="#8B3A1E" stroke-width="2.2" fill="none" stroke-dasharray="0.5 3" stroke-linecap="round"/></svg><h3 style="margin:0">Support CosmicSage</h3></div>
     <p id="exit-note" style="display:none;background:rgba(212,162,78,.1);border:1px solid rgba(212,162,78,.35);border-radius:10px;padding:10px 13px;color:var(--gold-soft)">Leaving so soon? 🙏 If CosmicSage helped you today, a small gift keeps it free for everyone ♥</p>
-    <p>Made with love by Kaushik. CosmicSage is free for everyone — your gift keeps the servers running. 🙏</p>
+    <p>Made with love by Kaushik. Your gift keeps CosmicSage free and the servers running. 🙏</p>
     <div class="amounts">
       <button class="amt" onclick="pickAmt(this,50)">₹50</button>
       <button class="amt sel" onclick="pickAmt(this,100)">₹100</button>
