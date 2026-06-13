@@ -23,6 +23,7 @@ MODEL_HAIKU = "claude-haiku-4-5-20251001"  # free questions 2-3
 FREE_LIMIT = 3
 PACK_PRICE = 69
 PACK_QUESTIONS = 9
+MATCH_PRICE = 29
 
 DAILY_LIMIT = int(os.environ.get("DAILY_QUESTION_LIMIT", "40"))
 ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
@@ -66,6 +67,8 @@ def init_db():
         cur.execute("""CREATE TABLE IF NOT EXISTS users(
             uid TEXT PRIMARY KEY, free_used INT NOT NULL DEFAULT 0,
             credits INT NOT NULL DEFAULT 0, created TIMESTAMPTZ DEFAULT now())""")
+        # safe, idempotent migration for the ₹29 matching feature
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS match_credits INT NOT NULL DEFAULT 0")
         cur.execute("""CREATE TABLE IF NOT EXISTS claims(
             utr TEXT PRIMARY KEY, uid TEXT NOT NULL, amount INT NOT NULL,
             status TEXT NOT NULL DEFAULT 'active', created TIMESTAMPTZ DEFAULT now())""")
@@ -76,31 +79,34 @@ init_db()
 
 def get_user(uid):
     if not DATABASE_URL:
-        return _mem_users.setdefault(uid, {"free_used": 0, "credits": 0})
+        return _mem_users.setdefault(uid, {"free_used": 0, "credits": 0, "match_credits": 0})
     with db() as c, c.cursor() as cur:
         cur.execute("INSERT INTO users(uid) VALUES(%s) ON CONFLICT(uid) DO NOTHING", (uid,))
-        cur.execute("SELECT free_used, credits FROM users WHERE uid=%s", (uid,))
-        f, cr = cur.fetchone()
-        return {"free_used": f, "credits": cr}
+        cur.execute("SELECT free_used, credits, match_credits FROM users WHERE uid=%s", (uid,))
+        f, cr, mc = cur.fetchone()
+        return {"free_used": f, "credits": cr, "match_credits": mc}
 
 
-def bump_user(uid, free_delta=0, credit_delta=0):
+def bump_user(uid, free_delta=0, credit_delta=0, match_delta=0):
     if not DATABASE_URL:
-        u = _mem_users.setdefault(uid, {"free_used": 0, "credits": 0})
+        u = _mem_users.setdefault(uid, {"free_used": 0, "credits": 0, "match_credits": 0})
         u["free_used"] += free_delta
         u["credits"] = max(0, u["credits"] + credit_delta)
+        u["match_credits"] = max(0, u["match_credits"] + match_delta)
         return u
     with db() as c, c.cursor() as cur:
         cur.execute("""UPDATE users SET free_used=free_used+%s,
-            credits=GREATEST(0, credits+%s) WHERE uid=%s
-            RETURNING free_used, credits""", (free_delta, credit_delta, uid))
-        f, cr = cur.fetchone()
-        return {"free_used": f, "credits": cr}
+            credits=GREATEST(0, credits+%s), match_credits=GREATEST(0, match_credits+%s)
+            WHERE uid=%s RETURNING free_used, credits, match_credits""",
+                    (free_delta, credit_delta, match_delta, uid))
+        f, cr, mc = cur.fetchone()
+        return {"free_used": f, "credits": cr, "match_credits": mc}
 
 
 def status_payload(u):
     return {"free_left": max(0, FREE_LIMIT - u["free_used"]), "credits": u["credits"],
-            "pack_price": PACK_PRICE, "pack_questions": PACK_QUESTIONS}
+            "match_credits": u.get("match_credits", 0),
+            "pack_price": PACK_PRICE, "pack_questions": PACK_QUESTIONS, "match_price": MATCH_PRICE}
 
 
 SYSTEM_PROMPT = """You are CosmicSage, a warm, wise Vedic astrologer who explains the
@@ -168,6 +174,8 @@ def api_claim():
     data = request.get_json(silent=True) or {}
     uid = str(data.get("uid", "")).strip()
     utr = "".join(ch for ch in str(data.get("utr", "")) if ch.isdigit())
+    kind = "match" if str(data.get("kind", "pack")) == "match" else "pack"
+    amount = MATCH_PRICE if kind == "match" else PACK_PRICE
     if not (8 <= len(uid) <= 64):
         return jsonify(error="Bad uid."), 400
     if len(utr) != 12:
@@ -176,16 +184,20 @@ def api_claim():
     if not DATABASE_URL:
         if utr in _mem_claims:
             return jsonify(error="This UTR has already been used."), 409
-        _mem_claims[utr] = {"uid": uid, "amount": PACK_PRICE, "status": "active"}
+        _mem_claims[utr] = {"uid": uid, "amount": amount, "status": "active"}
     else:
         with db() as c, c.cursor() as cur:
             cur.execute("SELECT 1 FROM claims WHERE utr=%s", (utr,))
             if cur.fetchone():
                 return jsonify(error="This UTR has already been used."), 409
-            cur.execute("INSERT INTO claims(utr, uid, amount) VALUES(%s,%s,%s)", (utr, uid, PACK_PRICE))
-    u = bump_user(uid, credit_delta=PACK_QUESTIONS)
-    return jsonify(message=f"Unlocked {PACK_QUESTIONS} questions. Thank you for supporting CosmicSage! ♥",
-                   status=status_payload(u))
+            cur.execute("INSERT INTO claims(utr, uid, amount) VALUES(%s,%s,%s)", (utr, uid, amount))
+    if kind == "match":
+        u = bump_user(uid, match_delta=1)
+        msg = "Kundali matching unlocked. Thank you for supporting CosmicSage! ♥"
+    else:
+        u = bump_user(uid, credit_delta=PACK_QUESTIONS)
+        msg = f"Unlocked {PACK_QUESTIONS} questions. Thank you for supporting CosmicSage! ♥"
+    return jsonify(message=msg, status=status_payload(u))
 
 
 @app.post("/api/ask")
@@ -207,7 +219,21 @@ def ask():
 
     u = get_user(uid)
     vip = _norm_name(data.get("name", "")) in FREE_NAMES
-    if vip:
+    is_match = str(data.get("kind", "")) == "match"
+    if is_match:
+        # Matching: free for VIPs and pack-credit holders (spends 1 credit);
+        # otherwise needs a ₹29 match unlock. Never uses the 3 free questions.
+        if vip:
+            kind, model, max_tokens = "vip", MODEL_SONNET, 1500
+        elif u["credits"] > 0:
+            kind, model, max_tokens = "paid", MODEL_SONNET, 1500
+        elif u.get("match_credits", 0) > 0:
+            kind, model, max_tokens = "match", MODEL_SONNET, 1500
+        else:
+            return jsonify(error="quota", paywall="match",
+                           message=f"Unlock Kundali matching for ₹{MATCH_PRICE} (free if you have a question pack).",
+                           status=status_payload(u)), 402
+    elif vip:
         kind, model, max_tokens = "vip", MODEL_SONNET, 1500
     elif u["free_used"] < FREE_LIMIT:
         kind = "free"
@@ -249,7 +275,8 @@ def ask():
         text = "\n".join(b.get("text", "") for b in out.get("content", []) if b.get("type") == "text").strip()
         # burn quota only after a successful answer
         u = u if kind == "vip" else bump_user(uid, free_delta=1 if kind == "free" else 0,
-                      credit_delta=-1 if kind == "paid" else 0)
+                      credit_delta=-1 if kind == "paid" else 0,
+                      match_delta=-1 if kind == "match" else 0)
         return jsonify(answer=text or "The sky is quiet — please ask again.", status=status_payload(u))
     except requests.RequestException as e:
         app.logger.error("Anthropic call failed: %s", e)
