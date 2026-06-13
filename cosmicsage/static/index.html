@@ -192,6 +192,21 @@
   .sc-badge.low{background:rgba(212,162,78,.18); color:var(--gold-soft);}
   .sc-badge.med{background:rgba(214,138,61,.2); color:#E8A24D;}
   .sc-note{font-size:.76rem; color:var(--muted); margin-top:12px; text-align:center;}
+  .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
+  .sc-summary b{color:var(--gold-soft);}
+  .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
+  .sc-item.dim{opacity:.55;}
+  .sc-more{background:transparent; border:1px dashed var(--line); color:var(--gold-soft); border-radius:10px; padding:9px; font-size:.82rem; width:100%; margin-top:4px;}
+  .dosha-tbl{width:100%; border-collapse:collapse; font-size:.88rem;}
+  .dosha-tbl th{text-align:left; color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; padding:6px 8px; border-bottom:1px solid var(--line);}
+  .dosha-row{cursor:pointer; border-bottom:1px solid rgba(52,48,92,.5);}
+  .dosha-row:hover{background:rgba(212,162,78,.06);}
+  .dosha-row td{padding:10px 8px; vertical-align:middle;}
+  .dosha-row td small{color:var(--muted); font-size:.74rem; margin-left:6px;}
+  .mini-bar{display:inline-block; width:70px; height:7px; background:var(--night); border:1px solid var(--line); border-radius:99px; overflow:hidden; vertical-align:middle;}
+  .mini-bar i{display:block; height:100%; background:linear-gradient(90deg,#F6C453,#E2702A);}
+  .dosha-detail{display:none;} .dosha-detail.open{display:table-row;}
+  .dosha-detail td{padding:4px 10px 12px; font-size:.85rem; color:var(--muted); line-height:1.55;}
   /* donation modal */
   .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
   .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:430px; width:100%; padding:28px; text-align:center;}
@@ -309,6 +324,7 @@
           <button class="sc-tab" onclick="scTab('planets',this)">🪐 Planet Strength</button>
         </div>
         <div class="sc-panel" id="sc-panel"></div>
+        <button class="wa-share" style="margin-top:12px" onclick="shareYogaDosha()">📲 Share my Yogas & Doshas</button>
         <div class="sc-note">Computed from your chart for reflection — tendencies, not fixed fate. Tap any area above, then ask the sage to go deeper.</div>
       </div>
 
@@ -758,58 +774,167 @@ function planetStrength(chart,k){
   }
   return Math.max(0.5,Math.min(10,s));
 }
-/* Yogas — return [{name, present, note}] */
+/* Yogas — 25 classical combinations. Each: {name, cat, present, strength(0-100), good, note} */
 function detectYogas(chart){
-  const P=chart.planets, out=[];
-  const houseFromMoon=(k)=>((P[k].sign-P.Moon.sign+12)%12)+1;
-  // Gaja Kesari: Jupiter in kendra from Moon
-  out.push({name:'Gaja Kesari Yoga',present:[1,4,7,10].includes(houseFromMoon('Jupiter')),
-    note:'Jupiter sits in a kendra from your Moon — brings wisdom, respect and lasting reputation.'});
-  // Budha-Aditya: Sun + Mercury same sign
-  out.push({name:'Budha-Aditya Yoga',present:P.Sun.sign===P.Mercury.sign,
-    note:'Sun and Mercury together — sharp intelligence, good communication and analytical skill.'});
-  // Chandra-Mangala: Moon + Mars same sign
-  out.push({name:'Chandra-Mangala Yoga',present:P.Moon.sign===P.Mars.sign,
-    note:'Moon with Mars — drive, resourcefulness and a knack for earning.'});
-  // Pancha Mahapurusha: Mars/Mer/Jup/Ven/Sat in own/exalt AND in kendra from lagna
-  const mahnames={Mars:'Ruchaka',Mercury:'Bhadra',Jupiter:'Hamsa',Venus:'Malavya',Saturn:'Sasa'};
+  const P=chart.planets, asc=chart.asc.sign, out=[];
+  const hM=(k)=>((P[k].sign-P.Moon.sign+12)%12)+1;       // house from Moon
+  const hL=(k)=>P[k].house;                                // house from Lagna
+  const inOwnEx=(k)=>(OWN[k]&&OWN[k].includes(P[k].sign))||EXALT[k]===P[k].sign;
+  const lordOf=(h)=>SIGN_LORD[(asc+h-1)%12];
+  const benefics=['Jupiter','Venus','Mercury','Moon'];
+  const kendra=[1,4,7,10],trikona=[1,5,9],upachaya=[3,6,10,11];
+  const str=(k)=>planetStrength(chart,k);
+  const add=(name,cat,present,strength,note)=>out.push({name,cat,present,strength:Math.round(Math.max(0,Math.min(100,strength))),note});
+
+  // ---- Mahapurusha (5) ----
+  const mah={Mars:'Ruchaka',Mercury:'Bhadra',Jupiter:'Hamsa',Venus:'Malavya',Saturn:'Shasha'};
   for(const k of ['Mars','Mercury','Jupiter','Venus','Saturn']){
-    const p=P[k],own=(OWN[k]&&OWN[k].includes(p.sign)),ex=(EXALT[k]===p.sign);
-    if((own||ex)&&[1,4,7,10].includes(p.house))
-      out.push({name:mahnames[k]+' Yoga (Mahapurusha)',present:true,
-        note:`${k} is powerful in a kendra — a rare Mahapurusha yoga giving standout strength of character.`});
+    const p=inOwnEx(k)&&kendra.includes(hL(k));
+    add(`${mah[k]} Yoga`,'Mahapurusha',p,p?70+str(k)*3:0,
+      `Your ${k} is dignified in an angle of the chart — a celebrated Pancha-Mahapurusha yoga. It gives you a naturally strong character and presence that people notice and respect.`);
   }
-  // Viparita Raja: lord of 6/8/12 placed in 6/8/12
-  let vip=false;
-  for(const dh of [6,8,12]){const lordSign=(chart.asc.sign+dh-1)%12;const lord=SIGN_LORD[lordSign];
-    if(P[lord]&&[6,8,12].includes(P[lord].house))vip=true;}
-  out.push({name:'Viparita Raja Yoga',present:vip,
-    note:'A "reversal" yoga — challenges tend to turn into unexpected gains and resilience.'});
+  // ---- Gaja Kesari ----
+  {const p=kendra.includes(hM('Jupiter'));add('Gaja Kesari Yoga','Wisdom & Fame',p,p?60+str('Jupiter')*3:0,
+    'Jupiter sits in a supportive angle from your Moon. This is a lovely combination for wisdom, good reputation and the respect of others — your kindness tends to come back to you.');}
+  // ---- Budha-Aditya ----
+  {const p=P.Sun.sign===P.Mercury.sign;add('Budha-Aditya Yoga','Intellect',p,p?55+str('Mercury')*3:0,
+    'Sun and Mercury travel together in your chart — a bright, articulate mind. You learn quickly and express yourself well.');}
+  // ---- Chandra-Mangala ----
+  {const p=P.Moon.sign===P.Mars.sign;add('Chandra-Mangala Yoga','Wealth',p,p?50+str('Mars')*3:0,
+    'Moon and Mars combine — energy paired with emotional drive. Often linked to earning capacity and the will to make things happen.');}
+  // ---- Saraswati (Jup/Ven/Mer well placed, Jup strong) ----
+  {const placed=['Jupiter','Venus','Mercury'].every(k=>[1,2,4,5,7,9,10].includes(hL(k)));
+   const p=placed&&inOwnEx('Jupiter')||placed&&str('Jupiter')>=6;
+   add('Saraswati Yoga','Wisdom & Fame',p,p?60+str('Jupiter')*2:0,
+    'The planets of learning and the arts — Jupiter, Venus and Mercury — are gracefully placed. A blessing for knowledge, creativity and skill.');}
+  // ---- Dhana (lords of 2 & 11 strong / related) ----
+  {const l2=lordOf(2),l11=lordOf(11);const p=(str(l2)+str(l11))/2>=6.2;
+   add('Dhana Yoga','Wealth',p,p?(str(l2)+str(l11))*5:30,
+    'Your houses of income and gains are supported. Money tends to come through steady effort, and your earning ability grows over time.');}
+  // ---- Lakshmi (9th lord strong + Venus strong) ----
+  {const l9=lordOf(9);const p=str(l9)>=6&&str('Venus')>=6;
+   add('Lakshmi Yoga','Wealth',p,p?(str(l9)+str('Venus'))*5:25,
+    'The lord of fortune and Venus are both well placed — a classical sign of prosperity, comfort and grace entering your life through good fortune.');}
+  // ---- Raja (kendra & trikona lords linked / strong) ----
+  {const lk=str(lordOf(10)),ltr=str(lordOf(9));const p=lk>=5.5&&ltr>=5.5;
+   add('Raja Yoga','Power & Status',p,p?(lk+ltr)*5:30,
+    'The pillars of action (10th) and fortune (9th) support each other — a combination linked with rising status, authority and recognition through your own merit.');}
+  // ---- Dharma-Karmadhipati (9th & 10th lords linked) ----
+  {const l9=lordOf(9),l10=lordOf(10);const p=P[l9].sign===P[l10].sign||hL(l9)===hL(l10);
+   add('Dharma-Karmadhipati Yoga','Power & Status',p,p?75:0,
+    'The lords of duty and destiny join forces — one of the strongest signs of success that comes from doing the right work in the right way.');}
+  // ---- Neecha Bhanga (a debilitated planet gets cancellation) ----
+  {let p=false;for(const k of GRAHA7){if(EXALT[k]!==undefined&&(EXALT[k]+6)%12===P[k].sign){
+     const dispLord=SIGN_LORD[P[k].sign];if(kendra.includes(hL(dispLord)))p=true;}}
+   add('Neecha Bhanga Raja Yoga','Power & Status',p,p?70:0,
+    'A planet that started weak gets "rescued" in your chart — a beautiful pattern where early struggles turn into later strength and success.');}
+  // ---- Viparita Raja (6/8/12 lords in 6/8/12) ----
+  {let p=false;for(const dh of [6,8,12]){const l=lordOf(dh);if([6,8,12].includes(hL(l)))p=true;}
+   add('Viparita Raja Yoga','Resilience',p,p?68:0,
+    'A "turnaround" yoga — difficult situations have a way of flipping into unexpected gains for you. You rise when others expect you to fall.');}
+  // ---- Amala (benefic in 10th from Lagna or Moon) ----
+  {const p=benefics.some(b=>hL(b)===10)||benefics.some(b=>hM(b)===10);
+   add('Amala Yoga','Power & Status',p,p?65:0,
+    'A benefic planet graces your house of career — a spotless reputation and lasting good name through honourable work.');}
+  // ---- Adhi (benefics in 6/7/8 from Moon) ----
+  {const p=benefics.some(b=>[6,7,8].includes(hM(b)))&&benefics.filter(b=>[6,7,8].includes(hM(b))).length>=2;
+   add('Adhi Yoga','Power & Status',p,p?66:0,
+    'Benefics support the 6th–8th from your Moon — a classical yoga of leadership, comfort and being well-regarded.');}
+  // ---- Vasumati (benefics in upachaya from Moon/Lagna) ----
+  {const p=benefics.filter(b=>upachaya.includes(hM(b))).length>=2;
+   add('Vasumati Yoga','Wealth',p,p?60:0,
+    'Benefics fill your houses of growth — wealth and resources tend to accumulate steadily through your own effort.');}
+  // ---- Saubhagya (Venus/Jupiter strong, lagna lord strong) ----
+  {const p=str('Venus')>=6&&str(lordOf(1))>=5.5;
+   add('Saubhagya Yoga','Happiness',p,p?62:0,
+    'Markers of good fortune and comfort are active — a life with its share of happiness, ease and pleasant experiences.');}
+  // ---- Kahala (4th lord strong + Jupiter supportive) ----
+  {const l4=lordOf(4);const p=str(l4)>=6&&kendra.includes(hL('Jupiter'));
+   add('Kahala Yoga','Courage',p,p?58:0,
+    'A yoga of boldness and drive — you have the courage to take on big things, and the energy to see them through.');}
+  // ---- Putra (5th house/lord supported) ----
+  {const l5=lordOf(5);const p=str(l5)>=5.5||benefics.some(b=>hL(b)===5);
+   add('Putra Yoga','Family',p,p?58:0,
+    'Your house of children and creativity is supported — happiness through children, creativity and the joys of family.');}
+  // ---- Property Yoga (4th lord & Mars supportive) ----
+  {const l4=lordOf(4);const p=str(l4)>=5.5&&str('Mars')>=5;
+   add('Property Yoga','Wealth',p,p?56:0,
+    'Your house of home and land is well supported — favourable for owning property and creating a comfortable home of your own.');}
+  // ---- Foreign Settlement (12th/9th & Rahu involvement) ----
+  {const l12=lordOf(12);const p=[9,12].includes(hL('Rahu'))||str(l12)>=6&&[3,9,12].includes(hL(l12));
+   add('Foreign Settlement Yoga','Travel',p,p?55:0,
+    'Your chart leans towards distant lands — good potential for travel, study or settling abroad if you wish to.');}
+  // ---- Sanyasa / Moksha (Ketu/Saturn/Jupiter & 12th) ----
+  {const p=([4,9,12].includes(hL('Ketu')))&&str('Jupiter')>=5;
+   add('Sanyasa / Moksha Yoga','Spiritual',p,p?55:0,
+    'A contemplative thread runs through your chart — a natural pull towards meaning, detachment and inner peace as life unfolds.');}
   return out;
 }
-/* Doshas — severity + cancellation/remedy framing */
+
+/* Doshas — 10 classical, each with status + severity %. Designed to reassure. */
 function detectDoshas(chart){
-  const P=chart.planets,out=[];
-  // Mangal (Manglik): Mars in 1,2,4,7,8,12 from lagna
-  const mh=P.Mars.house, mang=[1,2,4,7,8,12].includes(mh);
-  out.push({name:'Mangal Dosha (Manglik)',present:mang,
-    sev:mang?([7,8].includes(mh)?'Medium':'Low'):'None',
-    note:mang?`Mars sits in your ${mh}th house. This is a very common placement — traditionally it asks for a thoughtfully matched partner, and it is considered cancelled when both partners are Manglik or with simple remedies. It is not a barrier to a happy marriage.`
-             :'Mars is well placed — no Manglik dosha. Marriage matters flow more smoothly.'});
-  // Kaal Sarp: all 7 grahas between Rahu and Ketu
-  const ra=P.Rahu.lon,ke=P.Ketu.lon;
-  const arc=(x)=>((x-ra+360)%360);
-  const allOneSide=GRAHA7.every(g=>arc(P[g].lon)<180)||GRAHA7.every(g=>arc(P[g].lon)>=180);
-  out.push({name:'Kaal Sarp Dosha',present:allOneSide,
-    sev:allOneSide?'Medium':'None',
-    note:allOneSide?'All planets fall on one side of the Rahu-Ketu axis. Traditionally linked to a life of effortful rise — many highly successful people have it. Simple Shiva worship and patience are the classic responses; it is widely over-dramatised.'
-                   :'Your planets are spread either side of the Rahu-Ketu axis — no Kaal Sarp dosha.'});
-  // Grahan (eclipse) dosha: Sun or Moon conjunct Rahu/Ketu (same sign)
-  const grah=(P.Sun.sign===P.Rahu.sign||P.Sun.sign===P.Ketu.sign||P.Moon.sign===P.Rahu.sign||P.Moon.sign===P.Ketu.sign);
-  out.push({name:'Grahan Dosha',present:grah,
-    sev:grah?'Low':'None',
-    note:grah?'A luminary (Sun or Moon) shares a sign with a shadow planet. Gentle remedies — Surya/Chandra mantras and charity — are the traditional balm.'
-             :'Sun and Moon are clear of the shadow planets — no Grahan dosha.'});
+  const P=chart.planets,asc=chart.asc.sign,out=[];
+  const hL=(k)=>P[k].house, sameSign=(a,b)=>P[a].sign===P[b].sign;
+  const add=(name,present,cancelled,sev,note)=>out.push({
+    name, present, cancelled,
+    status: !present?'Absent':(cancelled?'Cancelled':(sev>=60?'Present':'Mild')),
+    sev: present?(cancelled?Math.min(sev,28):sev):0, note});
+
+  // Mangal: Mars in 1,2,4,7,8,12 (lagna). Cancellation: Mars in own/exalt, or in 1/4/7/10 own, or aspected by Jupiter.
+  {const mh=hL('Mars'),present=[1,2,4,7,8,12].includes(mh);
+   const cancelled=present&&((OWN['Mars']&&OWN['Mars'].includes(P.Mars.sign))||EXALT['Mars']===P.Mars.sign);
+   const sev=present?({7:72,8:68,1:55,4:48,2:40,12:38}[mh]||45):0;
+   add('Mangal Dosha (Manglik)',present,cancelled,sev,
+     present?`Mars influences your ${mh}th house. This is one of the most common placements in astrology — millions share it and marry very happily. ${cancelled?'In your chart it is naturally softened/cancelled.':'It simply suggests choosing a well-matched partner; matching with another Manglik or simple remedies fully settle it.'} It is not a problem, just something to be aware of.`
+            :'Mars is gently placed — no Manglik dosha. Marriage matters flow smoothly.');}
+  // Kaal Sarp: all 7 between Rahu-Ketu. Partial if 1-2 just outside.
+  {const ra=P.Rahu.lon;const arc=(x)=>((x-ra+360)%360);
+   const oneSide=GRAHA7.filter(g=>arc(P[g].lon)<180).length;
+   const present=oneSide===7||oneSide===0;const partial=oneSide===6||oneSide===1;
+   add('Kaal Sarp Dosha',present||partial,false,present?58:(partial?30:0),
+     present?'All your planets sit on one side of the Rahu-Ketu axis. Far from a curse, this is found in the charts of many highly accomplished, self-made people — it points to a life you build with your own hands. Simple Shiva worship is the traditional support.'
+            :partial?'A near-Kaal-Sarp pattern (one planet just outside). Very mild — it mainly adds intensity and drive to your journey.'
+            :'Your planets are well spread around the Rahu-Ketu axis — no Kaal Sarp dosha.');}
+  // Pitru: Sun with Rahu/Ketu/Saturn, or 9th house afflicted
+  {const present=sameSign('Sun','Rahu')||sameSign('Sun','Saturn')||sameSign('Sun','Ketu');
+   add('Pitru Dosha',present,false,present?40:0,
+     present?'A gentle ancestral thread shows in your chart (Sun with a shadow/Saturn). Traditionally honoured with simple gratitude to elders and ancestors, charity, and feeding others — warm, grounding practices, nothing to fear.'
+            :'Your Sun is clear — no Pitru dosha indicated.');}
+  // Guru Chandal: Jupiter with Rahu or Ketu
+  {const present=sameSign('Jupiter','Rahu')||sameSign('Jupiter','Ketu');
+   add('Guru Chandal Dosha',present,false,present?42:0,
+     present?'Jupiter shares space with a shadow planet — this often makes people unconventional thinkers who question the usual rules (many great innovators have it). A little patience with mentors and faith is the gentle remedy.'
+            :'Jupiter is free of the shadow planets — no Guru Chandal dosha.');}
+  // Grahan: Sun/Moon with Rahu/Ketu
+  {const present=sameSign('Sun','Rahu')||sameSign('Sun','Ketu')||sameSign('Moon','Rahu')||sameSign('Moon','Ketu');
+   add('Grahan Dosha',present,false,present?38:0,
+     present?'A luminary shares a sign with a shadow planet. It can make you sensitive and deep; gentle Surya/Chandra mantras and time in sunlight and nature are the soothing traditional balm.'
+            :'Sun and Moon are clear of the shadow planets — no Grahan dosha.');}
+  // Shrapit: Saturn + Rahu together
+  {const present=sameSign('Saturn','Rahu');
+   add('Shrapit Dosha',present,false,present?44:0,
+     present?'Saturn and Rahu meet in your chart — this asks for patience early on, and classically rewards it with hard-won, lasting success later. A slow start, a strong finish.'
+            :'Saturn and Rahu are apart — no Shrapit dosha.');}
+  // Kemadruma: no planet in 2nd/12th from Moon and no kendra from Moon (loneliness of Moon)
+  {const occ=(h)=>GRAHA7.some(g=>g!=='Moon'&&((P[g].sign-P.Moon.sign+12)%12)+1===h);
+   const present=!occ(2)&&!occ(12)&&!GRAHA7.some(g=>g!=='Moon'&&[1,4,7,10].includes(((P[g].sign-P.Moon.sign+12)%12)+1));
+   const cancelled=present&&[1,4,7,10].includes(P.Moon.house); // Moon in kendra cancels
+   add('Kemadruma Dosha',present,cancelled,present?40:0,
+     present?`Your Moon stands a little alone in the chart. ${cancelled?'Happily, your Moon sits in a strong angle, which traditionally cancels this entirely.':'It can make you self-reliant and independent — strengthen it with a calm routine, time near water, and Monday practices.'} Many independent, self-made people share this.`
+            :'Your Moon is well-supported by neighbours — no Kemadruma dosha.');}
+  // Nadi (matching dosha) — for an individual we report as N/A-style note
+  {add('Nadi Dosha',false,false,0,
+     'Nadi is a compatibility factor checked between two charts, not within one. Use Kundali Matching to see it for a couple.');}
+  // Daridra: 11th lord in dusthana (weak gains)
+  {const l11=SIGN_LORD[(asc+10)%12];const present=[6,8,12].includes(P[l11].house);
+   add('Daridra Dosha',present,false,present?35:0,
+     present?'Your house of gains takes an unusual route — money may come in waves rather than steadily early on. With disciplined saving this smooths out well; many late-bloomers in wealth share this placement.'
+            :'Your house of gains is well placed — no Daridra dosha.');}
+  // Gand Mool: Moon in Ashlesha/Jyeshtha/Revati/Ashwini/Magha/Mula (gandanta nakshatras)
+  {const gm=[0,8,9,17,18,26];const present=gm.includes(P.Moon.nakIdx);
+   add('Gand Mool Dosha',present,false,present?36:0,
+     present?`Your Moon sits in a "junction" nakshatra (${P.Moon.nak}) — these often produce unusually gifted, intense and successful people. A simple Gand Mool puja around birthdays is the gentle tradition; nothing to worry about.`
+            :'Your Moon is in a smooth nakshatra — no Gand Mool dosha.');}
   return out;
 }
 /* Sub-scores 0-100 for life areas, encouraging by design (floored) */
@@ -859,24 +984,46 @@ function scTab(which,btn){
   document.querySelectorAll('.sc-tab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   const host=document.getElementById('sc-panel');const ch=state.chart;if(!ch)return;
+  state.scTab=which;
   if(which==='yogas'){
-    const ys=detectYogas(ch);const present=ys.filter(y=>y.present);
-    host.innerHTML=(present.length?present:ys.slice(0,3)).map(y=>
-      `<div class="sc-item"><div class="nm">${y.name}<span class="sc-badge ${y.present?'yes':'no'}">${y.present?'Present':'Absent'}</span></div>
-       ${y.present?`<div class="ds">${y.note}</div>`:''}</div>`).join('')+
-      (present.length?'':'<div class="sc-note">No major classical yogas detected — most charts are defined more by planet strengths than rare yogas.</div>');
+    const ys=detectYogas(ch);const present=ys.filter(y=>y.present).sort((a,b)=>b.strength-a.strength);
+    const absent=ys.filter(y=>!y.present);
+    let html=`<div class="sc-summary">🔆 You have <b>${present.length}</b> auspicious yoga${present.length===1?'':'s'} in your chart${present.length?' — wonderful!':''}</div>`;
+    html+=present.map(y=>`<div class="sc-item">
+      <div class="nm"><span>${y.name} <span class="sc-cat">${y.cat}</span></span><span class="sc-badge yes">Present</span></div>
+      <div class="scbar" style="margin:7px 0"><i style="width:${y.strength}%"></i></div>
+      <div class="ds">${y.note}</div></div>`).join('');
+    if(!present.length)html+=`<div class="sc-note">No rare classical yogas this time — and that's perfectly normal. Most wonderful lives are shaped by planet strengths (see the Planet Strength tab), not rare yogas.</div>`;
+    if(absent.length)html+=`<button class="sc-more" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">Show ${absent.length} yogas not active in your chart ▾</button>
+      <div style="display:none">`+absent.map(y=>`<div class="sc-item dim"><div class="nm"><span>${y.name} <span class="sc-cat">${y.cat}</span></span><span class="sc-badge no">Not active</span></div></div>`).join('')+`</div>`;
+    host.innerHTML=html;
   }else if(which==='doshas'){
     const ds=detectDoshas(ch);
-    host.innerHTML=ds.map(d=>{const cls=d.sev==='None'?'no':d.sev==='Medium'?'med':'low';
-      return `<div class="sc-item"><div class="nm">${d.name}<span class="sc-badge ${cls}">${d.sev==='None'?'Clear':d.sev}</span></div>
-       <div class="ds">${d.note}</div></div>`;}).join('');
+    const active=ds.filter(d=>d.present&&d.status!=='Absent');
+    let html=`<div class="sc-summary">🛡 ${active.length?`${active.length} point${active.length===1?'':'s'} to be gently aware of — all manageable, none to fear.`:'Your chart is beautifully clear of the major doshas. ✨'}</div>`;
+    html+=`<table class="dosha-tbl"><thead><tr><th>Dosha</th><th>Status</th><th>Severity</th></tr></thead><tbody>`+
+      ds.map(d=>{const cls=d.status==='Absent'?'no':d.status==='Cancelled'?'yes':d.status==='Present'?'med':'low';
+        return `<tr class="dosha-row" onclick="this.nextElementSibling.classList.toggle('open')">
+          <td>${d.name}</td><td><span class="sc-badge ${cls}">${d.status}</span></td>
+          <td><div class="mini-bar"><i style="width:${d.sev}%"></i></div><small>${d.sev}%</small></td></tr>
+          <tr class="dosha-detail"><td colspan="3">${d.note}</td></tr>`;}).join('')+`</tbody></table>
+      <div class="sc-note">Tap any row for details. Severity is an intensity guide — even higher numbers are traditionally settled with simple, free practices.</div>`;
+    host.innerHTML=html;
   }else{
     const order=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
     host.innerHTML=order.map(k=>{const s=planetStrength(ch,k),pct=Math.round(s*10);
-      const lbl=s>=7.5?'Strong':s>=5.5?'Good':s>=4?'Moderate':'Needs support';
+      const lbl=s>=7.5?'Strong':s>=5.5?'Good':s>=4?'Moderate':'Growing';
       return `<div class="sc-item"><div class="nm">${k}<span class="sc-badge ${s>=5.5?'yes':s>=4?'low':'med'}">${lbl} · ${s.toFixed(1)}/10</span></div>
-       <div class="scbar" style="margin-top:7px"><i style="width:${pct}%"></i></div></div>`;}).join('');
+       <div class="scbar" style="margin-top:7px"><i style="width:${pct}%"></i></div></div>`;}).join('')+
+       `<div class="sc-note">Every chart is a mix of stronger and growing planets — your stronger ones show where life flows easily.</div>`;
   }
+}
+function shareYogaDosha(){
+  const ch=state.chart;if(!ch)return;
+  const ys=detectYogas(ch).filter(y=>y.present).map(y=>'🔆 '+y.name);
+  const ds=detectDoshas(ch).filter(d=>d.present&&d.status!=='Absent').map(d=>'🛡 '+d.name+' ('+d.status+')');
+  const txt=`My Vedic chart highlights:\n\n${ys.length?ys.join('\n'):'A balanced chart'}\n${ds.length?'\nTo be aware of:\n'+ds.join('\n'):''}`;
+  shareWhatsApp(txt,'My Yogas & Doshas ✨');
 }
 function shareScorecard(){
   const s=state.scorecard;if(!s)return;
