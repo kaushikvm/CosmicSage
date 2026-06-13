@@ -107,12 +107,12 @@
   .chat-log{flex:1; overflow-y:auto; max-height:400px; display:flex; flex-direction:column; gap:12px; padding-right:4px;}
   .msg{max-width:88%; padding:11px 14px; border-radius:12px; font-size:.92rem; white-space:pre-wrap;}
   .msg.user{align-self:flex-end; background:var(--panel2); border:1px solid var(--line);}
-  .msg.astro{align-self:flex-start; background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.35);}
+  .msg.astro{align-self:flex-start; background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.35); font-size:1rem; line-height:1.62;}
   .msg.astro .who{color:var(--gold); font-weight:600; font-size:.76rem; display:block; margin-bottom:4px;}
   .msg.thinking{color:var(--muted); font-style:italic;}
-  .ans-list{margin:6px 0 6px 2px; padding:0; list-style:none;}
-  .ans-list li{position:relative; padding:4px 0 4px 18px; font-size:.9rem;}
-  .ans-list li::before{content:"✦"; position:absolute; left:0; color:var(--gold); font-size:.8rem;}
+  .ans-list{margin:8px 0 8px 2px; padding:0; list-style:none;}
+  .ans-list li{position:relative; padding:6px 0 6px 22px; font-size:1.02rem; line-height:1.55;}
+  .ans-list li::before{content:"✦"; position:absolute; left:0; top:6px; color:var(--gold); font-size:.9rem;}
   .wa-share{display:inline-flex; align-items:center; gap:6px; margin-top:10px; background:#25D366; color:#fff;
     border-radius:8px; padding:7px 14px; font-size:.82rem; font-weight:600; cursor:pointer; border:none;}
   .wa-share:hover{background:#1da851;}
@@ -169,6 +169,29 @@
   .support-foot{text-align:center; padding:34px 0 10px;}
   .support-foot .wlcs{font-family:'Eczar',serif; color:var(--gold); font-size:1.15rem; margin:10px 0 4px;}
   .support-foot p{color:var(--muted); font-size:.85rem; max-width:440px; margin:0 auto 14px;}
+  .scorecard .sc-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  .sc-body{display:flex; gap:22px; align-items:center; flex-wrap:wrap;}
+  .sc-ring{position:relative; width:132px; height:132px; flex-shrink:0;}
+  .sc-ring-num{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .sc-ring-num span{font-family:'Eczar',serif; font-size:2.4rem; color:var(--gold); line-height:1;}
+  .sc-ring-num small{color:var(--muted); font-size:.74rem; letter-spacing:.08em; text-transform:uppercase;}
+  .sc-bars{flex:1; min-width:240px; display:flex; flex-direction:column; gap:9px;}
+  .scbar-row .top{display:flex; justify-content:space-between; font-size:.86rem; margin-bottom:3px;}
+  .scbar-row .top b{color:var(--ink); font-weight:500;} .scbar-row .top span{color:var(--gold-soft); font-weight:600;}
+  .scbar{height:8px; background:var(--night); border:1px solid var(--line); border-radius:99px; overflow:hidden;}
+  .scbar i{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#F6C453,#E2702A); width:0; transition:width .9s ease;}
+  .sc-tabs{display:flex; gap:8px; margin:18px 0 12px; flex-wrap:wrap;}
+  .sc-tab{background:var(--panel2); border:1px solid var(--line); color:var(--moon); border-radius:999px; padding:7px 14px; font-size:.82rem;}
+  .sc-tab.active{border-color:var(--gold); color:var(--gold-soft); background:rgba(212,162,78,.12);}
+  .sc-panel{display:flex; flex-direction:column; gap:8px;}
+  .sc-item{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:11px 13px;}
+  .sc-item .nm{font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:8px; justify-content:space-between;}
+  .sc-item .ds{font-size:.86rem; color:var(--muted); margin-top:4px; line-height:1.5;}
+  .sc-badge{font-size:.7rem; padding:2px 9px; border-radius:999px; font-weight:600; white-space:nowrap;}
+  .sc-badge.yes{background:rgba(111,174,92,.18); color:#9BD489;} .sc-badge.no{background:var(--night); color:var(--muted);}
+  .sc-badge.low{background:rgba(212,162,78,.18); color:var(--gold-soft);}
+  .sc-badge.med{background:rgba(214,138,61,.2); color:#E8A24D;}
+  .sc-note{font-size:.76rem; color:var(--muted); margin-top:12px; text-align:center;}
   /* donation modal */
   .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
   .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:430px; width:100%; padding:28px; text-align:center;}
@@ -262,6 +285,31 @@
         <div class="actions">
           <button class="btn ghost" onclick="window.print()">⬇ Save as PDF</button>
         </div>
+      </div>
+
+      <div class="card scorecard" style="grid-column:1/-1">
+        <div class="sc-head">
+          <h3 style="margin:0">✨ Your Astro Scorecard</h3>
+          <button class="wa-share" onclick="shareScorecard()">📲 Share</button>
+        </div>
+        <div class="sc-body">
+          <div class="sc-destiny">
+            <div class="sc-ring"><svg width="132" height="132" viewBox="0 0 132 132">
+              <circle cx="66" cy="66" r="56" fill="none" stroke="var(--line)" stroke-width="10"/>
+              <circle id="sc-arc" cx="66" cy="66" r="56" fill="none" stroke="url(#scGrad)" stroke-width="10"
+                stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352" transform="rotate(-90 66 66)"/>
+              <defs><linearGradient id="scGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F6C453"/><stop offset="100%" stop-color="#E2702A"/></linearGradient></defs>
+            </svg><div class="sc-ring-num"><span id="sc-destiny-num">–</span><small>Destiny</small></div></div>
+          </div>
+          <div class="sc-bars" id="sc-bars"></div>
+        </div>
+        <div class="sc-tabs">
+          <button class="sc-tab active" onclick="scTab('yogas',this)">🔆 Raj Yogas</button>
+          <button class="sc-tab" onclick="scTab('doshas',this)">🛡 Doshas</button>
+          <button class="sc-tab" onclick="scTab('planets',this)">🪐 Planet Strength</button>
+        </div>
+        <div class="sc-panel" id="sc-panel"></div>
+        <div class="sc-note">Computed from your chart for reflection — tendencies, not fixed fate. Tap any area above, then ask the sage to go deeper.</div>
       </div>
 
       <div class="stack">
@@ -404,7 +452,7 @@
           <div id="ms-bars"></div>
           <div class="status-line" id="ms-manglik" style="margin-top:14px"></div>
           <div class="status-line" id="ms-numero"></div>
-          <button class="btn" style="margin-top:16px" onclick="askMatchAI()">Get the sage's reading of this match</button>
+          <button class="btn" style="margin-top:16px" onclick="askMatchAI()">✨ Get the sage's reading <span style="opacity:.8;font-size:.82em">(₹29 · free with a pack)</span></button>
           <button class="btn ghost" style="margin-top:16px; margin-left:8px" onclick="window.print()">⬇ Save as PDF</button>
           <div id="match-ai" style="margin-top:14px"></div>
         </div>
@@ -416,13 +464,13 @@
 <!-- ============ UNLOCK MODAL (₹69 → 9 questions) ============ -->
 <div class="overlay hidden" id="modal-pay">
   <div class="modal">
-    <h3>Unlock 9 more questions · ₹69</h3>
-    <p>You've used your 3 free questions. Pay ₹69 to the QR below from any UPI app, then enter the 12-digit UTR / transaction ID from your payment receipt — your questions unlock instantly.</p>
+    <h3 id="pay-title">Unlock 9 more questions · ₹69</h3>
+    <p id="pay-desc">You've used your 3 free questions. Pay ₹69 to the QR below from any UPI app, then enter the 12-digit UTR / transaction ID from your payment receipt — your questions unlock instantly.</p>
     <div class="qr-frame"><img src="/static/qr.png" alt="UPI payment QR code" onerror="this.parentElement.innerHTML='<span style=\'color:#666;font-size:.8rem\'>Add your QR image as static/qr.png</span>'"></div>
-    <div class="scan-note">Scan & pay ₹69, then enter your UTR:</div>
+    <div class="scan-note" id="pay-scan">Scan & pay ₹69, then enter your UTR:</div>
     <input id="utr-input" type="text" inputmode="numeric" maxlength="12" placeholder="12-digit UTR (e.g. 416912345678)" style="text-align:center;letter-spacing:2px">
     <div class="geo-result err" id="utr-msg" style="min-height:18px;text-align:center"></div>
-    <button class="btn full" onclick="claimUTR()">Unlock my 9 questions</button>
+    <button class="btn full" id="pay-cta" onclick="claimUTR()">Unlock now</button>
     <button class="btn ghost full" style="margin-top:10px" onclick="hide('modal-pay')">Maybe later</button>
     <div class="field-hint" style="margin-top:10px;text-align:center">Find the UTR in your UPI app: open the payment → details → "UTR" or "Transaction ID".</div>
   </div>
@@ -684,6 +732,158 @@ function gunaMilan(A,B){ // A,B = charts; returns rows + total
 }
 function manglik(chart){return [1,2,4,7,8,12].includes(chart.planets.Mars.house);}
 
+/* ===== ASTRO SCORECARD ENGINE (computed — planet strength, yogas, doshas, scores) ===== */
+const FRIEND={Sun:['Moon','Mars','Jupiter'],Moon:['Sun','Mercury'],Mars:['Sun','Moon','Jupiter'],Mercury:['Sun','Venus'],Jupiter:['Sun','Moon','Mars'],Venus:['Mercury','Saturn'],Saturn:['Mercury','Venus']};
+const ENEMY={Sun:['Venus','Saturn'],Moon:[],Mars:['Mercury'],Mercury:['Moon'],Jupiter:['Mercury','Venus'],Venus:['Sun','Moon'],Saturn:['Sun','Moon','Mars']};
+const SIGN_LORD=['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+const GRAHA7=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+/* planet strength 0-10: dignity + house placement + (combustion) */
+function planetStrength(chart,k){
+  const p=chart.planets[k]; if(!p)return 5;
+  let s=5;
+  if(EXALT[k]===p.sign)s+=3.2;
+  else if(EXALT[k]!==undefined&&(EXALT[k]+6)%12===p.sign)s-=3;
+  else if(OWN[k]&&OWN[k].includes(p.sign))s+=2.2;
+  else{const lord=SIGN_LORD[p.sign];
+    if(FRIEND[k]&&FRIEND[k].includes(lord))s+=1;
+    else if(ENEMY[k]&&ENEMY[k].includes(lord))s-=1.2;}
+  const h=p.house;
+  if([1,4,7,10].includes(h))s+=1.4;        // kendra
+  else if([5,9].includes(h))s+=1;           // trikona
+  else if([6,8,12].includes(h))s-=1.4;      // dusthana
+  // combustion (too close to Sun, not Sun/nodes)
+  if(!['Sun','Rahu','Ketu'].includes(k)){
+    const d=Math.abs(((p.lon-chart.planets.Sun.lon+540)%360)-180);
+    if(d<8)s-=1.2;
+  }
+  return Math.max(0.5,Math.min(10,s));
+}
+/* Yogas — return [{name, present, note}] */
+function detectYogas(chart){
+  const P=chart.planets, out=[];
+  const houseFromMoon=(k)=>((P[k].sign-P.Moon.sign+12)%12)+1;
+  // Gaja Kesari: Jupiter in kendra from Moon
+  out.push({name:'Gaja Kesari Yoga',present:[1,4,7,10].includes(houseFromMoon('Jupiter')),
+    note:'Jupiter sits in a kendra from your Moon — brings wisdom, respect and lasting reputation.'});
+  // Budha-Aditya: Sun + Mercury same sign
+  out.push({name:'Budha-Aditya Yoga',present:P.Sun.sign===P.Mercury.sign,
+    note:'Sun and Mercury together — sharp intelligence, good communication and analytical skill.'});
+  // Chandra-Mangala: Moon + Mars same sign
+  out.push({name:'Chandra-Mangala Yoga',present:P.Moon.sign===P.Mars.sign,
+    note:'Moon with Mars — drive, resourcefulness and a knack for earning.'});
+  // Pancha Mahapurusha: Mars/Mer/Jup/Ven/Sat in own/exalt AND in kendra from lagna
+  const mahnames={Mars:'Ruchaka',Mercury:'Bhadra',Jupiter:'Hamsa',Venus:'Malavya',Saturn:'Sasa'};
+  for(const k of ['Mars','Mercury','Jupiter','Venus','Saturn']){
+    const p=P[k],own=(OWN[k]&&OWN[k].includes(p.sign)),ex=(EXALT[k]===p.sign);
+    if((own||ex)&&[1,4,7,10].includes(p.house))
+      out.push({name:mahnames[k]+' Yoga (Mahapurusha)',present:true,
+        note:`${k} is powerful in a kendra — a rare Mahapurusha yoga giving standout strength of character.`});
+  }
+  // Viparita Raja: lord of 6/8/12 placed in 6/8/12
+  let vip=false;
+  for(const dh of [6,8,12]){const lordSign=(chart.asc.sign+dh-1)%12;const lord=SIGN_LORD[lordSign];
+    if(P[lord]&&[6,8,12].includes(P[lord].house))vip=true;}
+  out.push({name:'Viparita Raja Yoga',present:vip,
+    note:'A "reversal" yoga — challenges tend to turn into unexpected gains and resilience.'});
+  return out;
+}
+/* Doshas — severity + cancellation/remedy framing */
+function detectDoshas(chart){
+  const P=chart.planets,out=[];
+  // Mangal (Manglik): Mars in 1,2,4,7,8,12 from lagna
+  const mh=P.Mars.house, mang=[1,2,4,7,8,12].includes(mh);
+  out.push({name:'Mangal Dosha (Manglik)',present:mang,
+    sev:mang?([7,8].includes(mh)?'Medium':'Low'):'None',
+    note:mang?`Mars sits in your ${mh}th house. This is a very common placement — traditionally it asks for a thoughtfully matched partner, and it is considered cancelled when both partners are Manglik or with simple remedies. It is not a barrier to a happy marriage.`
+             :'Mars is well placed — no Manglik dosha. Marriage matters flow more smoothly.'});
+  // Kaal Sarp: all 7 grahas between Rahu and Ketu
+  const ra=P.Rahu.lon,ke=P.Ketu.lon;
+  const arc=(x)=>((x-ra+360)%360);
+  const allOneSide=GRAHA7.every(g=>arc(P[g].lon)<180)||GRAHA7.every(g=>arc(P[g].lon)>=180);
+  out.push({name:'Kaal Sarp Dosha',present:allOneSide,
+    sev:allOneSide?'Medium':'None',
+    note:allOneSide?'All planets fall on one side of the Rahu-Ketu axis. Traditionally linked to a life of effortful rise — many highly successful people have it. Simple Shiva worship and patience are the classic responses; it is widely over-dramatised.'
+                   :'Your planets are spread either side of the Rahu-Ketu axis — no Kaal Sarp dosha.'});
+  // Grahan (eclipse) dosha: Sun or Moon conjunct Rahu/Ketu (same sign)
+  const grah=(P.Sun.sign===P.Rahu.sign||P.Sun.sign===P.Ketu.sign||P.Moon.sign===P.Rahu.sign||P.Moon.sign===P.Ketu.sign);
+  out.push({name:'Grahan Dosha',present:grah,
+    sev:grah?'Low':'None',
+    note:grah?'A luminary (Sun or Moon) shares a sign with a shadow planet. Gentle remedies — Surya/Chandra mantras and charity — are the traditional balm.'
+             :'Sun and Moon are clear of the shadow planets — no Grahan dosha.'});
+  return out;
+}
+/* Sub-scores 0-100 for life areas, encouraging by design (floored) */
+function lifeScores(chart){
+  const P=chart.planets,asc=chart.asc.sign;
+  const lordStr=(houseNum)=>{const lord=SIGN_LORD[(asc+houseNum-1)%12];return planetStrength(chart,lord);};
+  const occupants=(houseNum)=>GRAHA7.filter(g=>P[g].house===houseNum);
+  const benefic=(g)=>['Jupiter','Venus','Mercury','Moon'].includes(g);
+  const areaScore=(houses,keyPlanets)=>{
+    let s=0,n=0;
+    for(const h of houses){s+=lordStr(h);n++; const occ=occupants(h);
+      occ.forEach(g=>{s+=benefic(g)?planetStrength(chart,g)*0.5:planetStrength(chart,g)*0.25;n+=0.5;});}
+    for(const k of keyPlanets){s+=planetStrength(chart,k);n++;}
+    const raw=(s/n)/10*100;
+    return Math.round(Math.max(42,Math.min(97,raw+8))); // floor 42, gentle lift
+  };
+  return {
+    Career:areaScore([10,1,11],['Sun','Saturn']),
+    Wealth:areaScore([2,11,5],['Jupiter']),
+    Marriage:areaScore([7,2,4],['Venus']),
+    Health:areaScore([1,6],['Sun','Moon']),
+    Education:areaScore([4,5],['Mercury','Jupiter']),
+    Spirituality:areaScore([9,12],['Jupiter','Ketu']),
+  };
+}
+function destinyScore(scores){
+  const w={Career:1.1,Wealth:1.1,Marriage:1,Health:1.1,Education:.9,Spirituality:.8};
+  let s=0,n=0;for(const k in scores){s+=scores[k]*w[k];n+=w[k];}
+  return Math.round(s/n);
+}
+/* ----- scorecard rendering ----- */
+const SC_ICON={Career:'💼',Wealth:'💰',Marriage:'❤',Health:'🩺',Education:'🎓',Spirituality:'🕉'};
+function renderScorecard(chart){
+  const scores=lifeScores(chart), dest=destinyScore(scores);
+  state.scorecard={scores,dest};
+  document.getElementById('sc-destiny-num').textContent=dest;
+  document.getElementById('sc-bars').innerHTML=Object.entries(scores).map(([k,v])=>
+    `<div class="scbar-row"><div class="top"><b>${SC_ICON[k]} ${k}</b><span>${v}/100</span></div>
+     <div class="scbar"><i data-w="${v}"></i></div></div>`).join('');
+  scTab('yogas',document.querySelector('.sc-tab'));
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll('.sc-bars .scbar i').forEach(el=>el.style.width=el.dataset.w+'%');
+    const arc=document.getElementById('sc-arc');if(arc){arc.style.transition='stroke-dashoffset 1.1s ease';arc.style.strokeDashoffset=352*(1-dest/100);}
+  },80));
+}
+function scTab(which,btn){
+  document.querySelectorAll('.sc-tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const host=document.getElementById('sc-panel');const ch=state.chart;if(!ch)return;
+  if(which==='yogas'){
+    const ys=detectYogas(ch);const present=ys.filter(y=>y.present);
+    host.innerHTML=(present.length?present:ys.slice(0,3)).map(y=>
+      `<div class="sc-item"><div class="nm">${y.name}<span class="sc-badge ${y.present?'yes':'no'}">${y.present?'Present':'Absent'}</span></div>
+       ${y.present?`<div class="ds">${y.note}</div>`:''}</div>`).join('')+
+      (present.length?'':'<div class="sc-note">No major classical yogas detected — most charts are defined more by planet strengths than rare yogas.</div>');
+  }else if(which==='doshas'){
+    const ds=detectDoshas(ch);
+    host.innerHTML=ds.map(d=>{const cls=d.sev==='None'?'no':d.sev==='Medium'?'med':'low';
+      return `<div class="sc-item"><div class="nm">${d.name}<span class="sc-badge ${cls}">${d.sev==='None'?'Clear':d.sev}</span></div>
+       <div class="ds">${d.note}</div></div>`;}).join('');
+  }else{
+    const order=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+    host.innerHTML=order.map(k=>{const s=planetStrength(ch,k),pct=Math.round(s*10);
+      const lbl=s>=7.5?'Strong':s>=5.5?'Good':s>=4?'Moderate':'Needs support';
+      return `<div class="sc-item"><div class="nm">${k}<span class="sc-badge ${s>=5.5?'yes':s>=4?'low':'med'}">${lbl} · ${s.toFixed(1)}/10</span></div>
+       <div class="scbar" style="margin-top:7px"><i style="width:${pct}%"></i></div></div>`;}).join('');
+  }
+}
+function shareScorecard(){
+  const s=state.scorecard;if(!s)return;
+  const lines=Object.entries(s.scores).map(([k,v])=>`${SC_ICON[k]} ${k}: ${v}/100`).join('\n');
+  shareWhatsApp(`My CosmicSage Astro Scorecard:\n\n🌟 Overall Destiny: ${s.dest}/100\n\n${lines}`,'My Astro Scorecard ✨');
+}
+
 /* ===== KUNDALI SVG ===== */
 function renderKundali(chart){
   const W=420,H=420,m=8;
@@ -727,11 +927,28 @@ function updateQuotaPill(s){
   if(s.vip){el.textContent='✦ Free forever ♥';el.style.color='var(--gold-soft)';el.onclick=null;}
   else if(s.credits>0){el.textContent=`✦ ${s.credits} paid question${s.credits===1?'':'s'} left`;el.style.color='var(--gold-soft)';el.onclick=null;}
   else if(s.free_left>0){el.textContent=`${s.free_left} free question${s.free_left===1?'':'s'} left`;el.style.color='';el.onclick=null;}
-  else{el.textContent=`Unlock ${s.pack_questions} questions · ₹${s.pack_price}`;el.style.color='var(--gold-soft)';el.style.cursor='pointer';el.onclick=()=>show('modal-pay');}
+  else{el.textContent=`Unlock ${s.pack_questions} questions · ₹${s.pack_price}`;el.style.color='var(--gold-soft)';el.style.cursor='pointer';el.onclick=()=>openPay('pack');}
 }
 async function refreshStatus(){
   if(!state.uid)return;
   try{const r=await fetch('/api/status?uid='+state.uid+'&name='+encodeURIComponent(state.birth?state.birth.name:''));const s=await r.json();if(r.ok)updateQuotaPill(s);}catch(e){}
+}
+function openPay(kind){ // 'pack' or 'match'
+  state.payKind=kind;
+  const t=document.getElementById('pay-title'),d=document.getElementById('pay-desc'),
+        s=document.getElementById('pay-scan'),cta=document.getElementById('pay-cta');
+  if(kind==='match'){
+    t.textContent='Unlock Kundali Matching · ₹29';
+    d.textContent='See the full 36-guna match score for free below — to get the sage\u2019s detailed AI reading of this match, pay ₹29 to the QR (or it\u2019s free if you have a question pack). Then enter your 12-digit UTR.';
+    s.textContent='Scan & pay ₹29, then enter your UTR:';
+    cta.textContent='Unlock matching';
+  }else{
+    t.textContent='Unlock 9 more questions · ₹69';
+    d.textContent='You\u2019ve used your 3 free questions. Pay ₹69 to the QR below from any UPI app, then enter the 12-digit UTR / transaction ID — your questions unlock instantly.';
+    s.textContent='Scan & pay ₹69, then enter your UTR:';
+    cta.textContent='Unlock my 9 questions';
+  }
+  show('modal-pay');
 }
 async function claimUTR(){
   const utr=document.getElementById('utr-input').value.replace(/\D/g,'');
@@ -741,12 +958,13 @@ async function claimUTR(){
   msg.textContent='Verifying…';msg.className='geo-result';
   try{
     const r=await fetch('/api/claim',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({uid:state.uid,utr:utr})});
+      body:JSON.stringify({uid:state.uid,utr:utr,kind:state.payKind||'pack'})});
     const d=await r.json();
     if(!r.ok){msg.textContent=d.error||'Could not verify.';msg.className='geo-result err';return;}
     updateQuotaPill(d.status);hide('modal-pay');
     document.getElementById('utr-input').value='';msg.textContent='';
     addMsg('astro',d.message,'COSMICSAGE');
+    if(state.payKind==='match'&&typeof askMatchAI==='function'&&lastMatch)askMatchAI();
   }catch(e){msg.textContent='Network error — please try again.';msg.className='geo-result err';}
 }
 
@@ -1021,6 +1239,7 @@ function generateChart(){
   document.getElementById('num-name').textContent=nameNumber(name);
   document.getElementById('num-bday').textContent=reduceNum(+dob.split('-')[2]);
   document.getElementById('celebs').innerHTML=celebLine(lifePath(dob));
+  renderScorecard(state.chart);
   renderTopics();
   skyNow();
   switchView('view-dash');
@@ -1057,8 +1276,17 @@ function fmtAnswer(text){ // escape, then render "• " bullets as a clean list
   return html;
 }
 function shareWhatsApp(text,title){
-  const msg=`${title||'My CosmicSage reading'} ✨\n\n${text}\n\n— via CosmicSage`;
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  const site=location.origin&&location.origin.startsWith('http')?location.origin:'https://cosmicsage.onrender.com';
+  // keep it short and link back to the site — drives new visitors
+  let body=String(text).replace(/\n{3,}/g,'\n\n').trim();
+  if(body.length>600)body=body.slice(0,580).trim()+'…';
+  const msg=`*${title||'My CosmicSage reading'}* ✨\n\n${body}\n\n🔮 Get your own free Vedic reading at ${site}`;
+  const url='https://api.whatsapp.com/send?text='+encodeURIComponent(msg);
+  const win=window.open(url,'_blank');
+  if(!win){ // popup blocked — copy to clipboard as fallback
+    try{navigator.clipboard.writeText(msg);alert('WhatsApp could not open here, so the message is copied — paste it into any chat.');}
+    catch(e){prompt('Copy this and share:',msg);}
+  }
 }
 function addMsg(cls,text,who){const log=document.getElementById('chat-log');
   const d=document.createElement('div');d.className='msg '+cls;
@@ -1084,7 +1312,7 @@ async function sendQuestion(q,showUserMsg){
       think.remove();state.history.pop();
       addMsg('astro',data.message||'You\'ve used your free questions — unlock more for ₹69.','COSMICSAGE');
       if(data.status)updateQuotaPill(data.status);
-      show('modal-pay');return;
+      openPay('pack');return;
     }
     if(!r.ok)throw new Error(data.error||'Request failed');
     state.history.push({role:'assistant',content:data.answer});
@@ -1163,12 +1391,12 @@ Guna Milan total: ${g.total}/36. Breakdown: ${g.rows.map(r=>r[0]+' '+r[2]+'/'+r[
 Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:summary,uid:state.uid||'',lang:state.lang||'en',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a balanced, kind reading of this match in bullet points: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
+      body:JSON.stringify({chart:summary,uid:state.uid||'',lang:state.lang||'en',kind:'match',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a balanced, kind reading of this match in bullet points: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
     const data=await r.json();
     if(r.status===402){
-      holder.innerHTML='<div class="msg astro" style="max-width:100%"><span class="who">COSMICSAGE</span>'+(data.message||'Unlock more questions to get the match reading.')+'</div>';
+      holder.innerHTML='';
       if(data.status)updateQuotaPill(data.status);
-      show('modal-pay');return;
+      openPay('match');return;
     }
     if(!r.ok)throw new Error(data.error||'failed');
     if(data.status)updateQuotaPill(data.status);
