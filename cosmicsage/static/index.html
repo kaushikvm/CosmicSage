@@ -41,6 +41,10 @@
   .pill.btn-like:hover{border-color:var(--gold); color:var(--gold-soft);}
   .hero{padding:44px 0 30px; text-align:center;}
   .hero .eyebrow{color:var(--sindoor); text-transform:uppercase; letter-spacing:.22em; font-size:.75rem; font-weight:600;}
+  .hero-logo{width:130px; height:auto; margin:0 auto 6px; display:block; filter:drop-shadow(0 4px 18px rgba(226,112,42,.35));}
+  .hero-sub{color:var(--gold-soft)!important; font-size:1rem; font-weight:500; max-width:540px; margin:0 auto 8px;}
+  .btn-hero{font-size:1.15rem; padding:16px 36px; border-radius:12px; background:linear-gradient(135deg,#FFD75E,#F6A93B,#E2702A); color:#3a1d05; font-weight:700; box-shadow:0 6px 22px rgba(226,112,42,.45);}
+  .btn-hero:hover{transform:translateY(-2px); box-shadow:0 9px 28px rgba(226,112,42,.6); background:linear-gradient(135deg,#FFE07A,#F6B453,#E8853E);}
   .hero h2{font-size:clamp(2rem,5vw,3rem); margin:14px auto 10px; max-width:680px; line-height:1.2;}
   .hero h2 em{font-style:normal; color:var(--gold);}
   .hero p{color:var(--muted); max-width:560px; margin:0 auto 26px;}
@@ -123,6 +127,24 @@
   .wa-share{display:inline-flex; align-items:center; gap:6px; margin-top:10px; background:#25D366; color:#fff;
     border-radius:8px; padding:7px 14px; font-size:.82rem; font-weight:600; cursor:pointer; border:none;}
   .wa-share:hover{background:#1da851;}
+  .wa-share.sm{margin-top:0; padding:5px 11px; font-size:.74rem;}
+  .loshu-wrap{margin-top:16px; border-top:1px solid var(--line); padding-top:14px;}
+  .loshu-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .loshu-head h4{font-family:'Eczar',serif; color:var(--gold); font-size:1rem; font-weight:600; margin:0;}
+  .loshu-strength{font-size:.72rem; color:var(--gold-soft); background:rgba(212,162,78,.14); border:1px solid rgba(212,162,78,.35); border-radius:99px; padding:2px 9px; margin-left:6px;}
+  .loshu-flex{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start;}
+  .loshu-grid{display:grid; grid-template-columns:repeat(3,52px); grid-template-rows:repeat(3,52px); gap:5px; flex-shrink:0;}
+  .loshu-cell{border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Eczar',serif; font-size:1.1rem; font-weight:600; position:relative;}
+  .loshu-cell.on{background:rgba(212,162,78,.16); border:1px solid var(--gold); color:var(--gold-soft);}
+  .loshu-cell.off{background:var(--night); border:1px dashed var(--line); color:transparent;}
+  .loshu-cell small{font-size:.5rem; font-weight:400; color:var(--muted); letter-spacing:.02em; margin-top:1px; font-family:'Work Sans';}
+  .loshu-cell.off small{color:#4a4668;}
+  .loshu-side{flex:1; min-width:180px; font-size:.82rem;}
+  .ls-line{margin:4px 0; color:var(--moon); line-height:1.5;} .ls-line b{color:var(--gold-soft);} .ls-line.dim{color:var(--muted);}
+  .loshu-planes{margin-top:12px;}
+  .ls-planes-title{font-size:.82rem; color:var(--gold-soft); font-weight:600; margin-bottom:6px;}
+  .ls-plane{background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:8px 11px; font-size:.84rem; color:var(--moon); margin-bottom:6px; line-height:1.5;}
+  .ls-plane b{color:var(--gold-soft);}
   .chat-input{display:flex; gap:10px; margin-top:14px;}
   .chat-input input{flex:1;}
   .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
@@ -257,12 +279,14 @@
   <!-- ============ LANDING ============ -->
   <section id="view-landing">
     <div class="hero">
+      <svg class="sage-logo-full hero-logo" viewBox="0 0 120 110" role="img" aria-label="CosmicSage — sage meditating under a Bodhi tree"><defs><linearGradient id="goldgradH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><radialGradient id="sunglowH" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="60%" stop-color="#F6C453" stop-opacity=".35"/><stop offset="100%" stop-color="#F6C453" stop-opacity="0"/></radialGradient><linearGradient id="treegradH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6B73C"/><stop offset="1" stop-color="#D9651F"/></linearGradient></defs><circle cx="60" cy="52" r="46" fill="url(#sunglowH)"/><g fill="url(#treegradH)" opacity=".92"><circle cx="60" cy="20" r="15"/><circle cx="42" cy="26" r="12"/><circle cx="78" cy="26" r="12"/><circle cx="30" cy="34" r="10"/><circle cx="90" cy="34" r="10"/><circle cx="50" cy="14" r="10"/><circle cx="70" cy="14" r="10"/><circle cx="38" cy="16" r="8"/><circle cx="82" cy="16" r="8"/></g><path d="M58 34 Q57 50 50 60 M62 34 Q63 50 70 60 M60 34 L60 60" stroke="url(#treegradH)" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="#FFD75E" opacity=".8"><path d="M44 40 q-4 -5 0 -8 q4 3 0 8z"/><path d="M76 40 q4 -5 0 -8 q-4 3 0 8z"/></g><g fill="url(#goldgradH)"><circle cx="60" cy="50" r="13" opacity=".25"/><circle cx="60" cy="50" r="6.5"/><path d="M60 57 C51 59 46 67 46 78 L74 78 C74 67 69 59 60 57 Z"/><ellipse cx="60" cy="80" rx="22" ry="6.5"/><path d="M44 76 q16 7 32 0" stroke="#E2702A" stroke-width="1.3" fill="none" opacity=".5"/></g></svg>
       <div class="eyebrow">Vedic astrology · real ephemeris · free for everyone</div>
       <h2>Your birth sky, drawn the moment you arrive. <em>Then ask it anything.</em></h2>
-      <p>Kundali from real planetary positions, 36-point kundali matching, dasha timeline and a wise guide to ask about career, love, health and more. No sign-up, no payment — donations welcome.</p>
-      <button class="btn" onclick="switchView('view-onboard')">Cast my chart — free</button>
+      <p class="hero-sub">Free Vedic Kundali, Navamsa &amp; Kundali matching — ask about career, marriage, health and more, in your own language.</p>
+      <p>Real planetary positions, dasha timeline, yogas &amp; doshas, and a wise guide to talk to. No sign-up, no payment — donations welcome.</p>
+      <button class="btn btn-hero" onclick="switchView('view-onboard')">🔮 Get my free Kundali</button>
       <button class="btn ghost" style="margin-left:8px" onclick="goMatch()">Kundali matching</button>
-      <div class="note">No account needed. Birth details stay in your browser; only a chart summary is sent for AI readings.</div>
+      <div class="note">No sign-up · takes 30 seconds · your birth details stay in your browser.</div>
     </div>
     <div class="card fest-card">
       <h3>🪔 Hindu festivals this month</h3>
@@ -270,7 +294,7 @@
       <div class="field-hint" style="margin-top:10px">Dates computed from tithi & the Sun's sidereal position — approximate; confirm with your local panchang.</div>
     </div>
     <div class="support-foot" style="padding-bottom:50px">
-      <svg class="sage-logo" width="52" height="52" viewBox="0 0 64 64"><defs><linearGradient id="sg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="32" cy="22" r="15" fill="none" stroke="#E2702A" stroke-width="2.5" opacity=".55"/><circle cx="32" cy="20" r="7" fill="url(#sg3)"/><path d="M32 28 C25 30 21 37 21 46 L43 46 C43 37 39 30 32 28 Z" fill="url(#sg3)"/><ellipse cx="32" cy="49" rx="17" ry="5.5" fill="url(#sg3)"/></svg>
+      <svg class="sage-logo-full" style="width:64px;height:auto" viewBox="0 0 120 110"><defs><linearGradient id="goldgrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><linearGradient id="treegrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6B73C"/><stop offset="1" stop-color="#D9651F"/></linearGradient></defs><g fill="url(#treegrad3)" opacity=".92"><circle cx="60" cy="20" r="15"/><circle cx="42" cy="26" r="12"/><circle cx="78" cy="26" r="12"/><circle cx="30" cy="34" r="10"/><circle cx="90" cy="34" r="10"/><circle cx="50" cy="14" r="10"/><circle cx="70" cy="14" r="10"/></g><path d="M60 34 L60 60" stroke="url(#treegrad3)" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="url(#goldgrad3)"><circle cx="60" cy="50" r="6.5"/><path d="M60 57 C51 59 46 67 46 78 L74 78 C74 67 69 59 60 57 Z"/><ellipse cx="60" cy="80" rx="22" ry="6.5"/></g></svg>
       <div class="wlcs">#WeLoveCosmicSage</div>
       <p>This page is made with love from Kaushik. If a reading helps you, please donate and help us grow better.</p>
       <button class="pill btn-like support" onclick="show('modal-donate')">♥ Support us</button>
@@ -390,6 +414,19 @@
             <div class="num-tile"><div class="n" id="num-bday">–</div><div class="l">Birth Day</div></div>
           </div>
           <div class="status-line" id="celebs" style="margin-top:12px"></div>
+          <div class="loshu-wrap">
+            <div class="loshu-head">
+              <h4>🔢 Lo Shu Grid <span class="loshu-strength" id="loshu-str"></span></h4>
+              <button class="wa-share sm" onclick="shareLoShu()">📲 Share</button>
+            </div>
+            <div class="loshu-flex">
+              <div class="loshu-grid" id="loshu-grid"></div>
+              <div class="loshu-side" id="loshu-side"></div>
+            </div>
+            <div class="loshu-planes" id="loshu-planes"></div>
+            <button class="btn ghost" style="width:100%;margin-top:10px;font-size:.86rem" onclick="askLoShu()">✨ Explain my Lo Shu grid in detail</button>
+            <div class="field-hint" style="margin-top:8px">Numerology (not part of the Vedic chart). Present numbers are strengths; missing ones are simply areas to grow.</div>
+          </div>
         </div>
         <div class="card">
           <h3>Vimshottari Dasha</h3>
@@ -437,7 +474,7 @@
     </div>
     <div class="footer">
       <div class="support-foot">
-        <svg class="sage-logo" width="52" height="52" viewBox="0 0 64 64"><defs><linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="32" cy="22" r="15" fill="none" stroke="#E2702A" stroke-width="2.5" opacity=".55"/><circle cx="32" cy="20" r="7" fill="url(#sg2)"/><path d="M32 28 C25 30 21 37 21 46 L43 46 C43 37 39 30 32 28 Z" fill="url(#sg2)"/><ellipse cx="32" cy="49" rx="17" ry="5.5" fill="url(#sg2)"/></svg>
+        <svg class="sage-logo-full" style="width:64px;height:auto" viewBox="0 0 120 110"><defs><linearGradient id="goldgrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><linearGradient id="treegrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6B73C"/><stop offset="1" stop-color="#D9651F"/></linearGradient></defs><g fill="url(#treegrad2)" opacity=".92"><circle cx="60" cy="20" r="15"/><circle cx="42" cy="26" r="12"/><circle cx="78" cy="26" r="12"/><circle cx="30" cy="34" r="10"/><circle cx="90" cy="34" r="10"/><circle cx="50" cy="14" r="10"/><circle cx="70" cy="14" r="10"/></g><path d="M60 34 L60 60" stroke="url(#treegrad2)" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="url(#goldgrad2)"><circle cx="60" cy="50" r="6.5"/><path d="M60 57 C51 59 46 67 46 78 L74 78 C74 67 69 59 60 57 Z"/><ellipse cx="60" cy="80" rx="22" ry="6.5"/></g></svg>
         <div class="wlcs">#WeLoveCosmicSage</div>
         <p>This page is made with love from Kaushik. If a reading helped you, please donate and help us grow better.</p>
         <button class="pill btn-like support" onclick="show('modal-donate')">♥ Support us</button>
@@ -516,6 +553,7 @@
 <!-- ============ DONATION MODAL ============ -->
 <div class="overlay hidden" id="modal-donate">
   <div class="modal">
+    <svg class="sage-logo-full" style="width:74px;height:auto;margin:0 auto 6px;display:block" viewBox="0 0 120 110"><defs><linearGradient id="goldgradM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><radialGradient id="sunglowM" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="60%" stop-color="#F6C453" stop-opacity=".35"/><stop offset="100%" stop-color="#F6C453" stop-opacity="0"/></radialGradient><linearGradient id="treegradM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6B73C"/><stop offset="1" stop-color="#D9651F"/></linearGradient></defs><circle cx="60" cy="52" r="46" fill="url(#sunglowM)"/><g fill="url(#treegradM)" opacity=".92"><circle cx="60" cy="20" r="15"/><circle cx="42" cy="26" r="12"/><circle cx="78" cy="26" r="12"/><circle cx="30" cy="34" r="10"/><circle cx="90" cy="34" r="10"/><circle cx="50" cy="14" r="10"/><circle cx="70" cy="14" r="10"/><circle cx="38" cy="16" r="8"/><circle cx="82" cy="16" r="8"/></g><path d="M58 34 Q57 50 50 60 M62 34 Q63 50 70 60 M60 34 L60 60" stroke="url(#treegradM)" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="url(#goldgradM)"><circle cx="60" cy="50" r="13" opacity=".25"/><circle cx="60" cy="50" r="6.5"/><path d="M60 57 C51 59 46 67 46 78 L74 78 C74 67 69 59 60 57 Z"/><ellipse cx="60" cy="80" rx="22" ry="6.5"/></g></svg>
     <h3>Support CosmicSage</h3>
     <p id="exit-note" style="display:none;background:rgba(212,162,78,.1);border:1px solid rgba(212,162,78,.35);border-radius:10px;padding:10px 13px;color:var(--gold-soft)">Leaving so soon? 🙏 If CosmicSage helped you today, a small gift keeps it free for everyone ♥</p>
     <p>This page is made with love from Kaushik. We're helping everyone read their stars — free, with no sign-up and no paywall. Please donate and help us grow better; every rupee goes toward keeping our servers running.</p>
@@ -721,6 +759,84 @@ const LP_CELEBS={
 function celebLine(lp){
   const list=LP_CELEBS[lp]||LP_CELEBS[reduceNum(lp)]||[];
   return list.length?`<b>You share Life Path ${lp} with:</b> ${list.join(', ')} ✨`:'';
+}
+
+/* ===== LO SHU GRID (numerology, computed) ===== */
+const LOSHU_MEANING={
+ 1:['Self-expression & communication','Speaking your truth and connecting with people'],
+ 2:['Intuition & relationships','Sensitivity, balance and working well with others'],
+ 3:['Imagination & creativity','Ideas, learning and a playful, expressive mind'],
+ 4:['Discipline & practicality','Organisation, patience and building things that last'],
+ 5:['Balance & willpower','Emotional steadiness and the centre of strength'],
+ 6:['Love, home & responsibility','Family, care and creating beauty and comfort'],
+ 7:['Reflection & growth','Lessons through experience, depth and wisdom'],
+ 8:['Discipline & wealth','Order, effort and material achievement'],
+ 9:['Intellect & compassion','Sharp mind, ambition and care for others'],
+};
+const LOSHU_PLANES=[
+ {cells:[1,5,9],name:'Plane of Intellect (Rajyoga line)',note:'A wonderful mental line — clear thinking, willpower and the drive to achieve.'},
+ {cells:[2,5,8],name:'Plane of Emotion & Balance',note:'Strong emotional steadiness — you handle feelings and relationships with grace.'},
+ {cells:[3,5,7],name:'Plane of Action & Energy',note:'A practical, energetic line — you turn intentions into real-world results.'},
+ {cells:[4,9,2],name:'Mental / Thought Plane',note:'Strong planning and thought — you think before you act.'},
+ {cells:[3,5,7],name:'Emotional Plane',note:'Warmth and emotional intelligence run through your chart.'},
+ {cells:[8,1,6],name:'Practical / Action Plane',note:'You get things done — grounded, capable and hands-on.'},
+ {cells:[4,3,8],name:'Plane of Thought (vertical)',note:'A strong reasoning mind — analytical and thoughtful.'},
+ {cells:[9,5,1],name:'Plane of Will (vertical)',note:'Determination and purpose — you finish what you begin.'},
+ {cells:[2,7,6],name:'Plane of Action (vertical)',note:'Energy directed outward — you make things happen in the world.'},
+];
+function loShu(dob){
+  const num=dob.replace(/\D/g,'');
+  const digits=num.split('').map(Number).filter(d=>d>0); // zeros are not placed
+  const day=+dob.split('-')[2];
+  const driver=reduceNum(day);
+  const conductor=reduceNum(num.split('').reduce((a,c)=>a+ +c,0));
+  const counts={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+  digits.forEach(d=>counts[d]++);
+  if(driver>=1&&driver<=9)counts[driver]++;
+  if(conductor>=1&&conductor<=9)counts[conductor]++;
+  const present=Object.keys(counts).filter(n=>counts[n]>0).map(Number);
+  const missing=Object.keys(counts).filter(n=>counts[n]===0).map(Number);
+  // detect complete planes/arrows (all three present)
+  const seen=new Set();
+  const planes=LOSHU_PLANES.filter(pl=>pl.cells.every(c=>counts[c]>0))
+    .filter(pl=>{const k=pl.cells.slice().sort().join('');if(seen.has(k))return false;seen.add(k);return true;});
+  // strength: present numbers (each capped) + plane bonus, scaled 0-100, floored encouraging
+  let raw=present.length*8 + planes.length*9 + Math.min(12,(counts[5]||0)*4);
+  const strength=Math.round(Math.max(48,Math.min(96,raw+30)));
+  return {counts,driver,conductor,present,missing,planes,strength};
+}
+function renderLoShu(dob){
+  const r=loShu(dob); state.loshu=r;
+  const layout=[[4,9,2],[3,5,7],[8,1,6]];
+  document.getElementById('loshu-str').textContent='Strength '+r.strength+'/100';
+  document.getElementById('loshu-grid').innerHTML=layout.map(row=>row.map(n=>{
+    const c=r.counts[n];
+    return `<div class="loshu-cell ${c?'on':'off'}" title="${LOSHU_MEANING[n][0]}">${c?String(n).repeat(c):''}<small>${LOSHU_MEANING[n][0].split(' ')[0]}</small></div>`;
+  }).join('')).join('');
+  // side: top present strengths + growth areas
+  const strong=r.present.filter(n=>r.counts[n]>=2);
+  let side=`<div class="ls-line"><b>Driver (Mulank):</b> ${r.driver} · <b>Conductor (Bhagyank):</b> ${r.conductor}</div>`;
+  if(strong.length)side+=`<div class="ls-line"><b>Repeated strengths:</b> ${strong.map(n=>n+' ('+LOSHU_MEANING[n][0]+')').join(', ')}</div>`;
+  side+=`<div class="ls-line"><b>Present:</b> ${r.present.join(', ')||'—'}</div>`;
+  side+=`<div class="ls-line dim"><b>Growth areas:</b> ${r.missing.join(', ')||'none — a very full grid!'}</div>`;
+  document.getElementById('loshu-side').innerHTML=side;
+  document.getElementById('loshu-planes').innerHTML=r.planes.length?
+    `<div class="ls-planes-title">✦ Active power lines (${r.planes.length}):</div>`+
+    r.planes.map(p=>`<div class="ls-plane"><b>${p.name}</b> — ${p.note}</div>`).join(''):
+    `<div class="ls-line dim">No complete power lines this time — your strength comes from individual numbers above.</div>`;
+}
+function shareLoShu(){
+  const r=state.loshu;if(!r)return;
+  const planes=r.planes.length?'\n\nActive power lines:\n'+r.planes.map(p=>'✦ '+p.name).join('\n'):'';
+  shareWhatsApp(`My Lo Shu Grid 🔢\n\nDriver: ${r.driver} · Conductor: ${r.conductor}\nStrength: ${r.strength}/100\nPresent numbers: ${r.present.join(', ')}${planes}`,'My Lo Shu Grid ✨');
+}
+function askLoShu(){
+  const r=state.loshu;if(!r)return;
+  const desc=`MY LO SHU GRID (numerology). Driver/Mulank: ${r.driver}. Conductor/Bhagyank: ${r.conductor}. `+
+    `Number counts: ${Object.entries(r.counts).filter(([n,c])=>c>0).map(([n,c])=>n+'×'+c).join(', ')}. `+
+    `Missing numbers: ${r.missing.join(', ')||'none'}. Active power lines: ${r.planes.map(p=>p.name).join('; ')||'none'}.`;
+  sendQuestion(desc+'\n\nExplain my Lo Shu grid in detail — what my present and repeated numbers say about my personality and strengths, what the missing numbers gently invite me to grow, and what my active power lines mean. Be warm and encouraging, never negative.',true);
+  document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});
 }
 
 /* ===== GUNA MILAN ===== */
@@ -1497,6 +1613,7 @@ function generateChart(){
   document.getElementById('num-name').textContent=nameNumber(name);
   document.getElementById('num-bday').textContent=reduceNum(+dob.split('-')[2]);
   document.getElementById('celebs').innerHTML=celebLine(lifePath(dob));
+  renderLoShu(dob);
   renderScorecard(state.chart);
   renderTopics();
   skyNow();
