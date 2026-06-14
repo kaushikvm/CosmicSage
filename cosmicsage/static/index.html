@@ -347,6 +347,40 @@
   .dosha-extra{font-size:.88rem; color:var(--moon); line-height:1.55; margin-top:10px; padding:10px 12px; background:var(--panel2); border-radius:9px;}
   .dosha-foot{font-size:.8rem; color:var(--muted); margin-top:10px; font-style:italic;}
   .rel-cta{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--line);}
+  .outlook-row{padding:9px 0; border-bottom:1px solid rgba(52,48,92,.45);}
+  .ol-top{display:flex; justify-content:space-between; align-items:center;}
+  .ol-name{font-weight:600; font-size:.9rem; color:var(--ink);} .ol-stars{color:var(--gold); letter-spacing:2px; font-size:1rem;}
+  .ol-note{font-size:.84rem; color:var(--muted); margin-top:2px; line-height:1.45;}
+  .swot-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .swot-box{border-radius:11px; padding:12px; font-size:.85rem;}
+  .swot-box .swot-h{font-weight:600; margin-bottom:6px; font-size:.9rem;}
+  .swot-box ul{margin:0; padding-left:16px;} .swot-box li{color:var(--moon); line-height:1.5; margin-bottom:4px;}
+  .sw-s{background:rgba(111,174,92,.1); border:1px solid rgba(111,174,92,.3);} .sw-s .swot-h{color:#9BD489;}
+  .sw-w{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3);} .sw-w .swot-h{color:var(--gold-soft);}
+  .sw-o{background:rgba(99,160,232,.08); border:1px solid rgba(99,160,232,.3);} .sw-o .swot-h{color:#7FB0E8;}
+  .sw-r{background:rgba(200,71,47,.08); border:1px solid rgba(200,71,47,.3);} .sw-r .swot-h{color:#E8917D;}
+  .cn12-grid{display:flex; flex-direction:column; gap:9px; margin-bottom:12px;}
+  .cn12-item{display:flex; gap:10px; align-items:flex-start; font-size:.9rem; color:var(--moon); line-height:1.5;}
+  .cn12-ic{font-size:1.1rem; flex:none;} .cn12-item b{color:var(--gold-soft);}
+  .cn12-foot{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:11px 13px; font-size:.86rem; color:var(--moon); line-height:1.55;}
+  .cn12-foot div{margin:3px 0;} .cn12-foot b{color:var(--gold-soft);}
+  .loshu-breakdown{margin-top:14px; display:flex; flex-direction:column; gap:11px;}
+  .lb-row{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:11px 13px;}
+  .lb-h{font-weight:600; font-size:.88rem; color:var(--gold-soft); margin-bottom:7px;}
+  .lb-pills{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+  .num-pill{background:rgba(212,162,78,.14); border:1px solid var(--gold); color:var(--gold-soft); border-radius:99px; padding:3px 10px; font-size:.82rem; font-weight:600;}
+  .num-pill small{font-weight:400; color:var(--moon); font-size:.74rem;}
+  .num-none{color:var(--muted);}
+  .lb-note{font-size:.82rem; color:var(--muted); line-height:1.5;}
+  .match-bottom{margin-top:22px; padding-top:18px; border-top:1px solid var(--line); text-align:center;}
+  .match-bottom-btns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:14px;}
+  .share-cards{display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+  .share-card-btn{background:var(--panel2); border:1px solid var(--line); color:var(--moon); border-radius:99px; padding:7px 14px; font-size:.82rem; cursor:pointer; transition:border-color .15s;}
+  .share-card-btn:hover{border-color:var(--gold); color:var(--gold-soft);}
+  #sticky-pdf{position:fixed; right:16px; bottom:20px; z-index:80; background:linear-gradient(135deg,#F6C453,#E2702A); color:#3a1d05; border:none; border-radius:99px; padding:12px 18px; font-weight:600; font-size:.9rem; box-shadow:0 6px 20px rgba(226,112,42,.5); cursor:pointer; opacity:0; transform:translateY(20px); pointer-events:none; transition:all .3s;}
+  #sticky-pdf.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+  @media(min-width:760px){#sticky-pdf{display:none;}}
+  @media(max-width:520px){.swot-grid{grid-template-columns:1fr;}}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -389,7 +423,11 @@
     @page{margin:12mm;}
     *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
     body{background:#fff; color:#1b1430; font-size:12px;}
-    #stars,.topbar,.chat-card,.chat-input,.suggest-area,.topics,.donate-nudge,.greet .actions,.footer,.overlay,.support-foot,#loader,.wa-share,.sc-tabs,.sc-more,.kundali-ctrl,.dash-actions,#sky-card,.fest-card,.panchang-card{display:none !important;}
+    #stars,.topbar,.chat-card,.chat-input,.suggest-area,.topics,.donate-nudge,.greet .actions,.footer,.overlay,.support-foot,#loader,.wa-share,.sc-tabs,.sc-more,.kundali-ctrl,.dash-actions,#sky-card,.fest-card,.panchang-card,.rel-cta,.match-bottom,#sticky-pdf,.match-form,.match-intro,#match-ai,.sc-chev,.koota-explain{display:none !important;}
+    .match-wrap>h2,.match-wrap>p{display:none !important;}
+    body.print-match .match-bottom,body.print-match .print-footer{display:block !important;}
+    .koota-bar{border:1px solid #e0d3b0;} .koota-fill{background:#E2702A !important;}
+    .swot-box,.outlook-row,.ki-item,.rs-q,.cn12-item{break-inside:avoid;}
     .dash{display:block;} .stack{display:block;}
     .card{border:1px solid #d8c9a8; break-inside:avoid; background:#fff; margin-bottom:12px; box-shadow:none;}
     .card h3{color:#9a6a10;}
@@ -419,6 +457,7 @@
 <div id="zoom-overlay" onclick="closeZoom(event)">
   <div class="zoom-inner"><button class="zoom-close" onclick="closeZoom()">✕</button><div id="zoom-content"></div></div>
 </div>
+<button id="sticky-pdf" onclick="savePDF()">📄 Download PDF</button>
 
 <div id="stars"></div>
 <div class="shell">
@@ -745,6 +784,10 @@
       <button class="btn full" onclick="runMatch()">Match kundalis</button>
       <div id="match-result" class="hidden" style="margin-top:22px;">
         <div class="card">
+          <div class="print-only print-header">
+            <div class="pt">CosmicSage</div>
+            <div class="ps">Relationship Reading for <b id="print-name-match"></b></div>
+          </div>
           <div class="score-hero">
             <div class="ring-wrap">
               <svg width="150" height="150" viewBox="0 0 150 150">
@@ -775,6 +818,15 @@
           <h4 class="rel-h">🪔 Dosha & Manglik — the calm view</h4>
           <div class="status-line" id="ms-manglik"></div>
 
+          <h4 class="rel-h">💍 Marriage Outlook</h4>
+          <div id="ms-outlook"></div>
+
+          <h4 class="rel-h">📊 Relationship SWOT</h4>
+          <div class="swot-grid" id="ms-swot"></div>
+
+          <h4 class="rel-h">🔮 Your Next 12 Months Together</h4>
+          <div id="ms-next12"></div>
+
           <h4 class="rel-h">✅ Your Action Plan as a Couple</h4>
           <div class="action-cols" id="ms-action"></div>
 
@@ -784,6 +836,24 @@
             <button class="wa-share" onclick="shareMatch()">📲 Share</button>
           </div>
           <div id="match-ai" style="margin-top:14px"></div>
+
+          <div class="match-bottom">
+            <h4 style="color:var(--gold);margin:0 0 10px">Enjoyed your relationship reading?</h4>
+            <div class="match-bottom-btns">
+              <button class="btn" onclick="savePDF()">⬇ Download PDF</button>
+              <button class="btn ghost" onclick="shareMatch()">📲 Share on WhatsApp</button>
+            </div>
+            <div class="share-cards">
+              <button class="share-card-btn" onclick="shareMatchCard('score')">💞 Share our score</button>
+              <button class="share-card-btn" onclick="shareMatchCard('marriage')">💍 Marriage potential</button>
+              <button class="share-card-btn" onclick="shareMatchCard('strength')">💪 Our strength</button>
+            </div>
+          </div>
+          <div class="print-only print-footer">
+            <img src="/static/qr.png" alt="Support QR" onerror="this.style.display='none'">
+            <div class="pf-t">Made with love by Kaushik — scan to support CosmicSage ♥</div>
+            <div class="pf-s">CosmicSage offers astrological perspectives for reflection, not professional advice. · cosmicsage.onrender.com</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1893,14 +1963,21 @@ function zoomLoShu(){
   openZoom(big,'Lo Shu Grid · Strength '+r.strength+'/100');
 }
 function savePDF(){
-  // fill print-only header + chart (selected style/varga) just before printing
-  if(state.birth){document.getElementById('print-name').textContent=state.birth.name;}
-  const pc=document.getElementById('print-chart');
-  if(pc&&state.chart){
-    const D=state.vargaD||1, vch=D===1?state.chart:vargaChart(state.chart,D);
-    const v=VARGAS['D'+D];
-    pc.innerHTML=`<div style="font-family:'Eczar',serif;color:#9a6a10;font-size:15px;margin-bottom:6px">${v?v.name:'Rashi (D1)'} · ${state.chartStyle==='south'?'South':'North'} Indian</div>`+
-      buildKundaliSVG(vch,state.chartStyle||'south');
+  const onMatch=state.view==='view-match';
+  document.body.classList.toggle('print-match',onMatch);
+  if(onMatch){
+    const R=state.rel;
+    const pn=document.getElementById('print-name-match');
+    if(pn&&R)pn.textContent=`${R.nA} & ${R.nB}`;
+  } else {
+    if(state.birth){document.getElementById('print-name').textContent=state.birth.name;}
+    const pc=document.getElementById('print-chart');
+    if(pc&&state.chart){
+      const D=state.vargaD||1, vch=D===1?state.chart:vargaChart(state.chart,D);
+      const v=VARGAS['D'+D];
+      pc.innerHTML=`<div style="font-family:'Eczar',serif;color:#9a6a10;font-size:15px;margin-bottom:6px">${v?v.name:'Rashi (D1)'} · ${state.chartStyle==='south'?'South':'North'} Indian</div>`+
+        buildKundaliSVG(vch,state.chartStyle||'south');
+    }
   }
   setTimeout(()=>window.print(),60);
 }
@@ -2458,6 +2535,9 @@ function runMatch(){
 
   // calm dosha/manglik panel
   renderDoshaPanel(R);
+  renderOutlook(R);
+  renderSWOT(R);
+  renderCoupleNext12(R);
   renderMatchNumerology(A,B,R.l1,R.l2);
   renderMatchAction(R);
   document.getElementById('match-ai').innerHTML='';
@@ -2496,10 +2576,47 @@ function renderMatchAction(R){
    `<div class="action-do"><div class="ac-h">Do together</div><ul>${MATCH_ACTION.do.map(x=>`<li>${x}</li>`).join('')}</ul></div>
     <div class="action-avoid"><div class="ac-h">Gently avoid</div><ul>${MATCH_ACTION.avoid.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
 }
+function renderOutlook(R){
+  const stars=(n)=>'★'.repeat(n)+'☆'.repeat(5-n);
+  document.getElementById('ms-outlook').innerHTML=marriageOutlook(R).map(o=>
+   `<div class="outlook-row"><div class="ol-top"><span class="ol-name">${o.label}</span><span class="ol-stars">${stars(o.stars)}</span></div>
+      <div class="ol-note">${o.note}</div></div>`).join('');
+}
+function renderSWOT(R){
+  const sw=relSWOT(R);
+  const col=(cls,icon,title,arr)=>`<div class="swot-box ${cls}"><div class="swot-h">${icon} ${title}</div><ul>${arr.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+  document.getElementById('ms-swot').innerHTML=
+    col('sw-s','💪','Strengths',sw.S)+col('sw-w','🌱','Weaknesses',sw.W)+
+    col('sw-o','🚀','Opportunities',sw.O)+col('sw-r','⚠','Risks',sw.R);
+}
+function renderCoupleNext12(R){
+  const f=coupleNext12(R);
+  const ICON={Communication:'💬',Family:'🏡',Money:'💰',Romance:'❤',Growth:'🌿'};
+  let html='<div class="cn12-grid">';
+  for(const k of ['Communication','Family','Money','Romance','Growth'])
+    html+=`<div class="cn12-item"><span class="cn12-ic">${ICON[k]}</span><div><b>${k}</b> ${f[k]}</div></div>`;
+  html+='</div>';
+  html+=`<div class="cn12-foot"><div>💡 <b>Important conversations:</b> ${f._conversations}</div><div>🧭 <b>If tension rises:</b> ${f._caution}</div></div>`;
+  document.getElementById('ms-next12').innerHTML=html;
+}
 function shareMatch(){
   const R=state.rel;if(!R)return;
   shareWhatsApp(`${R.nA} & ${R.nB} — ${R.type} Match 💞\n\n${R.total} of 36 gunas · ${R.overall}% overall\n\n💪 ${R.Q.strength}\n🌱 ${R.Q.challenge}\n🕰 ${R.Q.lasting}`,'Our Compatibility ✨');
 }
+function shareMatchCard(kind){
+  const R=state.rel;if(!R)return;
+  const ol=marriageOutlook(R);
+  if(kind==='score') shareWhatsApp(`${R.nA} & ${R.nB} 💞\n\n✦ ${R.type} Match\n${R.total} of 36 gunas · ${R.overall}% overall compatibility\n"${R.verdict}"`,'Our Compatibility Score ✨');
+  else if(kind==='marriage'){const m=ol[0];shareWhatsApp(`${R.nA} & ${R.nB} 💍\n\nMarriage success: ${'★'.repeat(m.stars)}${'☆'.repeat(5-m.stars)}\n${m.note}\n\nLong-term: ${'★'.repeat(ol[5].stars)}${'☆'.repeat(5-ol[5].stars)}`,'Our Marriage Outlook ✨');}
+  else shareWhatsApp(`${R.nA} & ${R.nB} 💪\n\nOur relationship superpower:\n${R.strongest.dim.area} — ${R.strongest.dim.hi}\n\n🌟 ${R.unique}`,'Our Relationship Strength ✨');
+}
+// sticky mobile PDF button — appears after 50% scroll, only on dashboard or match
+window.addEventListener('scroll',()=>{
+  const btn=document.getElementById('sticky-pdf');if(!btn)return;
+  const onReport=state.view==='view-dash'||state.view==='view-match';
+  const sp=(window.scrollY)/(document.body.scrollHeight-window.innerHeight||1);
+  btn.classList.toggle('show',onReport&&sp>0.5);
+},{passive:true});
 /* numerology compatibility: driver/conductor friendliness + complementary numbers */
 const NUM_FRIEND={1:[1,3,5,9],2:[2,3,5],3:[1,2,3,9],4:[1,5,6,7],5:[1,3,5,6],6:[3,5,6,9],7:[1,4,5],8:[3,4,5],9:[1,3,6,9]};
 function numCompat(rA,rB){
@@ -2568,6 +2685,68 @@ function relationshipAnalysis(A,B,cA,cB,g){
   const unique=`What makes you unique: ${l1===l2?`you share Life Path ${l1}, giving deep natural understanding`:`your Life Paths ${l1} & ${l2} blend differently`}${fills>=3?', and you each bring numbers the other is missing — you genuinely complete each other.':'.'} ${type==='Complementary'?'You grow through balance, not sameness.':type==='Soulmate'?'This is a rare degree of alignment.':''}`;
   return {total,pct,overall,numC,l1,l2,rA,rB,type,typeNote:REL_TYPES[type],verdict,scored,strong,weak,strongest,weakest,nA,nB,mA,mB,Q,unique,fills};
 }
+/* ===== MARRIAGE OUTLOOK — star ratings from the real kootas ===== */
+function koota(R,name){const k=R.scored.find(x=>x.name===name);return k?k.ratio:0.5;}
+function stars5(ratio){return Math.max(2,Math.min(5,Math.round(ratio*5)));}
+function marriageOutlook(R){
+  const overall=R.total/36;
+  const fam=koota(R,'Family & Prosperity'), child=koota(R,'Health & Children');
+  const mind=koota(R,'Mental Connection'), pers=koota(R,'Personality Match'), money=koota(R,'Family & Prosperity');
+  const rows=[
+   ['Marriage success',stars5(overall),overall>=.75?'Strong foundations for a happy, committed marriage.':overall>=.55?'Good potential — built on effort and mutual care.':'Workable with open communication and patience.'],
+   ['Family support',stars5(fam),fam>=.75?'Both families and home life are well-supported.':fam>=.5?'Reasonable family harmony with mutual respect.':'Be intentional about family expectations together.'],
+   ['Children & wellbeing',stars5(child),child>=.75?'Supportive energy for children and family health.':child>=.5?'Generally supportive of family wellbeing.':'Worth a calm, planned conversation about family health.'],
+   ['Conflict resolution',stars5((mind+pers)/2),(mind+pers)/2>=.7?'You resolve differences with understanding.':'You can resolve conflict well by listening first.'],
+   ['Financial harmony',stars5(money),money>=.7?'Aligned attitudes toward money and security.':'Agree early on saving, spending and shared goals.'],
+   ['Long-term stability',stars5(overall*0.6+fam*0.4),overall>=.7?'Signs point to a stable, lasting bond.':'Stability grows steadily with shared commitment.'],
+  ];
+  return rows.map(([label,s,note])=>({label,stars:s,note}));
+}
+/* ===== RELATIONSHIP SWOT — practical, from strong/weak areas ===== */
+function relSWOT(R){
+  const S=R.strong.slice(0,3).map(k=>`${k.dim.area} — ${k.dim.hi}`);
+  if(!S.length)S.push('A genuine willingness to understand each other.');
+  const W=R.weak.slice(0,3).map(k=>`${k.dim.area} — needs gentle, regular attention.`);
+  if(!W.length)W.push('No major weak areas — stay attentive so strengths don\u2019t slip.');
+  const O=[
+    R.fills>=3?'You each bring strengths the other lacks — huge growth potential by learning from each other.':'Shared values give you a strong base to build new goals together.',
+    R.l1===R.l2?`Sharing Life Path ${R.l1} means deep natural understanding to lean on.`:'Different life paths mean you broaden each other\u2019s perspective.',
+    'Talking openly about the future now turns potential into a real, shared plan.',
+  ];
+  const Rk=[
+    R.weakest.dim.area+' left unaddressed could become a recurring friction point.',
+    R.mA!==R.mB?'The Manglik difference is best acknowledged calmly rather than ignored.':'Complacency — strong matches still need ongoing effort.',
+    'Avoiding hard conversations (money, family, expectations) tends to store up trouble.',
+  ];
+  return {S,W,O,R:Rk};
+}
+/* ===== NEXT 12 MONTHS FOR THE COUPLE — general energy, honest framing ===== */
+function coupleNext12(R){
+  const o=R.total/36;
+  const tier=(base)=>base>=.7?2:base>=.5?1:0;
+  const L={
+    Communication:[['Practice patient listening — it pays off.','Communication flows more easily this year.','A wonderful year for deepening how you connect.'][tier(koota(R,'Mental Connection'))]],
+    Family:[['Navigate family expectations together, gently.','Steady, supportive family energy ahead.','A warm year for family bonds and home life.'][tier(koota(R,'Family & Prosperity'))]],
+    Money:[['Align on budgets and shared goals early.','Finances move in a manageable direction.','A favourable year to build security together.'][tier(koota(R,'Family & Prosperity'))]],
+    Romance:[['Nurture closeness with small, regular gestures.','A comfortable, affectionate phase together.','A romantic, connecting year for the two of you.'][tier(koota(R,'Physical Chemistry'))]],
+    Growth:[['Treat challenges as a shared project.','You grow steadily as a couple this year.','A strong year for growing together and deciding big things.'][tier(o)]],
+  };
+  const out={};for(const k in L)out[k]=L[k][0];
+  out._conversations=o>=.6?'Good timing for important conversations — engagement, moving in, or future plans.':'Take big conversations slowly and kindly; there\u2019s no rush.';
+  out._caution='If tension rises, return to your strongest area ('+R.strongest.dim.area.toLowerCase()+') — it\u2019s your reset button.';
+  return out;
+}
+/* ===== LO SHU COMPATIBILITY — shared / complementary / missing / growth ===== */
+const LOSHU_NUM={1:'self-expression & drive',2:'intuition & relationships',3:'creativity & joy',4:'discipline & stability',5:'freedom & adaptability',6:'love & responsibility',7:'reflection & wisdom',8:'discipline & wealth',9:'compassion & ideals'};
+function loShuCompat(rA,rB){
+  const pA=new Set(rA.present),pB=new Set(rB.present);
+  const shared=[...pA].filter(n=>pB.has(n)).sort();
+  const aBringsB=[...pA].filter(n=>!pB.has(n)).sort(); // A has, B lacks
+  const bBringsA=[...pB].filter(n=>!pA.has(n)).sort(); // B has, A lacks
+  const bothMissing=[1,2,3,4,5,6,7,8,9].filter(n=>!pA.has(n)&&!pB.has(n)).sort();
+  return {shared,aBringsB,bBringsA,bothMissing};
+}
+
 function renderMatchNumerology(A,B,l1,l2){
   const rA=loShu(A.dob),rB=loShu(B.dob);
   const compat=numCompat(rA,rB);
@@ -2582,8 +2761,23 @@ function renderMatchNumerology(A,B,l1,l2){
         <div class="lc-person"><div class="lc-name">${nA}</div>${miniGrid(rA)}<div class="lc-dc">Driver ${rA.driver} · Conductor ${rA.conductor}</div></div>
         <div class="lc-person"><div class="lc-name">${nB}</div>${miniGrid(rB)}<div class="lc-dc">Driver ${rB.driver} · Conductor ${rB.conductor}</div></div>
       </div>
-      <div class="lc-note">Life paths ${l1} & ${l2}${l1===l2?' — same path, strong natural understanding.':' — different paths that can balance each other.'} ${rA.missing.filter(n=>rB.present.includes(n)).length||rB.missing.filter(n=>rA.present.includes(n)).length?'Each of you brings numbers the other is missing — you complete each other.':''} The full reading covers this in detail.</div>
+      <div class="lc-note">Life paths ${l1} & ${l2}${l1===l2?' — same path, strong natural understanding.':' — different paths that can balance each other.'} ${rA.missing.filter(n=>rB.present.includes(n)).length||rB.missing.filter(n=>rA.present.includes(n)).length?'Each of you brings numbers the other is missing — you complete each other.':''}</div>
+      ${loShuCompatHTML(rA,rB,nA,nB)}
     </div>`;
+}
+function loShuCompatHTML(rA,rB,nA,nB){
+  const c=loShuCompat(rA,rB);
+  const list=(arr)=>arr.length?arr.map(n=>`<span class="num-pill">${n} <small>${LOSHU_NUM[n]}</small></span>`).join(''):'<span class="num-none">—</span>';
+  return `<div class="loshu-breakdown">
+    <div class="lb-row"><div class="lb-h">🤝 Shared strengths</div><div class="lb-pills">${list(c.shared)}</div>
+      <div class="lb-note">${c.shared.length?'Energies you both naturally have — common ground you instinctively understand.':'You share few numbers directly — your strength is in how you complement each other (below).'}</div></div>
+    <div class="lb-row"><div class="lb-h">✨ ${nA} brings to ${nB}</div><div class="lb-pills">${list(c.aBringsB)}</div>
+      <div class="lb-note">${c.aBringsB.length?nA+' naturally supplies these where '+nB+' has room to grow.':'—'}</div></div>
+    <div class="lb-row"><div class="lb-h">✨ ${nB} brings to ${nA}</div><div class="lb-pills">${list(c.bBringsA)}</div>
+      <div class="lb-note">${c.bBringsA.length?nB+' naturally supplies these where '+nA+' has room to grow.':'—'}</div></div>
+    <div class="lb-row"><div class="lb-h">🌱 Growth areas for you both</div><div class="lb-pills">${list(c.bothMissing)}</div>
+      <div class="lb-note">${c.bothMissing.length?'Neither of you strongly carries these — a shared area to consciously develop together.':'Between you, you cover all nine energies — a beautifully complete pairing.'}</div></div>
+  </div>`;
 }
 async function askMatchAI(){
   if(!lastMatch||state.busy)return;
