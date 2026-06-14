@@ -390,6 +390,12 @@
   .pw-price{font-family:'Eczar',serif; color:var(--gold-soft); font-size:1.5rem; font-weight:600; margin-bottom:12px;}
   .pw-foot{font-size:.8rem; color:var(--muted); margin-top:10px;} .pw-foot a{color:var(--gold-soft);}
   #match-locked{transition:opacity .3s;}
+  .attract-p{font-size:.92rem; color:var(--moon); line-height:1.6; margin:0 0 10px; padding-left:12px; border-left:2px solid rgba(232,93,117,.4);}
+  .love-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .love-card{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px;}
+  .love-name{font-weight:600; color:var(--gold-soft); font-size:.95rem; margin-bottom:8px; text-align:center;}
+  .love-row{font-size:.86rem; color:var(--moon); line-height:1.5; margin:6px 0;} .love-row b{display:block; color:var(--ink); font-size:.8rem;}
+  @media(max-width:520px){.love-grid{grid-template-columns:1fr;}}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -448,6 +454,11 @@
     .print-header{text-align:center; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #E2702A;}
     .print-header .pt{font-family:'Eczar',serif; color:#E2702A; font-size:22px; font-weight:600;}
     .print-header .ps{color:#7a5410; font-size:12px; margin-top:2px;}
+    .print-cover{margin-top:14px;}
+    .pcover-score{font-family:'Eczar',serif; color:#E2702A; font-size:34px; font-weight:600;}
+    .pcover-score small{font-size:14px; color:#7a5410;}
+    .pcover-type{color:#9a6a10; font-size:15px; font-weight:600; margin-top:4px;}
+    .pcover-verdict{color:#555; font-size:12px; margin-top:2px;}
     .print-footer{display:block !important; margin-top:18px; padding-top:12px; border-top:2px solid #E2702A; text-align:center; break-inside:avoid;}
     .print-footer img{width:120px; height:120px; object-fit:contain;}
     .print-footer .pf-t{color:#E2702A; font-family:'Eczar',serif; font-size:14px; margin-top:6px;}
@@ -796,6 +807,7 @@
           <div class="print-only print-header">
             <div class="pt">CosmicSage</div>
             <div class="ps">Relationship Reading for <b id="print-name-match"></b></div>
+            <div class="print-cover" id="print-cover-match"></div>
           </div>
           <div class="score-hero">
             <div class="ring-wrap">
@@ -852,6 +864,15 @@
 
             <h4 class="rel-h">✨ What Makes You Unique</h4>
             <div class="rel-insights" id="ms-keyinsights"></div>
+
+            <h4 class="rel-h">💗 Why You're Drawn To Each Other</h4>
+            <div class="attract" id="ms-attract"></div>
+
+            <h4 class="rel-h">💑 How You Experience Love Differently</h4>
+            <div class="love-grid" id="ms-love"></div>
+
+            <h4 class="rel-h">🔢 Your Lo Shu Compatibility — in depth</h4>
+            <div id="ms-loshu-detail"></div>
 
             <h4 class="rel-h">🪔 Dosha &amp; Manglik — the calm, full view</h4>
             <div class="status-line" id="ms-manglik"></div>
@@ -2008,6 +2029,10 @@ function savePDF(){
     const R=state.rel;
     const pn=document.getElementById('print-name-match');
     if(pn&&R)pn.textContent=`${R.nA} & ${R.nB}`;
+    const cover=document.getElementById('print-cover-match');
+    if(cover&&R)cover.innerHTML=matchUnlocked()
+      ? `<div class="pcover-score">${R.total%1?R.total.toFixed(1):R.total}<small>/36 gunas</small></div><div class="pcover-type">${R.type} Match · ${R.overall}% overall</div><div class="pcover-verdict">${R.verdict}</div>`
+      : `<div class="pcover-type">${R.type} Match · ${R.total%1?R.total.toFixed(1):R.total}/36 gunas</div><div class="pcover-verdict">Compatibility preview — unlock the full blueprint for the complete reading</div>`;
   } else {
     if(state.birth){document.getElementById('print-name').textContent=state.birth.name;}
     const pc=document.getElementById('print-chart');
@@ -2579,6 +2604,8 @@ function runMatch(){
   // calm dosha/manglik panel
   renderDoshaPanel(R);
   renderUnique(R);
+  renderAttraction(R);
+  renderLoveStyles(R);
   renderOutlook(R);
   renderSWOT(R);
   renderCoupleNext12(R);
@@ -2625,6 +2652,19 @@ function renderUnique(R){
   document.getElementById('ms-keyinsights').innerHTML=
    `<div class="ki-item ki-uniq"><div class="ki-h">🌟 What makes you unique</div>${R.unique}</div>
     <div class="ki-item ki-strong"><div class="ki-h">✨ Why you complement each other</div>${R.fills>=3?'You each carry numbers and strengths the other lacks — you naturally fill each other\u2019s gaps.':'You share core strengths that give you a steady, understanding foundation.'} Your Moon signs (${RASHI[lastMatch.cA.planets.Moon.sign][1]} & ${RASHI[lastMatch.cB.planets.Moon.sign][1]}) and ${R.l1===R.l2?'shared':'differing'} Life Paths shape how you balance.</div>`;
+}
+function renderAttraction(R){
+  const parts=attractionAnalysis(lastMatch.cA,lastMatch.cB,R.nA,R.nB);
+  document.getElementById('ms-attract').innerHTML=parts.map(p=>`<p class="attract-p">${p}</p>`).join('');
+}
+function renderLoveStyles(R){
+  const sA=loveStyle(lastMatch.cA),sB=loveStyle(lastMatch.cB);
+  const card=(name,s)=>`<div class="love-card"><div class="love-name">${name}</div>
+    <div class="love-row"><b>💗 Love style</b> ${s.love}</div>
+    <div class="love-row"><b>🔥 Conflict style</b> ${s.conflict}</div>
+    <div class="love-row"><b>💬 Communication</b> ${s.comm}</div>
+    <div class="love-row"><b>🫶 Emotional needs</b> ${s.needs}</div></div>`;
+  document.getElementById('ms-love').innerHTML=card(R.nA,sA)+card(R.nB,sB);
 }
 /* ===== PAYWALL GATE ===== */
 function matchUnlocked(){
@@ -2817,7 +2857,39 @@ function loShuCompat(rA,rB){
   const bothMissing=[1,2,3,4,5,6,7,8,9].filter(n=>!pA.has(n)&&!pB.has(n)).sort();
   return {shared,aBringsB,bBringsA,bothMissing};
 }
-
+/* ===== PASS 2: WHY ATTRACTED + LOVE STYLES (warm tendencies from real placements) ===== */
+const SIGN_ELEM=['Fire','Earth','Air','Water','Fire','Earth','Air','Water','Fire','Earth','Air','Water']; // by sign index 0..11 (Aries..Pisces)
+function signElem(sign){return SIGN_ELEM[sign];}
+function attractionAnalysis(cA,cB,nA,nB){
+  const mA=cA.planets.Moon.sign,mB=cB.planets.Moon.sign;
+  const vA=cA.planets.Venus.sign,vB=cB.planets.Venus.sign;
+  const eMA=signElem(mA),eMB=signElem(mB);
+  const parts=[];
+  // Moon-to-Moon emotional pull
+  if(eMA===eMB)parts.push(`Both your Moons sit in ${eMA.toLowerCase()} signs — you feel the world in a similar emotional language, which creates an easy, instinctive sense of "you get me."`);
+  else parts.push(`${nA}'s Moon is in a ${eMA.toLowerCase()} sign and ${nB}'s in a ${eMB.toLowerCase()} sign — you experience emotions differently, and that contrast is often exactly what draws two people together: each feels something refreshing in the other.`);
+  // Venus warmth
+  parts.push(`Venus — the planet of affection — colours how you each show love: ${nA} through ${VENUS_LOVE[signElem(vA)]}, ${nB} through ${VENUS_LOVE[signElem(vB)]}. Noticing each other's love language is where the warmth deepens.`);
+  // 7th house / partnership tone
+  const a7=RASHI[(cA.asc.sign+6)%12][1];
+  parts.push(`In partnership, ${nA} naturally looks for ${PARTNER_WANT[signElem((cA.asc.sign+6)%12)]}, which shapes what feels like "home" in this relationship.`);
+  return parts;
+}
+const VENUS_LOVE={Fire:'warmth, passion and bold gestures',Earth:'steady, practical, dependable care',Air:'words, conversation and playful connection',Water:'deep feeling, tenderness and emotional closeness'};
+const PARTNER_WANT={Fire:'excitement and a partner who inspires them',Earth:'security and a partner they can rely on',Air:'mental connection and a partner to talk with',Water:'emotional safety and a partner who feels deeply'};
+const MOON_LOVE={Fire:'expressing love openly and with energy',Earth:'showing love through actions and reliability',Air:'sharing love through words and ideas',Water:'loving deeply and needing emotional closeness'};
+const MARS_CONFLICT={Fire:'direct and quick to address things head-on',Earth:'slow to anger but firm once decided',Air:'wanting to talk it through and reason it out',Water:'feeling conflict deeply and needing reassurance'};
+const MOON_COMM={Fire:'expressive and straightforward',Earth:'measured and practical',Air:'talkative and idea-driven',Water:'gentle and emotionally attuned'};
+const MOON_NEED={Fire:'appreciation and freedom to be themselves',Earth:'stability, loyalty and steady routine',Air:'conversation, variety and mental stimulation',Water:'emotional security, tenderness and reassurance'};
+function loveStyle(c){
+  const m=signElem(c.planets.Moon.sign),v=signElem(c.planets.Venus.sign),mars=signElem(c.planets.Mars.sign);
+  return {
+    love:MOON_LOVE[v]||MOON_LOVE[m],
+    conflict:MARS_CONFLICT[mars],
+    comm:MOON_COMM[m],
+    needs:MOON_NEED[m],
+  };
+}
 function renderMatchNumerology(A,B,l1,l2){
   const rA=loShu(A.dob),rB=loShu(B.dob);
   const compat=numCompat(rA,rB);
@@ -2825,6 +2897,7 @@ function renderMatchNumerology(A,B,l1,l2){
   const miniGrid=(r)=>`<div class="mini-loshu">`+layout.map(row=>row.map(n=>{
     const c=r.counts[n];return `<div class="ml-cell ${c?'on':'off'}">${c?String(n).repeat(c):''}</div>`;}).join('')).join('')+`</div>`;
   const nA=A.name.split(' ')[0],nB=B.name.split(' ')[0];
+  // FREE: score + grids + life-path verdict + teaser (no interpretation)
   document.getElementById('ms-numero').innerHTML=
    `<div class="numparison">
       <div class="numparison-head"><b>🔢 Numerology compatibility</b><span class="varga-score">${compat}/100</span></div>
@@ -2832,9 +2905,12 @@ function renderMatchNumerology(A,B,l1,l2){
         <div class="lc-person"><div class="lc-name">${nA}</div>${miniGrid(rA)}<div class="lc-dc">Driver ${rA.driver} · Conductor ${rA.conductor}</div></div>
         <div class="lc-person"><div class="lc-name">${nB}</div>${miniGrid(rB)}<div class="lc-dc">Driver ${rB.driver} · Conductor ${rB.conductor}</div></div>
       </div>
-      <div class="lc-note">Life paths ${l1} & ${l2}${l1===l2?' — same path, strong natural understanding.':' — different paths that can balance each other.'} ${rA.missing.filter(n=>rB.present.includes(n)).length||rB.missing.filter(n=>rA.present.includes(n)).length?'Each of you brings numbers the other is missing — you complete each other.':''}</div>
-      ${loShuCompatHTML(rA,rB,nA,nB)}
+      <div class="lc-note">Life paths ${l1} & ${l2}${l1===l2?' — same path, strong natural understanding.':' — different paths that can balance each other.'}</div>
+      <div class="rs-teaser">🔒 Your shared strengths, the unique numbers each of you brings the other, and your shared growth areas are in your full report.</div>
     </div>`;
+  // LOCKED: the interpretive breakdown
+  const ld=document.getElementById('ms-loshu-detail');
+  if(ld)ld.innerHTML=loShuCompatHTML(rA,rB,nA,nB);
 }
 function loShuCompatHTML(rA,rB,nA,nB){
   const c=loShuCompat(rA,rB);
