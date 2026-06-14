@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CosmicSage — Free Vedic Birth Chart, Kundali Matching & Insights</title>
-<meta name="description" content="Free Vedic Kundali from real planetary positions, 36-point kundali matching, dasha timeline, numerology and AI-powered readings. No sign-up.">
+<meta name="description" content="Free Vedic Kundali from real planetary positions, 36-point kundali matching, dasha timeline, numerology and guided readings. No sign-up.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 160 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='o' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0' stop-color='%23FFF6D8'/%3E%3Cstop offset='50%25' stop-color='%23FFD75E'/%3E%3Cstop offset='100%25' stop-color='%23F6A93B' stop-opacity='0'/%3E%3C/radialGradient%3E%3ClinearGradient id='r' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23FFD75E'/%3E%3Cstop offset='1' stop-color='%23E2702A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='80' cy='26' r='24' fill='url(%23o)'/%3E%3Ccircle cx='80' cy='26' r='11' fill='%23FFF6D8'/%3E%3Cpath d='M80 38 q-6 30 0 56' stroke='%23F6C453' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cg fill='url(%23r)'%3E%3Ccircle cx='80' cy='116' r='14'/%3E%3Cpath d='M80 126 C62 130 52 150 52 168 L108 168 C108 150 98 130 80 126 Z'/%3E%3Cellipse cx='80' cy='170' rx='42' ry='11'/%3E%3C/g%3E%3C/svg%3E">
@@ -172,6 +172,37 @@
   .chip:hover{background:rgba(212,162,78,.15);}
   .chip.skip{border-color:var(--line); color:var(--muted);}
   .cat-grid{display:flex; flex-direction:column; gap:8px;}
+  .tool-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;}
+  .tool-card{display:flex; flex-direction:column; align-items:center; text-align:center; gap:7px; background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:18px 12px; transition:transform .15s,border-color .15s,box-shadow .15s; cursor:pointer;}
+  .tool-card:hover{transform:translateY(-3px); border-color:var(--gold); box-shadow:0 8px 22px rgba(0,0,0,.25);}
+  .tool-card.match{border-color:rgba(200,71,47,.5);}
+  .tool-card.match:hover{border-color:var(--sindoor);}
+  .tool-ic{width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.7rem;}
+  .tool-t{font-weight:600; font-size:.92rem; color:var(--ink); line-height:1.2;}
+  .tool-d{font-size:.76rem; color:var(--muted); line-height:1.3;}
+  .cat-panel{display:none; margin-top:14px; background:var(--panel2); border:1px solid var(--gold); border-radius:14px; padding:16px;}
+  .cat-panel-head{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+  .cat-panel-head .ic{width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem;}
+  .cat-panel-head b{flex:1; color:var(--ink); font-size:1rem;}
+  .cat-close{background:var(--night); border:1px solid var(--line); color:var(--muted); width:30px; height:30px; border-radius:50%; cursor:pointer;}
+  .cat-panel-subs{display:flex; flex-wrap:wrap; gap:8px;}
+  .numparison{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; margin-top:6px;}
+  .numparison-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
+  .loshu-compare{display:flex; gap:14px; justify-content:center;}
+  .lc-person{flex:1; text-align:center; max-width:160px;}
+  .lc-name{font-weight:600; color:var(--gold-soft); font-size:.88rem; margin-bottom:6px;}
+  .mini-loshu{display:grid; grid-template-columns:repeat(3,1fr); gap:3px; aspect-ratio:1; margin:0 auto; max-width:120px;}
+  .ml-cell{display:flex; align-items:center; justify-content:center; border-radius:5px; font-size:.8rem; font-weight:600; font-family:'Eczar',serif; min-height:30px;}
+  .ml-cell.on{background:rgba(212,162,78,.18); border:1px solid var(--gold); color:var(--gold-soft);}
+  .ml-cell.off{background:var(--night); border:1px dashed var(--line);}
+  .lc-dc{font-size:.72rem; color:var(--muted); margin-top:6px;}
+  .lc-note{font-size:.84rem; color:var(--moon); line-height:1.5; margin-top:12px; text-align:center;}
+  /* tap to enlarge charts/grids */
+  .zoomable{cursor:zoom-in;}
+  #zoom-overlay{position:fixed; inset:0; z-index:90; background:rgba(8,6,20,.92); display:none; align-items:center; justify-content:center; padding:20px;}
+  #zoom-overlay.open{display:flex;}
+  #zoom-overlay .zoom-inner{max-width:560px; width:100%; background:var(--panel); border:1px solid var(--gold); border-radius:16px; padding:20px; max-height:92vh; overflow:auto;}
+  #zoom-overlay .zoom-close{float:right; background:var(--night); border:1px solid var(--line); color:var(--moon); width:34px; height:34px; border-radius:50%; cursor:pointer;}
   .cat{background:var(--panel2); border:1px solid var(--line); border-radius:12px; overflow:hidden;}
   .cat-head{width:100%; display:flex; align-items:center; gap:11px; background:transparent; padding:12px 14px; text-align:left;}
   .cat-head .ic{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex-shrink:0;}
@@ -240,6 +271,21 @@
   .sc-badge.low{background:rgba(212,162,78,.18); color:var(--gold-soft);}
   .sc-badge.med{background:rgba(214,138,61,.2); color:#E8A24D;}
   .sc-note{font-size:.76rem; color:var(--muted); margin-top:12px; text-align:center;}
+  .cosmic-card{background:linear-gradient(160deg,rgba(212,162,78,.08),var(--panel));}
+  .cosmic-body{display:flex; flex-direction:column; gap:10px; margin-top:6px;}
+  .cosmic-line{display:flex; flex-direction:column; gap:2px;}
+  .cl-q{font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; color:var(--gold-soft); font-weight:600;}
+  .cl-a{font-size:.98rem; color:var(--ink); line-height:1.5;}
+  .insights-grid{display:flex; flex-direction:column; gap:9px; margin:10px 0;}
+  .insight-item{display:flex; gap:12px; align-items:flex-start; background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:11px 13px;}
+  .insight-ic{font-size:1.3rem; flex:none;}
+  .insight-t{font-weight:600; font-size:.9rem; color:var(--gold-soft);}
+  .insight-x{font-size:.9rem; color:var(--moon); line-height:1.5; margin-top:2px;}
+  .sc-chev{color:var(--muted); font-size:.7rem;}
+  .sc-explain{display:none;} .sc-explain.open{display:block; margin-top:8px; padding:10px 12px; background:var(--panel2); border:1px solid var(--line); border-radius:9px;}
+  .exp-anchor{font-size:.82rem; color:var(--muted); margin-bottom:6px;}
+  .exp-tier{background:rgba(212,162,78,.16); color:var(--gold-soft); border-radius:99px; padding:1px 9px; font-size:.72rem; margin-left:4px;}
+  .exp-row{font-size:.88rem; color:var(--moon); line-height:1.5; margin:4px 0;} .exp-row b{color:var(--gold-soft); font-weight:600;}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -308,6 +354,9 @@
     <svg class="loader-logo" viewBox="0 0 160 180" aria-hidden="true"><defs><radialGradient id="orbL" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D8"/><stop offset="40%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F6A93B" stop-opacity="0"/></radialGradient><linearGradient id="threadL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#F6A93B"/></linearGradient><linearGradient id="robeL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="80" cy="20" r="22" fill="url(#orbL)"><animate attributeName="r" values="20;26;20" dur="1.8s" repeatCount="indefinite"/></circle><circle cx="80" cy="20" r="8" fill="#FFF6D8"/><path d="M80 28 q-7 22 0 40 q7 18 0 38 q-5 14 0 26" stroke="url(#threadL)" stroke-width="2.6" fill="none" stroke-linecap="round"/><g fill="url(#robeL)"><circle cx="80" cy="118" r="9"/><path d="M80 110 q-3 -6 0 -10 q3 4 0 10z" fill="#FFE9A8"/><path d="M80 127 C66 130 58 144 58 160 L102 160 C102 144 94 130 80 127 Z"/><ellipse cx="80" cy="162" rx="34" ry="9"/></g></svg>
     <div class="loader-text" id="loader-text">Aligning the planets…</div>
   </div>
+</div>
+<div id="zoom-overlay" onclick="closeZoom(event)">
+  <div class="zoom-inner"><button class="zoom-close" onclick="closeZoom()">✕</button><div id="zoom-content"></div></div>
 </div>
 
 <div id="stars"></div>
@@ -407,6 +456,18 @@
         </div>
       </div>
 
+      <div class="card cosmic-card" style="grid-column:1/-1">
+        <div class="sc-head"><h3 style="margin:0">🌌 Your Cosmic Summary</h3>
+          <button class="wa-share sm" onclick="shareCosmic()">📲 Share</button></div>
+        <div class="cosmic-body" id="cosmic-body"></div>
+      </div>
+
+      <div class="card insights-card" style="grid-column:1/-1">
+        <h3>✦ Your Top 5 Life Insights</h3>
+        <div class="insights-grid" id="insights-grid"></div>
+        <button class="btn" style="margin-top:6px;width:100%" onclick="askExecSummary()">📜 Get my full life summary</button>
+      </div>
+
       <div class="card scorecard" style="grid-column:1/-1">
         <div class="sc-head">
           <h3 style="margin:0">✨ Your Astro Scorecard</h3>
@@ -430,8 +491,7 @@
         </div>
         <div class="sc-panel" id="sc-panel"></div>
         <button class="wa-share" style="margin-top:12px" onclick="shareYogaDosha()">📲 Share my Yogas & Doshas</button>
-        <button class="btn" style="margin-top:12px;width:100%" onclick="askExecSummary()">📜 Get my AI life summary</button>
-        <div class="sc-note">Computed from your chart for reflection — tendencies, not fixed fate. Tap any area above, then ask the sage to go deeper.</div>
+        <div class="sc-note">Computed from your chart's planetary positions — tendencies, not fixed fate. Tap any area above, then ask the sage to go deeper.</div>
       </div>
 
       <div class="stack">
@@ -454,7 +514,7 @@
               <option value="7">Saptamsa (D7) · Children</option>
             </select>
           </div>
-          <div id="kundali-holder"></div>
+          <div id="kundali-holder" class="zoomable" onclick="zoomKundali()" title="Tap to enlarge"></div>
           <div class="varga-cap" id="varga-cap"></div>
           <div class="legend" id="kundali-legend"></div>
         </div>
@@ -495,7 +555,7 @@
               <button class="wa-share sm" onclick="shareLoShu()">📲 Share</button>
             </div>
             <div class="loshu-flex">
-              <div class="loshu-grid" id="loshu-grid"></div>
+              <div class="loshu-grid zoomable" id="loshu-grid" onclick="zoomLoShu()" title="Tap to enlarge"></div>
               <div class="loshu-side" id="loshu-side"></div>
             </div>
             <div class="loshu-planes" id="loshu-planes"></div>
@@ -1004,34 +1064,34 @@ function gunaMilan(A,B){ // A,B = charts; returns rows + total
   const sA=A.planets.Moon.sign,sB=B.planets.Moon.sign;
   const rows=[];let total=0;
   // 1 Varna (1)
-  const varna=VARNA(sA)<=VARNA(sB)?1:0; rows.push(["Varna","Temperament & ego",varna,1]);
+  const varna=VARNA(sA)<=VARNA(sB)?1:0; rows.push(["Ego Compatibility","How you each carry pride & purpose",varna,1,"Varna"]);
   // 2 Vashya (2) — simplified: same group 2; Leo vs quadruped 0; else 1
   const vA=VASHYA(sA),vB=VASHYA(sB);
-  const vashya=vA===vB?2:((vA===3&&vB===0)||(vB===3&&vA===0)?0:1); rows.push(["Vashya","Mutual influence",vashya,2]);
+  const vashya=vA===vB?2:((vA===3&&vB===0)||(vB===3&&vA===0)?0:1); rows.push(["Influence Compatibility","Natural give-and-take between you",vashya,2,"Vashya"]);
   // 3 Tara (3)
   const taraOK=r=>![3,5,7].includes(r===0?9:r);
   const r1=((nB-nA+27)%27+1)%9, r2=((nA-nB+27)%27+1)%9;
-  const tara=(taraOK(r1)?1.5:0)+(taraOK(r2)?1.5:0); rows.push(["Tara","Destiny & wellbeing",tara,3]);
+  const tara=(taraOK(r1)?1.5:0)+(taraOK(r2)?1.5:0); rows.push(["Luck & Wellbeing","Fortune you bring each other",tara,3,"Tara"]);
   // 4 Yoni (4) — simplified: same 4, enemy 0, else 2
   const yA=YONI_MAP[nA],yB=YONI_MAP[nB];
   const enemy=YONI_ENEMY.some(p=>(p[0]===yA&&p[1]===yB)||(p[1]===yA&&p[0]===yB));
-  const yoni=yA===yB?4:(enemy?0:2); rows.push(["Yoni","Intimacy ("+yA+" × "+yB+")",yoni,4]);
+  const yoni=yA===yB?4:(enemy?0:2); rows.push(["Physical Chemistry","Instinctive attraction ("+yA+" × "+yB+")",yoni,4,"Yoni"]);
   // 5 Graha Maitri (5)
   const lA=LORD[sA],lB=LORD[sB];
   const rel=(x,y)=>x===y?'F':(FRIENDS[x].includes(y)?'F':(ENEMIES[x].includes(y)?'E':'N'));
   const ab=rel(lA,lB),ba=rel(lB,lA);
   const gm=(ab==='F'&&ba==='F')?5:((ab==='F'&&ba==='N')||(ab==='N'&&ba==='F'))?4:(ab==='N'&&ba==='N')?3:((ab==='F'&&ba==='E')||(ab==='E'&&ba==='F'))?1:((ab==='N'&&ba==='E')||(ab==='E'&&ba==='N'))?0.5:0;
-  rows.push(["Graha Maitri","Mental compatibility ("+lA+" × "+lB+")",gm,5]);
+  rows.push(["Mental Connection","How your minds meet ("+lA+" × "+lB+")",gm,5,"Graha Maitri"]);
   // 6 Gana (6)
   const gA=GANA(nA),gB=GANA(nB);
   const gana=gA===gB?6:((gA!==2&&gB!==2)?5:((gA===0&&gB===2)||(gA===2&&gB===0)?1:0));
-  rows.push(["Gana","Nature ("+GANA_N[gA]+" × "+GANA_N[gB]+")",gana,6]);
+  rows.push(["Personality Match","Temperaments ("+GANA_N[gA]+" × "+GANA_N[gB]+")",gana,6,"Gana"]);
   // 7 Bhakoot (7)
   const dd=(sB-sA+12)%12, dd2=(sA-sB+12)%12;
   const bad=(a,b)=>(a===1&&b===11)||(a===11&&b===1)||(a===4&&b===8)||(a===8&&b===4)||(a===5&&b===7)||(a===7&&b===5);
-  const bhakoot=bad(dd,dd2)?0:7; rows.push(["Bhakoot","Prosperity & family",bhakoot,7]);
+  const bhakoot=bad(dd,dd2)?0:7; rows.push(["Family & Prosperity","Shared growth & home life",bhakoot,7,"Bhakoot"]);
   // 8 Nadi (8)
-  const nadi=NADI(nA)===NADI(nB)?0:8; rows.push(["Nadi","Health & progeny ("+NADI_N[NADI(nA)]+" × "+NADI_N[NADI(nB)]+")",nadi,8]);
+  const nadi=NADI(nA)===NADI(nB)?0:8; rows.push(["Health & Children","Wellbeing of family ("+NADI_N[NADI(nA)]+" × "+NADI_N[NADI(nB)]+")",nadi,8,"Nadi"]);
   rows.forEach(r=>total+=r[2]);
   return{rows,total};
 }
@@ -1254,15 +1314,96 @@ function destinyScore(scores){
   let s=0,n=0;for(const k in scores){s+=scores[k]*w[k];n+=w[k];}
   return Math.round(s/n);
 }
+/* ===== LIFE OUTCOMES: translate placements into plain-language guidance ===== */
+const HOUSE_LIFE={1:'yourself & vitality',2:'money & family',3:'courage & siblings',4:'home & peace',5:'creativity & children',6:'work & health',7:'partnership',8:'change & depth',9:'fortune & belief',10:'career & status',11:'gains & networks',12:'rest & letting go'};
+function strongestPlanet(chart){let best='Sun',bv=0;for(const k of GRAHA7){const v=planetStrength(chart,k);if(v>bv){bv=v;best=k;}}return best;}
+function weakestPlanet(chart){let w='Saturn',wv=99;for(const k of GRAHA7){const v=planetStrength(chart,k);if(v<wv){wv=v;w=k;}}return w;}
+const PLANET_GIFT={Sun:'leadership and a clear sense of purpose',Moon:'emotional intelligence and care for others',Mars:'drive, courage and the will to act',Mercury:'a sharp, quick and communicative mind',Jupiter:'wisdom, optimism and good judgement',Venus:'charm, creativity and an eye for harmony',Saturn:'discipline, patience and staying power'};
+const PLANET_GROW={Sun:'building quiet confidence without needing approval',Moon:'protecting your peace and emotional rest',Mars:'channelling energy patiently instead of rushing',Mercury:'slowing the mind and finishing what you start',Jupiter:'turning big ideas into steady action',Venus:'valuing yourself as much as you value others',Saturn:'trusting that slow, steady effort pays off'};
+/* Top-5 one-line outcome insights, each tied to a real placement */
+function lifeInsights(chart){
+  const P=chart.planets,asc=chart.asc.sign;
+  const lord=(h)=>SIGN_LORD[(asc+h-1)%12];
+  const houseOf=(k)=>P[k].house;
+  const strong=strongestPlanet(chart);
+  return [
+   ['💼','Career',`Your career grows fastest through ${HOUSE_LIFE[houseOf(lord(10))]} — your 10th lord sits in your ${houseOf(lord(10))}th house, so you shine when work connects to that area.`],
+   ['💰','Wealth',`Money builds steadily for you through ${HOUSE_LIFE[houseOf(lord(2))]}; with patience your means grow rather than arrive overnight.`],
+   ['❤','Relationships',`In love you're drawn to ${planetStrength(chart,'Venus')>=6?'warmth and harmony — you give and need genuine affection':'depth and loyalty over flash — you bond slowly but deeply'}.`],
+   ['🩺','Health',`Your vitality is ${planetStrength(chart,'Sun')>=6?'naturally strong; keep momentum with regular routine':'steady when you protect rest and manage stress'} — your Moon and 1st house set the tone.`],
+   ['🕉','Spirit',`Your inner growth comes through ${HOUSE_LIFE[houseOf('Ketu')]}; quiet reflection suits you more than show.`],
+  ];
+}
+/* Per-area explanation: strength / challenge / focus */
+function scoreExplain(chart,area,val){
+  const P=chart.planets,asc=chart.asc.sign;
+  const lord=(h)=>SIGN_LORD[(asc+h-1)%12];
+  const tier=val>=75?'strong':val>=60?'good':val>=50?'developing':'a growth area';
+  const M={
+    Career:{h:10,s:'You carry natural drive to achieve and be recognised.',c:'Avoid scattering energy across too many directions at once.',f:'Pick one path and go deep — focus beats spread for you.'},
+    Wealth:{h:2,s:'You can build lasting resources through steady effort.',c:'Watch impulse spending in stronger-earning years.',f:'Automate savings; let wealth compound quietly.'},
+    Marriage:{h:7,s:'You offer loyalty and real commitment to a partner.',c:'Give space for differences rather than expecting sameness.',f:'Communicate early and gently; harmony is your strong suit.'},
+    Health:{h:1,s:'Your constitution responds well to routine and rest.',c:'Stress and irregular habits are your main watch-points.',f:'Protect sleep and daily rhythm — small habits, big results.'},
+    Education:{h:5,s:'You learn quickly and think creatively.',c:'Finishing what you begin matters more than starting new things.',f:'Build one skill to mastery rather than many halfway.'},
+    Spirituality:{h:9,s:'You have a natural pull toward meaning and reflection.',c:"Don't let doubt or over-thinking block simple practice.",f:'A short daily practice grounds everything else.'},
+  }[area];
+  return {tier,strength:M.s,challenge:M.c,focus:M.f,
+    anchor:`Your ${M.h}th house (${HOUSE_LIFE[M.h]}) is led by ${lord(M.h)}.`};
+}
+/* Cosmic Summary — answers the 5 first-screen questions */
+function cosmicSummary(chart){
+  const scores=lifeScores(chart),dest=destinyScore(scores);
+  const strong=strongestPlanet(chart),weak=weakestPlanet(chart);
+  const top=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const low=Object.entries(scores).sort((a,b)=>a[1]-b[1])[0][0];
+  const ascName=RASHI[chart.asc.sign][0];
+  return {
+    theme:`A ${ascName}-rising chart with ${strong} as your strongest force — you're built for ${PLANET_GIFT[strong]}.`,
+    strength:`Your biggest strength is ${top.toLowerCase()} — ${PLANET_GIFT[strong]} carries you here.`,
+    challenge:`Your main growth area is ${low.toLowerCase()} — it asks for ${PLANET_GROW[weak]}.`,
+    focus:`Right now, focus on ${top.toLowerCase()}: lean into what already flows for you.`,
+    next:`Your next big opening tends to come through ${HOUSE_LIFE[chart.planets[strong].house]} — stay open to it.`,
+    dest
+  };
+}
 /* ----- scorecard rendering ----- */
 const SC_ICON={Career:'💼',Wealth:'💰',Marriage:'❤',Health:'🩺',Education:'🎓',Spirituality:'🕉'};
+function renderCosmic(chart){
+  const c=cosmicSummary(chart);state.cosmic=c;
+  document.getElementById('cosmic-body').innerHTML=
+   `<div class="cosmic-line"><span class="cl-q">What this means for you</span><span class="cl-a">${c.theme}</span></div>
+    <div class="cosmic-line"><span class="cl-q">💪 Biggest strength</span><span class="cl-a">${c.strength}</span></div>
+    <div class="cosmic-line"><span class="cl-q">🌱 Biggest growth area</span><span class="cl-a">${c.challenge}</span></div>
+    <div class="cosmic-line"><span class="cl-q">🎯 Focus right now</span><span class="cl-a">${c.focus}</span></div>
+    <div class="cosmic-line"><span class="cl-q">🚀 Next big opportunity</span><span class="cl-a">${c.next}</span></div>`;
+}
+function renderInsights(chart){
+  const ins=lifeInsights(chart);state.insights=ins;
+  document.getElementById('insights-grid').innerHTML=ins.map(([ic,t,txt])=>
+   `<div class="insight-item"><div class="insight-ic">${ic}</div><div><div class="insight-t">${t}</div><div class="insight-x">${txt}</div></div></div>`).join('');
+}
+function shareCosmic(){
+  const c=state.cosmic;if(!c)return;
+  shareWhatsApp(`My Cosmic Summary 🌌\n\n${c.theme}\n\n💪 Strength: ${c.strength}\n🎯 Focus: ${c.focus}\n\n🌟 Destiny Score: ${c.dest}/100`,'My Cosmic Summary ✨');
+}
+function toggleExplain(area,val){
+  const host=document.getElementById('explain-'+area);if(!host)return;
+  if(host.innerHTML){host.innerHTML='';host.classList.remove('open');return;}
+  document.querySelectorAll('.sc-explain').forEach(e=>{e.innerHTML='';e.classList.remove('open');});
+  const e=scoreExplain(state.chart,area,val);
+  host.innerHTML=`<div class="exp-anchor">${e.anchor} <span class="exp-tier">${e.tier}</span></div>
+    <div class="exp-row"><b>💪 Strength</b> ${e.strength}</div>
+    <div class="exp-row"><b>🌱 Watch for</b> ${e.challenge}</div>
+    <div class="exp-row"><b>🎯 Focus</b> ${e.focus}</div>`;
+  host.classList.add('open');
+}
 function renderScorecard(chart){
   const scores=lifeScores(chart), dest=destinyScore(scores);
   state.scorecard={scores,dest};
   document.getElementById('sc-destiny-num').textContent=dest;
   document.getElementById('sc-bars').innerHTML=Object.entries(scores).map(([k,v])=>
-    `<div class="scbar-row"><div class="top"><b>${SC_ICON[k]} ${k}</b><span>${v}/100</span></div>
-     <div class="scbar"><i data-w="${v}"></i></div></div>`).join('');
+    `<div class="scbar-row" onclick="toggleExplain('${k}',${v})" style="cursor:pointer"><div class="top"><b>${SC_ICON[k]} ${k}</b><span>${v}/100 <span class="sc-chev">▾</span></span></div>
+     <div class="scbar"><i data-w="${v}"></i></div><div class="sc-explain" id="explain-${k}"></div></div>`).join('');
   scTab('yogas',document.querySelector('.sc-tab'));
   requestAnimationFrame(()=>setTimeout(()=>{
     document.querySelectorAll('.sc-bars .scbar i').forEach(el=>el.style.width=el.dataset.w+'%');
@@ -1433,6 +1574,26 @@ function setChartStyle(s){state.chartStyle=s;
   document.getElementById('kstyle-south').classList.toggle('active',s==='south');
   renderKundali();}
 function setVarga(d){state.vargaD=+d;renderKundali();}
+function openZoom(html,title){
+  document.getElementById('zoom-content').innerHTML=(title?`<h3 style="color:var(--gold);margin:0 0 10px">${title}</h3>`:'')+html;
+  document.getElementById('zoom-overlay').classList.add('open');
+}
+function closeZoom(e){
+  if(e&&e.target&&e.target.closest('.zoom-inner')&&e.target.className!=='zoom-close')return;
+  document.getElementById('zoom-overlay').classList.remove('open');
+}
+function zoomKundali(){
+  const D=state.vargaD||1,vch=D===1?state.chart:vargaChart(state.chart,D),v=VARGAS['D'+D];
+  openZoom(buildKundaliSVG(vch,state.chartStyle||'south'),(v?v.name:'Rashi (D1)')+' · '+(state.chartStyle==='south'?'South':'North')+' Indian');
+}
+function zoomLoShu(){
+  const r=state.loshu;if(!r)return;
+  const layout=[[4,9,2],[3,5,7],[8,1,6]];
+  const big=`<div class="loshu-grid" style="grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,72px);margin:0 auto;width:max-content">`+
+    layout.map(row=>row.map(n=>{const c=r.counts[n];
+      return `<div class="loshu-cell ${c?'on':'off'}" style="font-size:1.4rem">${c?String(n).repeat(c):''}<small>${LOSHU_MEANING[n][0].split(' ')[0]}</small></div>`;}).join('')).join('')+`</div>`;
+  openZoom(big,'Lo Shu Grid · Strength '+r.strength+'/100');
+}
 function savePDF(){
   // fill print-only header + chart (selected style/varga) just before printing
   if(state.birth){document.getElementById('print-name').textContent=state.birth.name;}
@@ -1483,7 +1644,7 @@ function openPay(kind){ // 'pack' or 'match'
         s=document.getElementById('pay-scan'),cta=document.getElementById('pay-cta');
   if(kind==='match'){
     t.textContent='Unlock Kundali Matching · ₹29';
-    d.textContent='See the full 36-guna match score for free below — to get the sage\u2019s detailed AI reading of this match, pay ₹29 to the QR (or it\u2019s free if you have a question pack). Then enter your 12-digit UTR.';
+    d.textContent='See the full 36-guna match score for free below — to get the sage\u2019s detailed reading of this match, pay ₹29 to the QR (or it\u2019s free if you have a question pack). Then enter your 12-digit UTR.';
     s.textContent='Scan & pay ₹29, then enter your UTR:';
     cta.textContent='Unlock matching';
   }else{
@@ -1682,30 +1843,40 @@ const CATS=[
    ["My lucky elements","From my Lagna lord and beneficial planets, give my lucky numbers, colours, days and directions — and how to use them simply."],
  ]],
 ];
-let openCat=-1;
+const CAT_DESC={'Career & Profession':'Job, growth & direction','Education':'Studies, focus & streams','Love & Marriage':'Timing, partner & harmony','Health & Wellbeing':'Vitality & peace of mind','Wealth & Finance':'Earning, saving & gains','Property & Real Estate':'Home, land & buying','Children':'Family & parenting','Business & Enterprise':'Starting & growing','Legal & Court Matters':'Disputes & approvals','Relocation & Immigration':'Abroad & settling','Vehicle & Luxury':'Buying & timing','Daily Life Guidance':'Today, week, month, year','Muhurat (Timing)':'Auspicious dates','Remedies & Solutions':'Gentle, simple remedies','Dasha & Transit':'Your planetary periods','Karma & Past Life':'Soul & lessons','Lucky Elements':'Numbers, colours, days'};
 function renderTopics(){
   const host=document.getElementById('topics');
-  host.classList.add('cat-grid');
-  let html=CATS.map((c,ci)=>{
-    const head=`<button class="cat-head" onclick="toggleCat(${ci})">
-      <span class="ic" style="background:${c[2]}22;color:${c[2]}">${c[0]}</span>
-      <span class="cat-name">${c[1]}</span><span class="cat-caret" id="caret-${ci}">▾</span></button>`;
-    const subs=`<div class="cat-subs" id="subs-${ci}">`+
-      c[3].map((s,si)=>`<button class="chip" onclick="subAsk(${ci},${si})">${s[0]}</button>`).join('')+`</div>`;
-    return `<div class="cat ${openCat===ci?'open':''}">${head}${subs}</div>`;
-  }).join('');
-  html+=`<div class="cat"><button class="cat-head" style="border-color:var(--sindoor)" onclick="goMatch()">
-    <span class="ic" style="background:rgba(200,71,47,.18);color:var(--sindoor)">💞</span>
-    <span class="cat-name">Match Kundali</span><span class="cat-caret">→</span></button></div>`;
+  host.classList.add('tool-grid');
+  let html=CATS.map((c,ci)=>
+    `<button class="tool-card" onclick="openCat(${ci})">
+       <span class="tool-ic" style="background:${c[2]}1f;color:${c[2]}">${c[0]}</span>
+       <span class="tool-t">${c[1]}</span>
+       <span class="tool-d">${CAT_DESC[c[1]]||''}</span>
+     </button>`).join('');
+  html+=`<button class="tool-card match" onclick="goMatch()">
+       <span class="tool-ic" style="background:rgba(200,71,47,.18);color:var(--sindoor)">💞</span>
+       <span class="tool-t">Kundali Matching</span>
+       <span class="tool-d">36-guna compatibility</span></button>`;
   host.innerHTML=html;
 }
-function toggleCat(ci){openCat=openCat===ci?-1:ci;
-  document.querySelectorAll('.cat').forEach((el,i)=>el.classList.toggle('open',i===openCat&&i<CATS.length));
+function openCat(ci){
+  const c=CATS[ci];
+  // build a focused panel of sub-topics below the grid
+  let panel=document.getElementById('cat-panel');
+  if(!panel){panel=document.createElement('div');panel.id='cat-panel';panel.className='cat-panel';
+    document.getElementById('topics').after(panel);}
+  panel.innerHTML=`<div class="cat-panel-head"><span class="ic" style="background:${c[2]}22;color:${c[2]}">${c[0]}</span>
+      <b>${c[1]}</b><button class="cat-close" onclick="closeCat()">✕</button></div>
+    <div class="cat-panel-subs">`+
+    c[3].map((s,si)=>`<button class="chip" onclick="subAsk(${ci},${si})">${s[0]}</button>`).join('')+`</div>`;
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function subAsk(ci,si){startIntake(ci,si);
+function closeCat(){const p=document.getElementById('cat-panel');if(p)p.style.display='none';}
+function subAsk(ci,si){closeCat();startIntake(ci,si);
   document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});}
 
-/* ===== INTAKE: quick taps before the AI call — richer answer, one API call ===== */
+/* ===== INTAKE: quick taps before the reading — richer answer ===== */
 /* generic intake by category index; transit/daily/dasha categories skip intake */
 const INTAKE={
  0:[["What stage are you at?",["Student","Early career","Mid career","Business owner"]],["Main focus?",["Growth","Job change","New direction","Stability"]]],
@@ -1813,13 +1984,15 @@ function buildChartAndShow(name,dob,tob,place){
   document.getElementById('num-bday').textContent=reduceNum(+dob.split('-')[2]);
   document.getElementById('celebs').innerHTML=celebLine(lifePath(dob));
   renderLoShu(dob);
+  renderCosmic(state.chart);
+  renderInsights(state.chart);
   renderScorecard(state.chart);
   renderTopics();
   skyNow();
   switchView('view-dash');
 }
 
-/* ===== AI CONTEXT & Q&A ===== */
+/* ===== READING CONTEXT & Q&A ===== */
 function chartSummary(){
   const c=state.chart,b=state.birth,now=new Date();
   const lines=[`Ascendant (Lagna): ${RASHI[c.asc.sign][1]} ${c.asc.deg.toFixed(1)}°`];
@@ -1947,7 +2120,7 @@ function runMatch(){
   document.getElementById('ms-chips').innerHTML=[[A,cA],[B,cB]].map(([p,c])=>
    `<div class="pchip"><b>${p.name.split(' ')[0]}</b><span>Moon: ${RASHI[c.planets.Moon.sign][1]} · ${c.planets.Moon.nak}<br>Lagna: ${RASHI[c.asc.sign][1]} · ${GANA_N[GANA(c.planets.Moon.nakIdx)]} gana</span></div>`).join('');
   document.getElementById('ms-bars').innerHTML=g.rows.map(r=>
-   `<div class="koota-row"><div class="koota-top"><span><span class="nm">${r[0]}</span> <span class="meas">· ${r[1]}</span></span><span>${r[2]%1?r[2].toFixed(1):r[2]}/${r[3]}</span></div>
+   `<div class="koota-row"><div class="koota-top"><span><span class="nm" title="Traditionally: ${r[4]||r[0]}">${r[0]}</span> <span class="meas">· ${r[1]}</span></span><span>${r[2]%1?r[2].toFixed(1):r[2]}/${r[3]}</span></div>
     <div class="koota-bar"><div class="koota-fill ${r[2]===0?'zero':''}" style="width:0%" data-w="${Math.max(r[2]/r[3]*100,r[2]===0?4:0)}"></div></div></div>`).join('');
   show('match-result');
   requestAnimationFrame(()=>setTimeout(()=>{
@@ -1958,9 +2131,38 @@ function runMatch(){
   const mA=manglik(cA),mB=manglik(cB);
   document.getElementById('ms-manglik').innerHTML=`<b>Manglik check:</b> ${A.name.split(' ')[0]} — ${mA?'Manglik':'Non-manglik'} · ${B.name.split(' ')[0]} — ${mB?'Manglik':'Non-manglik'}${mA!==mB?' · One partner manglik — traditionally reviewed with an astrologer; matching mangliks or remedies are common resolutions.':mA&&mB?' · Both manglik — dosha is traditionally considered cancelled.':''}`;
   const l1=lifePath(A.dob),l2=lifePath(B.dob);
-  document.getElementById('ms-numero').innerHTML=`<b>Numerology:</b> Life paths ${l1} and ${l2}${l1===l2?' — same path, strong natural understanding.':' — different paths; the sage can read how they complement each other.'}`;
+  renderMatchNumerology(A,B,l1,l2);
   document.getElementById('match-ai').innerHTML='';
   show('match-result');
+}
+/* numerology compatibility: driver/conductor friendliness + complementary numbers */
+const NUM_FRIEND={1:[1,3,5,9],2:[2,3,5],3:[1,2,3,9],4:[1,5,6,7],5:[1,3,5,6],6:[3,5,6,9],7:[1,4,5],8:[3,4,5],9:[1,3,6,9]};
+function numCompat(rA,rB){
+  let s=50;
+  if(NUM_FRIEND[rA.driver]&&NUM_FRIEND[rA.driver].includes(rB.driver))s+=18; else s-=6;
+  if(NUM_FRIEND[rA.conductor]&&NUM_FRIEND[rA.conductor].includes(rB.conductor))s+=14; else s-=4;
+  // complementary: each fills the other's missing numbers
+  const fillAtoB=rB.missing.filter(n=>rA.present.includes(n)).length;
+  const fillBtoA=rA.missing.filter(n=>rB.present.includes(n)).length;
+  s+=Math.min(16,(fillAtoB+fillBtoA)*2);
+  return Math.round(Math.max(45,Math.min(96,s)));
+}
+function renderMatchNumerology(A,B,l1,l2){
+  const rA=loShu(A.dob),rB=loShu(B.dob);
+  const compat=numCompat(rA,rB);
+  const layout=[[4,9,2],[3,5,7],[8,1,6]];
+  const miniGrid=(r)=>`<div class="mini-loshu">`+layout.map(row=>row.map(n=>{
+    const c=r.counts[n];return `<div class="ml-cell ${c?'on':'off'}">${c?String(n).repeat(c):''}</div>`;}).join('')).join('')+`</div>`;
+  const nA=A.name.split(' ')[0],nB=B.name.split(' ')[0];
+  document.getElementById('ms-numero').innerHTML=
+   `<div class="numparison">
+      <div class="numparison-head"><b>🔢 Numerology compatibility</b><span class="varga-score">${compat}/100</span></div>
+      <div class="loshu-compare">
+        <div class="lc-person"><div class="lc-name">${nA}</div>${miniGrid(rA)}<div class="lc-dc">Driver ${rA.driver} · Conductor ${rA.conductor}</div></div>
+        <div class="lc-person"><div class="lc-name">${nB}</div>${miniGrid(rB)}<div class="lc-dc">Driver ${rB.driver} · Conductor ${rB.conductor}</div></div>
+      </div>
+      <div class="lc-note">Life paths ${l1} & ${l2}${l1===l2?' — same path, strong natural understanding.':' — different paths that can balance each other.'} ${rA.missing.filter(n=>rB.present.includes(n)).length||rB.missing.filter(n=>rA.present.includes(n)).length?'Each of you brings numbers the other is missing — you complete each other.':''} The full reading covers this in detail.</div>
+    </div>`;
 }
 async function askMatchAI(){
   if(!lastMatch||state.busy)return;
@@ -1972,14 +2174,15 @@ async function askMatchAI(){
   const holder=document.getElementById('match-ai');
   holder.innerHTML='<div class="msg astro thinking" style="max-width:100%"><span class="think-row"><span class="think-dots"><i></i><i></i><i></i></span> Reading both charts together…</span></div>';
   state.busy=true;
+  const rA=loShu(A.dob),rB=loShu(B.dob);
   const summary=`KUNDALI MATCH READING REQUEST.
 Partner 1: ${A.name}, Moon in ${RASHI[cA.planets.Moon.sign][1]}, ${cA.planets.Moon.nak} nakshatra, Lagna ${RASHI[cA.asc.sign][1]}, ${manglik(cA)?'Manglik':'Non-manglik'}.
 Partner 2: ${B.name}, Moon in ${RASHI[cB.planets.Moon.sign][1]}, ${cB.planets.Moon.nak} nakshatra, Lagna ${RASHI[cB.asc.sign][1]}, ${manglik(cB)?'Manglik':'Non-manglik'}.
 Guna Milan total: ${g.total}/36. Breakdown: ${g.rows.map(r=>r[0]+' '+r[2]+'/'+r[3]).join(', ')}.
-Life paths: ${lifePath(A.dob)} & ${lifePath(B.dob)}.`;
+Numerology: Life paths ${lifePath(A.dob)} & ${lifePath(B.dob)}; ${A.name.split(' ')[0]} driver ${rA.driver}/conductor ${rA.conductor}, ${B.name.split(' ')[0]} driver ${rB.driver}/conductor ${rB.conductor}; numerology compatibility ${numCompat(rA,rB)}/100.`;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chart:summary,uid:state.uid||'',lang:state.lang||'en',kind:'match',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a balanced, kind reading of this match in bullet points: overall harmony, the strongest kootas, any weak areas (especially Nadi or Bhakoot if 0) with traditional perspective and constructive guidance. Avoid fatalism.'}]})});
+      body:JSON.stringify({chart:summary,uid:state.uid||'',lang:state.lang||'en',kind:'match',name:(lastMatch&&lastMatch.A)?lastMatch.A.name:'',history:[{role:'user',content:'Give a warm, balanced relationship reading in bullet points covering BOTH the Guna Milan compatibility AND the numerology compatibility together: overall harmony, the strongest areas, what each partner brings, any areas needing care (framed constructively, never fatalistic), and practical guidance for a happy life together.'}]})});
     const data=await r.json();
     if(r.status===402){
       holder.innerHTML='';
