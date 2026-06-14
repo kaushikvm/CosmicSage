@@ -2609,12 +2609,19 @@ function runMatch(){
   renderOutlook(R);
   renderSWOT(R);
   renderCoupleNext12(R);
-  renderMatchNumerology(A,B,R.l1,R.l2);
+  renderMatchNumerology(A,B,R.l1,R.l2,R);
   renderMatchAction(R);
   document.getElementById('match-ai').innerHTML='';
-  // ensure we know unlock status, then paint the paywall gate
-  if(!state.uid){ computeUid(A.name,A.dob,A.tob,A.place).then(uid=>{state.uid=uid;refreshStatus().then(paintMatchGate);}); paintMatchGate(); }
-  else { refreshStatus().then(paintMatchGate); paintMatchGate(); }
+  // Avoid paywall flash for paid/VIP users: if unlock status isn't known yet,
+  // hide BOTH locked content and paywall until status resolves, then paint once.
+  if(state.quota){ paintMatchGate(); }
+  else {
+    const locked=document.getElementById('match-locked'),pw=document.getElementById('match-paywall');
+    if(locked)locked.style.display='none'; if(pw)pw.classList.add('hidden');
+  }
+  const finish=()=>{ if(!state.quota)state.quota={}; paintMatchGate(); };
+  if(!state.uid){ computeUid(A.name,A.dob,A.tob,A.place).then(uid=>{state.uid=uid;refreshStatus().then(finish).catch(finish);}); }
+  else { refreshStatus().then(finish).catch(finish); }
   show('match-result');
 }
 function toggleKoota(i){
@@ -2871,7 +2878,6 @@ function attractionAnalysis(cA,cB,nA,nB){
   // Venus warmth
   parts.push(`Venus — the planet of affection — colours how you each show love: ${nA} through ${VENUS_LOVE[signElem(vA)]}, ${nB} through ${VENUS_LOVE[signElem(vB)]}. Noticing each other's love language is where the warmth deepens.`);
   // 7th house / partnership tone
-  const a7=RASHI[(cA.asc.sign+6)%12][1];
   parts.push(`In partnership, ${nA} naturally looks for ${PARTNER_WANT[signElem((cA.asc.sign+6)%12)]}, which shapes what feels like "home" in this relationship.`);
   return parts;
 }
@@ -2890,9 +2896,9 @@ function loveStyle(c){
     needs:MOON_NEED[m],
   };
 }
-function renderMatchNumerology(A,B,l1,l2){
-  const rA=loShu(A.dob),rB=loShu(B.dob);
-  const compat=numCompat(rA,rB);
+function renderMatchNumerology(A,B,l1,l2,R){
+  const rA=(R&&R.rA)||loShu(A.dob),rB=(R&&R.rB)||loShu(B.dob);
+  const compat=(R&&R.numC)||numCompat(rA,rB);
   const layout=[[4,9,2],[3,5,7],[8,1,6]];
   const miniGrid=(r)=>`<div class="mini-loshu">`+layout.map(row=>row.map(n=>{
     const c=r.counts[n];return `<div class="ml-cell ${c?'on':'off'}">${c?String(n).repeat(c):''}</div>`;}).join('')).join('')+`</div>`;
