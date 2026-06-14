@@ -128,6 +128,12 @@
   .pan-row{display:flex; justify-content:space-between; align-items:center; padding:9px 2px; border-bottom:1px solid rgba(52,48,92,.5); font-size:.9rem;}
   .pan-row:last-child{border-bottom:none;}
   .pan-k{color:var(--moon);} .pan-v{color:var(--gold-soft); font-weight:500; text-align:right;}
+  .time-row{display:flex; align-items:center; gap:8px;}
+  .time-sel{flex:1; min-width:0;}
+  .time-colon{color:var(--muted); font-weight:700;}
+  .free-strip{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; align-items:center; margin-top:20px;}
+  .free-strip>span:first-child{color:var(--gold-soft); font-weight:600; font-size:.84rem;}
+  .fchip{font-size:.76rem; color:var(--moon); background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:4px 11px;}
   .think-dots{display:inline-flex; gap:4px;}
   .think-dots i{width:7px; height:7px; border-radius:50%; background:var(--gold); display:inline-block; animation:thinkPulse 1.2s ease-in-out infinite;}
   .think-dots i:nth-child(2){animation-delay:.2s;} .think-dots i:nth-child(3){animation-delay:.4s;}
@@ -135,6 +141,8 @@
   .ans-list{margin:8px 0 8px 2px; padding:0; list-style:none;}
   .ans-list li{position:relative; padding:6px 0 6px 22px; font-size:1.02rem; line-height:1.55;}
   .ans-list li::before{content:"✦"; position:absolute; left:0; top:6px; color:var(--gold); font-size:.9rem;}
+  .ans-head{color:var(--gold-soft); font-weight:600; font-size:.96rem; margin:12px 0 4px; padding-top:6px; border-top:1px solid rgba(212,162,78,.18);}
+  .ans-head:first-child{border-top:none; padding-top:0; margin-top:0;}
   .wa-share{display:inline-flex; align-items:center; gap:6px; margin-top:10px; background:#25D366; color:#fff;
     border-radius:8px; padding:7px 14px; font-size:.82rem; font-weight:600; cursor:pointer; border:none;}
   .wa-share:hover{background:#1da851;}
@@ -271,14 +279,27 @@
   .footer{padding:28px 0 50px; color:var(--muted); font-size:.78rem; text-align:center; border-top:1px solid var(--line); margin-top:20px;}
   /* print = save as PDF */
   @media print{
+    @page{margin:12mm;}
+    *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
     body{background:#fff; color:#1b1430; font-size:12px;}
-    #stars,.topbar,.chat-input,.suggest-area,.topics,.donate-nudge,.greet .actions,.footer,.overlay{display:none !important;}
-    .card{border:1px solid #ccc; break-inside:avoid; background:#fff;}
-    .card h3{color:#7a5410;}
-    .dash{display:block;} .stack{display:block;} .card{margin-bottom:14px;}
+    #stars,.topbar,.chat-card,.chat-input,.suggest-area,.topics,.donate-nudge,.greet .actions,.footer,.overlay,.support-foot,#loader,.wa-share,.sc-tabs,.sc-more,.kundali-ctrl,.dash-actions,#sky-card,.fest-card,.panchang-card{display:none !important;}
+    .dash{display:block;} .stack{display:block;}
+    .card{border:1px solid #d8c9a8; break-inside:avoid; background:#fff; margin-bottom:12px; box-shadow:none;}
+    .card h3{color:#9a6a10;}
     .msg{border:1px solid #ddd; background:#fff !important; max-width:100%;}
-    .num-tile .n{color:#7a5410;} table.pos td.g{color:#7a5410;}
+    .num-tile .n{color:#9a6a10;} table.pos td.g{color:#9a6a10;}
+    .kundali-svg{max-width:320px; margin:0 auto;}
+    /* print-only header + footer */
+    .print-only{display:block !important;}
+    .print-header{text-align:center; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #E2702A;}
+    .print-header .pt{font-family:'Eczar',serif; color:#E2702A; font-size:22px; font-weight:600;}
+    .print-header .ps{color:#7a5410; font-size:12px; margin-top:2px;}
+    .print-footer{display:block !important; margin-top:18px; padding-top:12px; border-top:2px solid #E2702A; text-align:center; break-inside:avoid;}
+    .print-footer img{width:120px; height:120px; object-fit:contain;}
+    .print-footer .pf-t{color:#E2702A; font-family:'Eczar',serif; font-size:14px; margin-top:6px;}
+    .print-footer .pf-s{color:#555; font-size:11px;}
   }
+  .print-only{display:none;}
 </style>
 </head>
 <body>
@@ -314,6 +335,16 @@
       <button class="btn btn-hero" onclick="switchView('view-onboard')">🔮 Get my free Kundali</button>
       <button class="btn btn-match" style="margin-left:8px" onclick="goMatch()">💞 Kundali Matching</button>
       <div class="note">No sign-up · takes 30 seconds · your birth details stay in your browser.</div>
+      <div class="free-strip">
+        <span>✨ All free:</span>
+        <span class="fchip">Kundali (D1) + Navamsa</span>
+        <span class="fchip">Astro Scorecard</span>
+        <span class="fchip">24 Yogas & 10 Doshas</span>
+        <span class="fchip">Lo Shu Grid</span>
+        <span class="fchip">Divisional charts</span>
+        <span class="fchip">Dasha & Sade Sati</span>
+        <span class="fchip">Sky view</span>
+      </div>
     </div>
     <div class="card panchang-card">
       <h3>📿 Today's Panchang</h3>
@@ -342,9 +373,14 @@
       <input id="f-name" type="text" placeholder="e.g. Ananya Sharma" autocomplete="off">
       <label for="f-dob">Date of birth</label>
       <input id="f-dob" type="date" min="1900-01-01">
-      <label for="f-tob">Time of birth</label>
-      <input id="f-tob" type="time" value="12:00">
-      <div class="field-hint">Not sure? Keep 12:00 — planets stay accurate; the ascendant becomes approximate.</div>
+      <label for="f-tob-h">Time of birth</label>
+      <div class="time-row" id="f-tob">
+        <select id="f-tob-h" class="time-sel"></select>
+        <span class="time-colon">:</span>
+        <select id="f-tob-m" class="time-sel"></select>
+        <select id="f-tob-ap" class="time-sel"></select>
+      </div>
+      <div class="field-hint">Not sure? Keep 12:00 PM — planets stay accurate; the ascendant becomes approximate.</div>
       <label for="f-place">Place of birth</label>
       <div class="geo-row">
         <input id="f-place" type="text" placeholder="Type your town or city, e.g. Madurai" onkeydown="if(event.key==='Enter')findPlace('f')">
@@ -358,10 +394,16 @@
   <!-- ============ DASHBOARD ============ -->
   <section id="view-dash" class="hidden">
     <div class="dash">
+      <div class="print-only print-header">
+        <div class="pt">CosmicSage</div>
+        <div class="ps">Vedic birth chart & life reading for <b id="print-name"></b></div>
+      </div>
+      <div class="print-only" id="print-chart" style="text-align:center;margin-bottom:14px"></div>
       <div class="greet">
         <h2>Namaste, <em id="g-name"></em></h2>
-        <div class="actions">
-          <button class="btn ghost" onclick="window.print()">⬇ Save as PDF</button>
+        <div class="actions dash-actions">
+          <button class="btn ghost" onclick="newChart()">✦ New chart</button>
+          <button class="btn ghost" onclick="savePDF()">⬇ Save as PDF</button>
         </div>
       </div>
 
@@ -388,6 +430,7 @@
         </div>
         <div class="sc-panel" id="sc-panel"></div>
         <button class="wa-share" style="margin-top:12px" onclick="shareYogaDosha()">📲 Share my Yogas & Doshas</button>
+        <button class="btn" style="margin-top:12px;width:100%" onclick="askExecSummary()">📜 Get my AI life summary</button>
         <div class="sc-note">Computed from your chart for reflection — tendencies, not fixed fate. Tap any area above, then ask the sage to go deeper.</div>
       </div>
 
@@ -400,8 +443,8 @@
           <h3>Janma Kundali</h3>
           <div class="kundali-ctrl">
             <div class="style-chips">
-              <button class="kstyle active" id="kstyle-north" onclick="setChartStyle('north')">North Indian</button>
-              <button class="kstyle" id="kstyle-south" onclick="setChartStyle('south')">South Indian</button>
+              <button class="kstyle" id="kstyle-north" onclick="setChartStyle('north')">North Indian</button>
+              <button class="kstyle active" id="kstyle-south" onclick="setChartStyle('south')">South Indian</button>
             </div>
             <select id="varga-sel" onchange="setVarga(this.value)">
               <option value="1">Rashi (D1) · Birth chart</option>
@@ -504,6 +547,15 @@
         </div>
       </div>
     </div>
+    <div class="dash-actions" style="display:flex;gap:10px;justify-content:center;margin:18px 0">
+      <button class="btn ghost" onclick="newChart()">✦ New chart</button>
+      <button class="btn" onclick="savePDF()">⬇ Save this reading as PDF</button>
+    </div>
+    <div class="print-only print-footer">
+      <img src="/static/qr.png" alt="Support QR" onerror="this.style.display='none'">
+      <div class="pf-t">Made with love by Kaushik — scan to support CosmicSage ♥</div>
+      <div class="pf-s">CosmicSage offers astrological perspectives for reflection, not professional medical, financial or legal advice. · cosmicsage.onrender.com</div>
+    </div>
     <div class="footer">
       <div class="support-foot">
         <svg class="sage-logo-full" style="height:70px;width:auto" viewBox="0 0 160 180"><defs><radialGradient id="orb2" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D8"/><stop offset="40%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F6A93B" stop-opacity="0"/></radialGradient><linearGradient id="thread2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#F6A93B"/></linearGradient><linearGradient id="robe2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="80" cy="20" r="22" fill="url(#orb2)"/><circle cx="80" cy="20" r="8" fill="#FFF6D8"/><path d="M80 28 q-7 22 0 40 q7 18 0 38 q-5 14 0 26" stroke="url(#thread2)" stroke-width="2.6" fill="none" stroke-linecap="round"/><g fill="url(#robe2)"><circle cx="80" cy="118" r="9"/><path d="M80 110 q-3 -6 0 -10 q3 4 0 10z" fill="#FFE9A8"/><path d="M80 127 C66 130 58 144 58 160 L102 160 C102 144 94 130 80 127 Z"/><ellipse cx="80" cy="162" rx="34" ry="9"/></g><path d="M72 128 q8 14 16 0" stroke="#8B3A1E" stroke-width="2.2" fill="none" stroke-dasharray="0.5 3" stroke-linecap="round"/></svg>
@@ -524,7 +576,7 @@
           <h3>Partner 1 <span id="m1-auto" style="font-size:.72rem;color:var(--leaf);font-family:'Work Sans'"></span></h3>
           <label>Name</label><input id="m1-name" type="text">
           <label>Date of birth</label><input id="m1-dob" type="date" min="1900-01-01">
-          <label>Time of birth</label><input id="m1-tob" type="time" value="12:00">
+          <label>Time of birth</label><div class="time-row" id="m1-tob"><select id="m1-tob-h" class="time-sel"></select><span class="time-colon">:</span><select id="m1-tob-m" class="time-sel"></select><select id="m1-tob-ap" class="time-sel"></select></div>
           <label>Place of birth</label>
           <div class="geo-row"><input id="m1-place" type="text" placeholder="City" onkeydown="if(event.key==='Enter')findPlace('m1')"><button class="btn ghost" onclick="findPlace('m1')">Find</button></div>
           <div class="geo-result" id="m1-geo">&nbsp;</div>
@@ -533,7 +585,7 @@
           <h3>Partner 2</h3>
           <label>Name</label><input id="m2-name" type="text">
           <label>Date of birth</label><input id="m2-dob" type="date" min="1900-01-01">
-          <label>Time of birth</label><input id="m2-tob" type="time" value="12:00">
+          <label>Time of birth</label><div class="time-row" id="m2-tob"><select id="m2-tob-h" class="time-sel"></select><span class="time-colon">:</span><select id="m2-tob-m" class="time-sel"></select><select id="m2-tob-ap" class="time-sel"></select></div>
           <label>Place of birth</label>
           <div class="geo-row"><input id="m2-place" type="text" placeholder="City" onkeydown="if(event.key==='Enter')findPlace('m2')"><button class="btn ghost" onclick="findPlace('m2')">Find</button></div>
           <div class="geo-result" id="m2-geo">&nbsp;</div>
@@ -760,6 +812,7 @@ setInterval(tickClock,1000); tickClock();
   document.getElementById('now-nak').textContent=`${NAK[nakIdx(s.sMoon)]} · Tithi ${s.tithi<=15?'Shukla '+s.tithi:(s.tithi===30?'Amavasya':'Krishna '+(s.tithi-15))}`;
   renderFestivals();renderPanchang();})();
 try{history.replaceState({view:'view-landing'},'',location.pathname);}catch(e){}
+['f-tob','m1-tob','m2-tob'].forEach(fillTimeSelects);
 
 /* ===== DASHA (maha + antar) ===== */
 const DASHA=[["Ketu",7],["Venus",20],["Sun",6],["Moon",10],["Mars",7],["Rahu",18],["Jupiter",16],["Saturn",19],["Mercury",17]];
@@ -789,6 +842,29 @@ function currentAntardasha(md){
 }
 const fdate=d=>d.toLocaleDateString('en-IN',{year:'numeric',month:'short'});
 function to12h(t){const[h,m]=t.split(':').map(Number);const ap=h<12?'AM':'PM';const h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} ${ap}`;}
+function fillTimeSelects(prefix){
+  const h=document.getElementById(prefix+'-h'),m=document.getElementById(prefix+'-m'),ap=document.getElementById(prefix+'-ap');
+  if(!h||h.options.length)return; // already filled
+  for(let i=1;i<=12;i++)h.add(new Option(i,i));
+  for(let i=0;i<60;i++)h&&m.add(new Option(String(i).padStart(2,'0'),i));
+  ap.add(new Option('AM','AM'));ap.add(new Option('PM','PM'));
+  // default 12:00 PM (noon)
+  h.value='12';m.value='0';ap.value='PM';
+}
+function getTime(prefix){ // returns "HH:MM" 24-hour
+  const h=+document.getElementById(prefix+'-h').value;
+  const m=+document.getElementById(prefix+'-m').value;
+  const ap=document.getElementById(prefix+'-ap').value;
+  let H=h%12; if(ap==='PM')H+=12;
+  return String(H).padStart(2,'0')+':'+String(m).padStart(2,'0');
+}
+function setTime(prefix,t){
+  fillTimeSelects(prefix);
+  const[H,M]=t.split(':').map(Number);
+  document.getElementById(prefix+'-h').value=String(H%12||12);
+  document.getElementById(prefix+'-m').value=String(M);
+  document.getElementById(prefix+'-ap').value=H<12?'AM':'PM';
+}
 
 /* ===== SADE SATI ===== */
 function sadeSati(chart){
@@ -897,6 +973,13 @@ function shareLoShu(){
   const r=state.loshu;if(!r)return;
   const planes=r.planes.length?'\n\nActive power lines:\n'+r.planes.map(p=>'✦ '+p.name).join('\n'):'';
   shareWhatsApp(`My Lo Shu Grid 🔢\n\nDriver: ${r.driver} · Conductor: ${r.conductor}\nStrength: ${r.strength}/100\nPresent numbers: ${r.present.join(', ')}${planes}`,'My Lo Shu Grid ✨');
+}
+function askExecSummary(){
+  const sc=state.scorecard;const ch=state.chart;if(!ch)return;
+  const yogas=detectYogas(ch).filter(y=>y.present).map(y=>y.name).slice(0,6).join(', ')||'none major';
+  const ctx=sc?`My scores — Destiny ${sc.dest}/100; ${Object.entries(sc.scores).map(([k,v])=>k+' '+v).join(', ')}. Key yogas: ${yogas}.`:'';
+  sendQuestion(`Give me a warm "big picture" executive summary of who I am from my whole chart — my core strengths, my natural path in life, and what to lean into. ${ctx}\n\nUse the structured format (In short / Why / Your current period / Next 12 months / What you can do). Make me feel understood and motivated.`,true);
+  document.querySelector('.chat-card').scrollIntoView({behavior:'smooth'});
 }
 function askLoShu(){
   const r=state.loshu;if(!r)return;
@@ -1350,6 +1433,25 @@ function setChartStyle(s){state.chartStyle=s;
   document.getElementById('kstyle-south').classList.toggle('active',s==='south');
   renderKundali();}
 function setVarga(d){state.vargaD=+d;renderKundali();}
+function savePDF(){
+  // fill print-only header + chart (selected style/varga) just before printing
+  if(state.birth){document.getElementById('print-name').textContent=state.birth.name;}
+  const pc=document.getElementById('print-chart');
+  if(pc&&state.chart){
+    const D=state.vargaD||1, vch=D===1?state.chart:vargaChart(state.chart,D);
+    const v=VARGAS['D'+D];
+    pc.innerHTML=`<div style="font-family:'Eczar',serif;color:#9a6a10;font-size:15px;margin-bottom:6px">${v?v.name:'Rashi (D1)'} · ${state.chartStyle==='south'?'South':'North'} Indian</div>`+
+      buildKundaliSVG(vch,state.chartStyle||'south');
+  }
+  setTimeout(()=>window.print(),60);
+}
+function newChart(){
+  // clear the form for a fresh person and go to onboarding
+  ['f-name','f-place'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const geo=document.getElementById('f-geo');if(geo){geo.textContent='\u00a0';geo.className='geo-result';}
+  state.places['f']=null;
+  switchView('view-onboard');
+}
 
 /* ===== UNIQUE ID (name+dob+tob+place hash) & QUOTA ===== */
 async function computeUid(name,dob,tob,place){
@@ -1411,7 +1513,7 @@ async function claimUTR(){
 }
 
 /* ===== APP STATE / GEOCODING / VIEWS ===== */
-const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100,lang:'en',chartStyle:'north',vargaD:1};
+const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100,lang:'en',chartStyle:'south',vargaD:1};
 const show=id=>document.getElementById(id).classList.remove('hidden');
 const hide=id=>document.getElementById(id).classList.add('hidden');
 function switchView(id,fromPop){
@@ -1666,7 +1768,7 @@ function hideLoader(){document.getElementById('loader').classList.add('hidden');
 function generateChart(){
   const name=document.getElementById('f-name').value.trim();
   const dob=document.getElementById('f-dob').value;
-  const tob=document.getElementById('f-tob').value||'12:00';
+  const tob=getTime('f-tob');
   const place=state.places['f'];
   if(!name||!dob){alert('Name and date of birth are needed.');return;}
   if(!place){alert('Please find your place of birth first (type it and press Find).');return;}
@@ -1736,15 +1838,17 @@ DASHA: ${cur?cur.lord+' Mahadasha (until '+fdate(cur.to)+')':''}${ad?', '+ad.lor
 NUMEROLOGY: Life path ${lifePath(b.dob)}, name number ${nameNumber(b.name)}, birth day ${reduceNum(+b.dob.split('-')[2])}.
 CURRENT TRANSITS (sidereal): ${tr}.`;
 }
-function fmtAnswer(text){ // escape, then render "• " bullets as a clean list
+function fmtAnswer(text){ // escape, then render "✦ Section:" headers + "• " bullets
   const esc=text.replace(/</g,'&lt;').replace(/\*\*/g,'');
   const lines=esc.split('\n').map(l=>l.trim()).filter(Boolean);
   let html='',inList=false;
+  const closeList=()=>{if(inList){html+='</ul>';inList=false;}};
   for(const l of lines){
     if(l.startsWith('•')){ if(!inList){html+='<ul class="ans-list">';inList=true;} html+='<li>'+l.replace(/^•\s*/,'')+'</li>'; }
-    else { if(inList){html+='</ul>';inList=false;} html+='<p style="margin:6px 0">'+l+'</p>'; }
+    else if(l.startsWith('✦')){ closeList(); html+='<div class="ans-head">'+l.replace(/^✦\s*/,'')+'</div>'; }
+    else { closeList(); html+='<p style="margin:6px 0">'+l+'</p>'; }
   }
-  if(inList)html+='</ul>';
+  closeList();
   return html;
 }
 async function shareWhatsApp(text,title){
@@ -1816,7 +1920,7 @@ function goMatch(){
   if(state.birth){ // prefill partner 1 from generated chart
     document.getElementById('m1-name').value=state.birth.name;
     document.getElementById('m1-dob').value=state.birth.dob;
-    document.getElementById('m1-tob').value=state.birth.tob;
+    setTime('m1-tob',state.birth.tob);
     document.getElementById('m1-place').value=state.birth.place.name.split(',')[0];
     state.places['m1']=state.birth.place;
     document.getElementById('m1-geo').textContent='✓ '+state.birth.place.name;
@@ -1827,7 +1931,7 @@ function goMatch(){
 let lastMatch=null;
 function runMatch(){
   const get=(p)=>({name:document.getElementById(p+'-name').value.trim(),dob:document.getElementById(p+'-dob').value,
-    tob:document.getElementById(p+'-tob').value||'12:00',place:state.places[p]});
+    tob:getTime(p+'-tob'),place:state.places[p]});
   const A=get('m1'),B=get('m2');
   if(!A.name||!A.dob||!A.place||!B.name||!B.dob||!B.place){alert('Fill all details and press Find for both places.');return;}
   if(+A.dob.slice(0,4)<1900||+B.dob.slice(0,4)<1900){alert('Please check the dates of birth — year must be 1900 or later.');return;}
