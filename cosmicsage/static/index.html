@@ -286,6 +286,22 @@
   .exp-anchor{font-size:.82rem; color:var(--muted); margin-bottom:6px;}
   .exp-tier{background:rgba(212,162,78,.16); color:var(--gold-soft); border-radius:99px; padding:1px 9px; font-size:.72rem; margin-left:4px;}
   .exp-row{font-size:.88rem; color:var(--moon); line-height:1.5; margin:4px 0;} .exp-row b{color:var(--gold-soft); font-weight:600;}
+  .timeline{display:flex; flex-direction:column; gap:0; margin:8px 0; position:relative;}
+  .tl-item{display:flex; gap:14px; padding:12px 0; border-left:2px solid var(--line); margin-left:8px; padding-left:18px; position:relative;}
+  .tl-item::before{content:''; position:absolute; left:-7px; top:16px; width:12px; height:12px; border-radius:50%; background:var(--panel2); border:2px solid var(--line);}
+  .tl-item.now{border-left-color:var(--gold);} .tl-item.now::before{background:var(--gold); border-color:var(--gold); box-shadow:0 0 10px var(--gold);}
+  .tl-item.past{opacity:.55;} .tl-item.future .tl-title{color:var(--moon);}
+  .tl-years{flex:none; width:96px; font-weight:600; color:var(--gold-soft); font-size:.88rem; display:flex; flex-direction:column;}
+  .tl-years small{color:var(--muted); font-weight:400; font-size:.72rem;}
+  .tl-title{font-weight:600; font-size:.96rem; color:var(--ink);}
+  .tl-now{background:var(--gold); color:#3a1d05; border-radius:99px; padding:1px 9px; font-size:.68rem; font-weight:700; margin-left:6px; vertical-align:middle;}
+  .tl-focus{font-size:.82rem; color:var(--gold-soft); margin-top:3px;}
+  .tl-note{font-size:.88rem; color:var(--muted); line-height:1.5; margin-top:3px;}
+  .remedies{display:flex; flex-direction:column; gap:10px; margin:8px 0;}
+  .remedy-item{background:var(--panel2); border:1px solid var(--line); border-radius:11px; padding:13px 15px;}
+  .remedy-head{font-weight:600; font-size:.94rem; color:var(--gold-soft); margin-bottom:7px;}
+  .remedy-row{font-size:.88rem; color:var(--moon); line-height:1.5; margin:3px 0;} .remedy-row b{color:var(--ink); font-weight:600; margin-right:4px;}
+  .remedy-row.benefit{color:var(--gold-soft);}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -466,6 +482,19 @@
         <h3>✦ Your Top 5 Life Insights</h3>
         <div class="insights-grid" id="insights-grid"></div>
         <button class="btn" style="margin-top:6px;width:100%" onclick="askExecSummary()">📜 Get my full life summary</button>
+      </div>
+
+      <div class="card timeline-card" style="grid-column:1/-1">
+        <div class="sc-head"><h3 style="margin:0">🛤 Your Life Timeline</h3>
+          <button class="wa-share sm" onclick="shareTimeline()">📲 Share</button></div>
+        <div class="timeline" id="timeline"></div>
+        <div class="sc-note">Life chapters from your planetary periods (dasha) — themes and opportunities, not fixed predictions.</div>
+      </div>
+
+      <div class="card remedies-card" style="grid-column:1/-1">
+        <h3>🌿 Gentle Remedies For You</h3>
+        <div class="remedies" id="remedies"></div>
+        <div class="sc-note">Simple, free practices to strengthen your growth areas — encouragement, never fear.</div>
       </div>
 
       <div class="card scorecard" style="grid-column:1/-1">
@@ -1314,6 +1343,42 @@ function destinyScore(scores){
   let s=0,n=0;for(const k in scores){s+=scores[k]*w[k];n+=w[k];}
   return Math.round(s/n);
 }
+/* ===== LIFE TIMELINE — dasha periods as plain-language life chapters ===== */
+const DASHA_THEME={
+  Sun:['Stepping into your own light','recognition, leadership and finding your purpose','A time to stand tall, take charge, and let your real self be seen.'],
+  Moon:['Heart, home and belonging','emotional growth, family and inner comfort','A gentler chapter — nurture relationships, home, and your own peace of mind.'],
+  Mars:['Energy, courage and action','drive, property, and bold moves','A high-energy phase for taking initiative, building, and pushing through obstacles.'],
+  Mercury:['Learning, skill and connection','study, communication, business and networks','A sharp, busy chapter — great for learning, deals, writing and clever work.'],
+  Jupiter:['Growth, wisdom and good fortune','expansion, family, teaching and luck','One of life\u2019s most blessed phases — opportunity, optimism and meaningful growth.'],
+  Venus:['Love, comfort and the good things','relationships, creativity, beauty and ease','A warm, pleasant chapter for love, art, comfort and enjoying life\u2019s sweetness.'],
+  Saturn:['Building something that lasts','discipline, responsibility and slow steady gains','A serious, maturing phase — hard work now creates lasting, well-earned rewards.'],
+  Rahu:['Ambition and new horizons','bold leaps, foreign connections and reinvention','An unconventional, ambitious chapter — unexpected doors and a big appetite for more.'],
+  Ketu:['Depth, letting go and meaning','spirituality, simplification and inner search','A reflective phase — less about chasing, more about understanding and inner peace.'],
+};
+function lifeTimeline(chart,periods,dob){
+  const birthYr=new Date(dob).getFullYear(), now=new Date();
+  return periods.map(p=>{
+    const fromYr=p.from.getFullYear(), toYr=p.to.getFullYear();
+    const ageFrom=Math.max(0,fromYr-birthYr), ageTo=toYr-birthYr;
+    const t=DASHA_THEME[p.lord];
+    const status=now>=p.from&&now<p.to?'now':(p.to<now?'past':'future');
+    return {lord:p.lord,fromYr,toYr,ageFrom,ageTo,title:t[0],focus:t[1],note:t[2],status};
+  }).filter(c=>c.toYr>=birthYr+1);
+}
+/* ===== PERSONALIZED REMEDIES — gentle, free, never fear-based ===== */
+const REMEDY={
+  Sun:{area:'confidence & recognition',practice:'Greet the sunrise for a few minutes and offer water to the rising sun on Sundays.',habit:'Speak up once a day where you\u2019d normally stay quiet.',benefit:'Steadier confidence and a clearer sense of purpose.'},
+  Moon:{area:'emotional peace',practice:'Spend quiet time near water; keep a calm bedtime routine on Mondays.',habit:'Write one line of gratitude each night.',benefit:'A calmer mind and easier, warmer relationships.'},
+  Mars:{area:'energy & patience',practice:'Channel energy into exercise; offer help to someone on Tuesdays.',habit:'Pause and breathe before reacting when frustrated.',benefit:'Energy that builds rather than burns — courage with control.'},
+  Mercury:{area:'focus & clarity',practice:'Read or learn something small daily; keep a tidy desk on Wednesdays.',habit:'Finish one task fully before starting the next.',benefit:'A clearer, calmer, more decisive mind.'},
+  Jupiter:{area:'growth & optimism',practice:'Share knowledge or give to a student or teacher; show gratitude on Thursdays.',habit:'Take one small step toward a big goal each week.',benefit:'Doors open more easily; ideas turn into real growth.'},
+  Venus:{area:'harmony & self-worth',practice:'Bring a little beauty into your space; be kind to yourself on Fridays.',habit:'Value your own needs as much as others\u2019.',benefit:'More harmony, comfort and ease in love and life.'},
+  Saturn:{area:'patience & discipline',practice:'Help elders or those in need; keep simple, honest routines on Saturdays.',habit:'Show up consistently for one important thing, even on hard days.',benefit:'Slow, solid, lasting rewards for your steady effort.'},
+};
+function remedies(chart){
+  const ranked=GRAHA7.map(k=>({k,s:planetStrength(chart,k)})).sort((a,b)=>a.s-b.s);
+  return ranked.slice(0,3).map(({k,s})=>({planet:k,strength:Math.round(s*10),...REMEDY[k]}));
+}
 /* ===== LIFE OUTCOMES: translate placements into plain-language guidance ===== */
 const HOUSE_LIFE={1:'yourself & vitality',2:'money & family',3:'courage & siblings',4:'home & peace',5:'creativity & children',6:'work & health',7:'partnership',8:'change & depth',9:'fortune & belief',10:'career & status',11:'gains & networks',12:'rest & letting go'};
 function strongestPlanet(chart){let best='Sun',bv=0;for(const k of GRAHA7){const v=planetStrength(chart,k);if(v>bv){bv=v;best=k;}}return best;}
@@ -1385,6 +1450,33 @@ function renderInsights(chart){
 function shareCosmic(){
   const c=state.cosmic;if(!c)return;
   shareWhatsApp(`My Cosmic Summary 🌌\n\n${c.theme}\n\n💪 Strength: ${c.strength}\n🎯 Focus: ${c.focus}\n\n🌟 Destiny Score: ${c.dest}/100`,'My Cosmic Summary ✨');
+}
+function renderTimeline(){
+  const tl=lifeTimeline(state.chart,state.dasha,state.birth.dob);state.timeline=tl;
+  document.getElementById('timeline').innerHTML=tl.map(c=>
+   `<div class="tl-item ${c.status}">
+      <div class="tl-years">${c.fromYr}–${c.toYr}<small>age ${c.ageFrom}–${c.ageTo}</small></div>
+      <div class="tl-body"><div class="tl-title">${c.title}${c.status==='now'?' <span class="tl-now">you are here</span>':''}</div>
+        <div class="tl-focus">Focus: ${c.focus}</div>
+        <div class="tl-note">${c.note}</div></div>
+    </div>`).join('');
+}
+function renderRemedies(){
+  const rs=remedies(state.chart);state.remedies=rs;
+  document.getElementById('remedies').innerHTML=rs.map(r=>
+   `<div class="remedy-item">
+      <div class="remedy-head">${SC_ICON_P[r.planet]||'✦'} Strengthen your ${r.area}</div>
+      <div class="remedy-row"><b>Try this</b> ${r.practice}</div>
+      <div class="remedy-row"><b>Daily habit</b> ${r.habit}</div>
+      <div class="remedy-row benefit"><b>You'll feel</b> ${r.benefit}</div>
+    </div>`).join('');
+}
+const SC_ICON_P={Sun:'☀',Moon:'🌙',Mars:'♂',Mercury:'☿',Jupiter:'♃',Venus:'♀',Saturn:'♄'};
+function shareTimeline(){
+  const tl=state.timeline;if(!tl)return;
+  const now=tl.find(c=>c.status==='now');
+  const lines=tl.filter(c=>c.status!=='past').slice(0,4).map(c=>`${c.fromYr}–${c.toYr}: ${c.title}`).join('\n');
+  shareWhatsApp(`My Life Timeline 🛤${now?`\n\nRight now (${now.fromYr}–${now.toYr}): ${now.title} — ${now.note}`:''}\n\nAhead:\n${lines}`,'My Life Timeline ✨');
 }
 function toggleExplain(area,val){
   const host=document.getElementById('explain-'+area);if(!host)return;
@@ -1986,6 +2078,8 @@ function buildChartAndShow(name,dob,tob,place){
   renderLoShu(dob);
   renderCosmic(state.chart);
   renderInsights(state.chart);
+  renderTimeline();
+  renderRemedies();
   renderScorecard(state.chart);
   renderTopics();
   skyNow();
