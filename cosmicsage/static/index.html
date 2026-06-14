@@ -123,6 +123,15 @@
   .msg.astro{align-self:flex-start; background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.35); font-size:1rem; line-height:1.62;}
   .msg.astro .who{color:var(--gold); font-weight:600; font-size:.76rem; display:block; margin-bottom:4px;}
   .msg.thinking{color:var(--muted); font-style:italic;}
+  .think-row{display:inline-flex; align-items:center; gap:8px;}
+  .panchang-grid{display:flex; flex-direction:column; gap:1px; margin-top:8px;}
+  .pan-row{display:flex; justify-content:space-between; align-items:center; padding:9px 2px; border-bottom:1px solid rgba(52,48,92,.5); font-size:.9rem;}
+  .pan-row:last-child{border-bottom:none;}
+  .pan-k{color:var(--moon);} .pan-v{color:var(--gold-soft); font-weight:500; text-align:right;}
+  .think-dots{display:inline-flex; gap:4px;}
+  .think-dots i{width:7px; height:7px; border-radius:50%; background:var(--gold); display:inline-block; animation:thinkPulse 1.2s ease-in-out infinite;}
+  .think-dots i:nth-child(2){animation-delay:.2s;} .think-dots i:nth-child(3){animation-delay:.4s;}
+  @keyframes thinkPulse{0%,80%,100%{opacity:.3;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
   .ans-list{margin:8px 0 8px 2px; padding:0; list-style:none;}
   .ans-list li{position:relative; padding:6px 0 6px 22px; font-size:1.02rem; line-height:1.55;}
   .ans-list li::before{content:"✦"; position:absolute; left:0; top:6px; color:var(--gold); font-size:.9rem;}
@@ -305,6 +314,11 @@
       <button class="btn btn-hero" onclick="switchView('view-onboard')">🔮 Get my free Kundali</button>
       <button class="btn btn-match" style="margin-left:8px" onclick="goMatch()">💞 Kundali Matching</button>
       <div class="note">No sign-up · takes 30 seconds · your birth details stay in your browser.</div>
+    </div>
+    <div class="card panchang-card">
+      <h3>📿 Today's Panchang</h3>
+      <div class="panchang-grid" id="panchang-grid">Computing…</div>
+      <div class="field-hint" style="margin-top:10px">Computed from the Moon &amp; Sun's sidereal positions — approximate (±1 day at tithi changes); confirm with your local panchang.</div>
     </div>
     <div class="card fest-card">
       <h3>🪔 Hindu festivals this month</h3>
@@ -701,6 +715,42 @@ function renderFestivals(){
     <span>${f.name}${f.past?' <span class="sub">(passed)</span>':''}</span>
     <span class="d">${f.date.toLocaleDateString('en-IN',{day:'numeric',month:'short',weekday:'short'})}</span></div>`).join('');
 }
+const TITHI_NAMES=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi'];
+const VAARA=['Ravivara (Sun)','Somavara (Mon)','Mangalavara (Tue)','Budhavara (Wed)','Guruvara (Thu)','Shukravara (Fri)','Shanivara (Sat)'];
+function tithiName(t){
+  if(t===15)return 'Purnima (Full Moon)';
+  if(t===30)return 'Amavasya (New Moon)';
+  const paksha=t<15?'Shukla':'Krishna';
+  const idx=(t<=14?t:t-15)-1;
+  return `${paksha} ${TITHI_NAMES[idx]}`;
+}
+function moonPhaseInfo(t){
+  // t 1..30; illumination approx from angular distance
+  const ang=(t-1)*12; const ill=Math.round((1-Math.cos(ang*Math.PI/180))/2*100);
+  let emoji='🌑',label='New Moon';
+  if(t===15){emoji='🌕';label='Full Moon';}
+  else if(t<8){emoji='🌒';label='Waxing Crescent';}
+  else if(t<15){emoji='🌔';label='Waxing Gibbous';}
+  else if(t<23){emoji='🌖';label='Waning Gibbous';}
+  else if(t<30){emoji='🌘';label='Waning Crescent';}
+  return {emoji,label,ill};
+}
+function renderPanchang(){
+  const host=document.getElementById('panchang-grid');if(!host)return;
+  const now=new Date();
+  const s=skyAt(now);
+  const nak=NAK[nakIdx(s.sMoon)];
+  const mp=moonPhaseInfo(s.tithi);
+  const rows=[
+    ['📅 Date', now.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})],
+    ['🗓 Vaara', VAARA[now.getDay()]],
+    ['🌙 Tithi', tithiName(s.tithi)],
+    ['⭐ Nakshatra', nak],
+    [mp.emoji+' Moon', mp.label+' · ~'+mp.ill+'% lit'],
+    ['☀ Sun sign', RASHI[s.sunSign][0]+' ('+RASHI[s.sunSign][1]+')'],
+  ];
+  host.innerHTML=rows.map(([k,v])=>`<div class="pan-row"><span class="pan-k">${k}</span><span class="pan-v">${v}</span></div>`).join('');
+}
 function tickClock(){
   const now=new Date();
   document.getElementById('now-clock').textContent=now.toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -708,7 +758,7 @@ function tickClock(){
 setInterval(tickClock,1000); tickClock();
 (function(){const s=skyAt(new Date());
   document.getElementById('now-nak').textContent=`${NAK[nakIdx(s.sMoon)]} · Tithi ${s.tithi<=15?'Shukla '+s.tithi:(s.tithi===30?'Amavasya':'Krishna '+(s.tithi-15))}`;
-  renderFestivals();})();
+  renderFestivals();renderPanchang();})();
 try{history.replaceState({view:'view-landing'},'',location.pathname);}catch(e){}
 
 /* ===== DASHA (maha + antar) ===== */
@@ -1723,7 +1773,8 @@ function toast(text){
 }
 function addMsg(cls,text,who){const log=document.getElementById('chat-log');
   const d=document.createElement('div');d.className='msg '+cls;
-  d.innerHTML=(who?`<span class="who">${who}</span>`:'')+text.replace(/</g,'&lt;');
+  const safe=cls.indexOf('thinking')>=0?text:text.replace(/</g,'&lt;'); // thinking indicator is trusted HTML
+  d.innerHTML=(who?`<span class="who">${who}</span>`:'')+safe;
   log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
 function setLang(v){state.lang=v;}
 async function askQuestion(){
@@ -1735,7 +1786,7 @@ async function sendQuestion(q,showUserMsg){
   if(state.busy)return;
   if(showUserMsg)addMsg('user',q);
   state.history.push({role:'user',content:q});
-  const think=addMsg('astro thinking','Reading your chart, dasha and today\'s sky…','COSMICSAGE');
+  const think=addMsg('astro thinking','<span class="think-row"><span class="think-dots"><i></i><i></i><i></i></span> Reading your chart, dasha &amp; today\'s sky…</span>','COSMICSAGE');
   state.busy=true;
   try{
     const r=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -1815,7 +1866,7 @@ async function askMatchAI(){
     await refreshStatus();
   }
   const holder=document.getElementById('match-ai');
-  holder.innerHTML='<div class="msg astro thinking" style="max-width:100%">Reading both charts together…</div>';
+  holder.innerHTML='<div class="msg astro thinking" style="max-width:100%"><span class="think-row"><span class="think-dots"><i></i><i></i><i></i></span> Reading both charts together…</span></div>';
   state.busy=true;
   const summary=`KUNDALI MATCH READING REQUEST.
 Partner 1: ${A.name}, Moon in ${RASHI[cA.planets.Moon.sign][1]}, ${cA.planets.Moon.nak} nakshatra, Lagna ${RASHI[cA.asc.sign][1]}, ${manglik(cA)?'Manglik':'Non-manglik'}.
