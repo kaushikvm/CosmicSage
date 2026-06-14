@@ -381,6 +381,15 @@
   #sticky-pdf.show{opacity:1; transform:translateY(0); pointer-events:auto;}
   @media(min-width:760px){#sticky-pdf{display:none;}}
   @media(max-width:520px){.swot-grid{grid-template-columns:1fr;}}
+  .rs-teaser{background:var(--panel2); border:1px dashed var(--gold); border-radius:10px; padding:11px 13px; color:var(--gold-soft); font-size:.86rem; line-height:1.5;}
+  .paywall{background:linear-gradient(165deg,rgba(212,162,78,.12),var(--panel2)); border:1.5px solid var(--gold); border-radius:16px; padding:22px; text-align:center; margin:22px 0;}
+  .pw-lock{font-size:2rem;} .pw-title{color:var(--gold); font-family:'Eczar',serif; font-size:1.3rem; margin:6px 0;}
+  .pw-sub{color:var(--moon); font-size:.92rem; line-height:1.55; margin:0 auto 14px; max-width:440px;}
+  .pw-list{list-style:none; padding:0; margin:0 auto 16px; max-width:380px; text-align:left;}
+  .pw-list li{color:var(--moon); font-size:.9rem; line-height:1.7; padding-left:2px;}
+  .pw-price{font-family:'Eczar',serif; color:var(--gold-soft); font-size:1.5rem; font-weight:600; margin-bottom:12px;}
+  .pw-foot{font-size:.8rem; color:var(--muted); margin-top:10px;} .pw-foot a{color:var(--gold-soft);}
+  #match-locked{transition:opacity .3s;}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -423,7 +432,7 @@
     @page{margin:12mm;}
     *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
     body{background:#fff; color:#1b1430; font-size:12px;}
-    #stars,.topbar,.chat-card,.chat-input,.suggest-area,.topics,.donate-nudge,.greet .actions,.footer,.overlay,.support-foot,#loader,.wa-share,.sc-tabs,.sc-more,.kundali-ctrl,.dash-actions,#sky-card,.fest-card,.panchang-card,.rel-cta,.match-bottom,#sticky-pdf,.match-form,.match-intro,#match-ai,.sc-chev,.koota-explain{display:none !important;}
+    #stars,.topbar,.chat-card,.chat-input,.suggest-area,.topics,.donate-nudge,.greet .actions,.footer,.overlay,.support-foot,#loader,.wa-share,.sc-tabs,.sc-more,.kundali-ctrl,.dash-actions,#sky-card,.fest-card,.panchang-card,.rel-cta,.match-bottom,#sticky-pdf,.match-form,.match-intro,#match-ai,.sc-chev,.koota-explain,#match-paywall,.rs-teaser{display:none !important;}
     .match-wrap>h2,.match-wrap>p{display:none !important;}
     body.print-match .match-bottom,body.print-match .print-footer{display:block !important;}
     .koota-bar{border:1px solid #e0d3b0;} .koota-fill{background:#E2702A !important;}
@@ -806,8 +815,6 @@
 
           <div class="rel-summary" id="ms-summary"></div>
 
-          <div class="rel-insights" id="ms-keyinsights"></div>
-
           <h4 class="rel-h">💞 Your Compatibility Dashboard</h4>
           <p class="rel-sub">Eight dimensions from your charts, in plain language. Tap any for what it means.</p>
           <div id="ms-bars"></div>
@@ -815,38 +822,70 @@
           <h4 class="rel-h">🔢 Numerology & Lo Shu Compatibility</h4>
           <div class="status-line" id="ms-numero"></div>
 
-          <h4 class="rel-h">🪔 Dosha & Manglik — the calm view</h4>
-          <div class="status-line" id="ms-manglik"></div>
+          <h4 class="rel-h">🪔 Dosha & Manglik</h4>
+          <div class="status-line" id="ms-manglik-free"></div>
 
-          <h4 class="rel-h">💍 Marriage Outlook</h4>
-          <div id="ms-outlook"></div>
-
-          <h4 class="rel-h">📊 Relationship SWOT</h4>
-          <div class="swot-grid" id="ms-swot"></div>
-
-          <h4 class="rel-h">🔮 Your Next 12 Months Together</h4>
-          <div id="ms-next12"></div>
-
-          <h4 class="rel-h">✅ Your Action Plan as a Couple</h4>
-          <div class="action-cols" id="ms-action"></div>
-
-          <div class="rel-cta">
-            <button class="btn" onclick="askMatchAI()">✨ Get the sage's full relationship reading <span style="opacity:.8;font-size:.82em">(₹29 · free with a pack)</span></button>
-            <button class="btn ghost" onclick="savePDF()">⬇ Save as PDF</button>
-            <button class="wa-share" onclick="shareMatch()">📲 Share</button>
+          <!-- ===== PAYWALL (shown when locked) ===== -->
+          <div id="match-paywall" class="paywall hidden">
+            <div class="pw-lock">🔒</div>
+            <h3 class="pw-title">Unlock Your Complete Relationship Blueprint</h3>
+            <p class="pw-sub">You've seen the compatibility overview. Unlock the full analysis of where this relationship truly shines and what to nurture:</p>
+            <ul class="pw-list">
+              <li>✓ Your full Executive Summary — strength, challenge, will it last</li>
+              <li>✓ Why you're drawn together &amp; what makes you unique</li>
+              <li>✓ Marriage success, family &amp; children outlook</li>
+              <li>✓ Full Dosha &amp; Manglik analysis</li>
+              <li>✓ Relationship SWOT &amp; Next 12 Months together</li>
+              <li>✓ Your couple action plan</li>
+              <li>✓ A personalized reading from the sage</li>
+              <li>✓ Beautiful downloadable PDF</li>
+            </ul>
+            <div class="pw-price">Only ₹29</div>
+            <button class="btn full" onclick="openPay('match')">🔓 Unlock Full Report · ₹29</button>
+            <div class="pw-foot">Already unlocked on another device? <a href="#" onclick="refreshStatus();paintMatchGate();return false;">Refresh</a> · free if you have a question pack</div>
           </div>
-          <div id="match-ai" style="margin-top:14px"></div>
 
-          <div class="match-bottom">
-            <h4 style="color:var(--gold);margin:0 0 10px">Enjoyed your relationship reading?</h4>
-            <div class="match-bottom-btns">
-              <button class="btn" onclick="savePDF()">⬇ Download PDF</button>
-              <button class="btn ghost" onclick="shareMatch()">📲 Share on WhatsApp</button>
+          <!-- ===== LOCKED CONTENT (revealed after unlock) ===== -->
+          <div id="match-locked">
+            <h4 class="rel-h">💬 Your Full Executive Summary</h4>
+            <div class="rel-summary" id="ms-summary-full"></div>
+
+            <h4 class="rel-h">✨ What Makes You Unique</h4>
+            <div class="rel-insights" id="ms-keyinsights"></div>
+
+            <h4 class="rel-h">🪔 Dosha &amp; Manglik — the calm, full view</h4>
+            <div class="status-line" id="ms-manglik"></div>
+
+            <h4 class="rel-h">💍 Marriage Outlook</h4>
+            <div id="ms-outlook"></div>
+
+            <h4 class="rel-h">📊 Relationship SWOT</h4>
+            <div class="swot-grid" id="ms-swot"></div>
+
+            <h4 class="rel-h">🔮 Your Next 12 Months Together</h4>
+            <div id="ms-next12"></div>
+
+            <h4 class="rel-h">✅ Your Action Plan as a Couple</h4>
+            <div class="action-cols" id="ms-action"></div>
+
+            <div class="rel-cta">
+              <button class="btn" onclick="askMatchAI()">✨ Get the sage's personalized reading</button>
+              <button class="btn ghost" onclick="savePDF()">⬇ Save as PDF</button>
+              <button class="wa-share" onclick="shareMatch()">📲 Share</button>
             </div>
-            <div class="share-cards">
-              <button class="share-card-btn" onclick="shareMatchCard('score')">💞 Share our score</button>
-              <button class="share-card-btn" onclick="shareMatchCard('marriage')">💍 Marriage potential</button>
-              <button class="share-card-btn" onclick="shareMatchCard('strength')">💪 Our strength</button>
+            <div id="match-ai" style="margin-top:14px"></div>
+
+            <div class="match-bottom">
+              <h4 style="color:var(--gold);margin:0 0 10px">Enjoyed your relationship reading?</h4>
+              <div class="match-bottom-btns">
+                <button class="btn" onclick="savePDF()">⬇ Download PDF</button>
+                <button class="btn ghost" onclick="shareMatch()">📲 Share on WhatsApp</button>
+              </div>
+              <div class="share-cards">
+                <button class="share-card-btn" onclick="shareMatchCard('score')">💞 Share our score</button>
+                <button class="share-card-btn" onclick="shareMatchCard('marriage')">💍 Marriage potential</button>
+                <button class="share-card-btn" onclick="shareMatchCard('strength')">💪 Our strength</button>
+              </div>
             </div>
           </div>
           <div class="print-only print-footer">
@@ -2044,7 +2083,11 @@ async function claimUTR(){
     updateQuotaPill(d.status);hide('modal-pay');
     document.getElementById('utr-input').value='';msg.textContent='';
     addMsg('astro',d.message,'COSMICSAGE');
-    if(state.payKind==='match'&&typeof askMatchAI==='function'&&lastMatch)askMatchAI();
+    if(state.payKind==='match'){
+      paintMatchGate();
+      const ml=document.getElementById('match-locked');
+      if(ml)ml.scrollIntoView({behavior:'smooth',block:'start'});
+    }
   }catch(e){msg.textContent='Network error — please try again.';msg.className='geo-result err';}
 }
 
@@ -2503,22 +2546,22 @@ function runMatch(){
   document.getElementById('ms-chips').innerHTML=[[A,cA],[B,cB]].map(([p,c])=>
    `<div class="pchip"><b>${p.name.split(' ')[0]}</b><span>Moon: ${RASHI[c.planets.Moon.sign][1]} · ${c.planets.Moon.nak}<br>Lagna: ${RASHI[c.asc.sign][1]} · ${GANA_N[GANA(c.planets.Moon.nakIdx)]} gana</span></div>`).join('');
 
-  // 7-question relationship summary
+  // FREE terse summary teaser — just the hook
   document.getElementById('ms-summary').innerHTML=
    `<div class="rel-type-note">${R.typeNote}</div>
     <div class="rs-q"><span class="rs-ic">💞</span><div><b>Are you a good match?</b> ${R.Q.match}</div></div>
-    <div class="rs-q"><span class="rs-ic">💪</span><div><b>Your biggest strength</b> ${R.Q.strength}</div></div>
+    <div class="rs-teaser">🔒 Your biggest strength, biggest challenge, whether it lasts, and what to focus on are in your full report below.</div>`;
+
+  // FULL locked summary (revealed after unlock)
+  document.getElementById('ms-summary-full').innerHTML=
+   `<div class="rs-q"><span class="rs-ic">💪</span><div><b>Your biggest strength</b> ${R.Q.strength}</div></div>
     <div class="rs-q"><span class="rs-ic">🌱</span><div><b>Your area to nurture</b> ${R.Q.challenge}</div></div>
     <div class="rs-q"><span class="rs-ic">🕰</span><div><b>Will it last?</b> ${R.Q.lasting}</div></div>
     <div class="rs-q"><span class="rs-ic">🎯</span><div><b>What to focus on</b> ${R.Q.focus}</div></div>
     <div class="rs-q"><span class="rs-ic">⚠</span><div><b>What to avoid</b> ${R.Q.avoid}</div></div>
-    <div class="rs-q"><span class="rs-ic">👉</span><div><b>What to do next</b> ${R.Q.next}</div></div>`;
-
-  // key insights
-  document.getElementById('ms-keyinsights').innerHTML=
-   `<div class="ki-item ki-strong"><div class="ki-h">✨ Relationship superpower</div>${R.strongest.dim.area}: ${R.strongest.dim.hi}</div>
-    <div class="ki-item ki-grow"><div class="ki-h">🔍 Conscious-effort area</div>${R.weakest.dim.area}: ${R.weakest.ratio<0.5?R.weakest.dim.lo:R.weakest.dim.mid}</div>
-    <div class="ki-item ki-uniq"><div class="ki-h">🌟 What makes you unique</div>${R.unique}</div>`;
+    <div class="rs-q"><span class="rs-ic">👉</span><div><b>What to do next</b> ${R.Q.next}</div></div>
+    <div class="rs-q"><span class="rs-ic">✨</span><div><b>Relationship superpower</b> ${R.strongest.dim.area}: ${R.strongest.dim.hi}</div></div>
+    <div class="rs-q"><span class="rs-ic">🔍</span><div><b>Conscious-effort area</b> ${R.weakest.dim.area}: ${R.weakest.ratio<0.5?R.weakest.dim.lo:R.weakest.dim.mid}</div></div>`;
 
   // compatibility dashboard — tappable for depth
   document.getElementById('ms-bars').innerHTML=g.rows.map((r,i)=>{
@@ -2535,12 +2578,16 @@ function runMatch(){
 
   // calm dosha/manglik panel
   renderDoshaPanel(R);
+  renderUnique(R);
   renderOutlook(R);
   renderSWOT(R);
   renderCoupleNext12(R);
   renderMatchNumerology(A,B,R.l1,R.l2);
   renderMatchAction(R);
   document.getElementById('match-ai').innerHTML='';
+  // ensure we know unlock status, then paint the paywall gate
+  if(!state.uid){ computeUid(A.name,A.dob,A.tob,A.place).then(uid=>{state.uid=uid;refreshStatus().then(paintMatchGate);}); paintMatchGate(); }
+  else { refreshStatus().then(paintMatchGate); paintMatchGate(); }
   show('match-result');
 }
 function toggleKoota(i){
@@ -2555,17 +2602,41 @@ function toggleKoota(i){
 function renderDoshaPanel(R){
   const {mA,mB,nA,nB}=R;
   const level=(mA&&mB)?'Low':(mA||mB)?'Moderate':'Low';
+  // FREE reassuring headline
+  let head;
+  if(!mA&&!mB) head='✓ No major Manglik concern — nothing to worry about here.';
+  else if(mA&&mB) head='✓ Both partners share the same placement — traditionally considered balanced.';
+  else head='A point worth a calm look — very common and not a barrier. Full guidance in your report.';
+  document.getElementById('ms-manglik-free').innerHTML=`<div class="dosha-row"><span class="dosha-tag ${level==='Low'?'low':'mid'}">${level} concern</span><span class="dosha-text">${head}</span></div>`;
+  // FULL (locked)
   let body;
   if(!mA&&!mB) body=`Neither of you is Manglik — this traditional concern simply doesn't apply to your match. Nothing to worry about here.`;
   else if(mA&&mB) body=`Both of you are Manglik — and traditionally, when both partners share it, the dosha is considered to <b>cancel out</b>. This is regarded as a balanced, compatible situation.`;
   else body=`One of you (${mA?nA:nB}) has a Manglik placement. This is <b>very common</b> and not a barrier — traditionally it's reviewed thoughtfully, and matching with remedies or simple rituals is a well-established path. Many happy marriages have exactly this.`;
-  // Nadi (Health & Children) is the most weighted koota; surface calmly if zero
   const nadi=R.scored.find(k=>k.name==='Health & Children');
   const nadiNote=nadi&&nadi.val===0?` <div class="dosha-extra">Your Health & Children koota scored low — traditionally worth a gentle conversation about family planning and wellbeing, and often softened when other factors (like sharing a sign or strong overall match) are present. It's guidance, not a verdict.</div>`:'';
   document.getElementById('ms-manglik').innerHTML=
    `<div class="dosha-row"><span class="dosha-tag ${level==='Low'?'low':'mid'}">${level} concern</span>
       <span class="dosha-text">${body}</span></div>${nadiNote}
     <div class="dosha-foot">CosmicSage always frames these as areas for awareness, never fear. A low score is a conversation, not a stop sign.</div>`;
+}
+// "What Makes You Unique" (locked section)
+function renderUnique(R){
+  document.getElementById('ms-keyinsights').innerHTML=
+   `<div class="ki-item ki-uniq"><div class="ki-h">🌟 What makes you unique</div>${R.unique}</div>
+    <div class="ki-item ki-strong"><div class="ki-h">✨ Why you complement each other</div>${R.fills>=3?'You each carry numbers and strengths the other lacks — you naturally fill each other\u2019s gaps.':'You share core strengths that give you a steady, understanding foundation.'} Your Moon signs (${RASHI[lastMatch.cA.planets.Moon.sign][1]} & ${RASHI[lastMatch.cB.planets.Moon.sign][1]}) and ${R.l1===R.l2?'shared':'differing'} Life Paths shape how you balance.</div>`;
+}
+/* ===== PAYWALL GATE ===== */
+function matchUnlocked(){
+  const q=state.quota||{};
+  return !!(q.vip || (q.match_credits>0) || (q.credits>0));
+}
+function paintMatchGate(){
+  const locked=document.getElementById('match-locked');
+  const pw=document.getElementById('match-paywall');
+  if(!locked||!pw)return;
+  if(matchUnlocked()){ locked.classList.remove('locked-blur'); locked.style.display=''; pw.classList.add('hidden'); }
+  else{ locked.style.display='none'; pw.classList.remove('hidden'); }
 }
 const MATCH_ACTION={
   do:['Talk openly about expectations — money, family, and the future','Lean on your strongest area when things feel tense','Appreciate one thing about each other out loud, daily','Make decisions together on the areas that need care'],
