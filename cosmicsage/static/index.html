@@ -302,6 +302,27 @@
   .remedy-head{font-weight:600; font-size:.94rem; color:var(--gold-soft); margin-bottom:7px;}
   .remedy-row{font-size:.88rem; color:var(--moon); line-height:1.5; margin:3px 0;} .remedy-row b{color:var(--ink); font-weight:600; margin-right:4px;}
   .remedy-row.benefit{color:var(--gold-soft);}
+  .chapter-title{font-family:'Eczar',serif; font-size:1.2rem; color:var(--ink); margin-bottom:4px;}
+  .chapter-yrs{color:var(--gold-soft); font-size:.85rem; font-family:'Work Sans';}
+  .chapter-focus{font-size:.9rem; color:var(--moon); margin-bottom:6px;} .chapter-focus b{color:var(--gold-soft);}
+  .chapter-ad{font-size:.85rem; color:var(--muted); background:var(--panel2); border-radius:8px; padding:8px 11px; margin-bottom:10px;}
+  .chapter-grid{display:flex; gap:10px; flex-wrap:wrap;}
+  .chapter-box{flex:1; min-width:200px; border-radius:10px; padding:11px 13px; font-size:.9rem; line-height:1.5;}
+  .chapter-box.good{background:rgba(111,174,92,.1); border:1px solid rgba(111,174,92,.35); color:var(--moon);}
+  .chapter-box.warn{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); color:var(--moon);}
+  .cb-h{font-weight:600; margin-bottom:4px;} .chapter-box.good .cb-h{color:#9BD489;} .chapter-box.warn .cb-h{color:var(--gold-soft);}
+  .forecast{display:flex; flex-direction:column; gap:11px; margin:8px 0;}
+  .fc-row{border-bottom:1px solid rgba(52,48,92,.5); padding-bottom:10px;}
+  .fc-top{display:flex; justify-content:space-between; align-items:center;}
+  .fc-name{font-weight:600; font-size:.92rem; color:var(--ink);}
+  .fc-stars{color:var(--gold); font-size:1.05rem; letter-spacing:2px;}
+  .fc-line{font-size:.86rem; color:var(--muted); margin-top:3px; line-height:1.45;}
+  .action-cols{display:flex; gap:12px; flex-wrap:wrap; margin-top:6px;}
+  .action-do,.action-avoid{flex:1; min-width:220px; border-radius:11px; padding:13px 15px;}
+  .action-do{background:rgba(111,174,92,.1); border:1px solid rgba(111,174,92,.35);}
+  .action-avoid{background:rgba(200,71,47,.08); border:1px solid rgba(200,71,47,.3);}
+  .ac-h{font-weight:600; margin-bottom:7px;} .action-do .ac-h{color:#9BD489;} .action-avoid .ac-h{color:#E8917D;}
+  .action-cols ul{margin:0; padding-left:18px;} .action-cols li{font-size:.88rem; color:var(--moon); line-height:1.6;}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -478,6 +499,11 @@
         <div class="cosmic-body" id="cosmic-body"></div>
       </div>
 
+      <div class="card chapter-card" style="grid-column:1/-1">
+        <h3>📖 Your Current Chapter</h3>
+        <div id="chapter-body"></div>
+      </div>
+
       <div class="card insights-card" style="grid-column:1/-1">
         <h3>✦ Your Top 5 Life Insights</h3>
         <div class="insights-grid" id="insights-grid"></div>
@@ -495,6 +521,18 @@
         <h3>🌿 Gentle Remedies For You</h3>
         <div class="remedies" id="remedies"></div>
         <div class="sc-note">Simple, free practices to strengthen your growth areas — encouragement, never fear.</div>
+      </div>
+
+      <div class="card forecast-card" style="grid-column:1/-1">
+        <div class="sc-head"><h3 style="margin:0">🔮 Your Next 12 Months</h3>
+          <button class="wa-share sm" onclick="shareForecast()">📲 Share</button></div>
+        <div class="forecast" id="forecast"></div>
+        <div class="sc-note">General energy for the year ahead from your current planetary period — tendencies, not fixed predictions.</div>
+      </div>
+
+      <div class="card actionplan-card" style="grid-column:1/-1">
+        <h3>✅ Your Action Plan This Month</h3>
+        <div class="action-cols" id="actionplan"></div>
       </div>
 
       <div class="card scorecard" style="grid-column:1/-1">
@@ -1379,24 +1417,106 @@ function remedies(chart){
   const ranked=GRAHA7.map(k=>({k,s:planetStrength(chart,k)})).sort((a,b)=>a.s-b.s);
   return ranked.slice(0,3).map(({k,s})=>({planet:k,strength:Math.round(s*10),...REMEDY[k]}));
 }
+/* ===== CURRENT CHAPTER (live mahadasha+antardasha in plain language) ===== */
+const CHAPTER_USE={
+  Sun:'Step forward, take ownership, and let your leadership show.',
+  Moon:'Nurture home, family and your own emotional wellbeing.',
+  Mars:'Take bold action and build — channel the high energy purposefully.',
+  Mercury:'Build skills and expertise that compound over time.',
+  Jupiter:'Say yes to growth, learning and meaningful opportunities.',
+  Venus:'Invest in relationships, creativity and the comforts you\u2019ve earned.',
+  Saturn:'Do the patient, disciplined work that creates lasting security.',
+  Rahu:'Be bold and ambitious — pursue the unconventional path that calls you.',
+  Ketu:'Simplify, reflect, and reconnect with what truly matters.',
+};
+const CHAPTER_MISTAKE={
+  Sun:'Letting ego or the need for approval drive your decisions.',
+  Moon:'Letting moods or over-attachment cloud clear choices.',
+  Mars:'Acting impulsively or burning energy on conflict.',
+  Mercury:'Jumping between too many ideas instead of going deep on one.',
+  Jupiter:'Over-promising or expanding faster than you can sustain.',
+  Venus:'Over-indulging or avoiding hard conversations for the sake of comfort.',
+  Saturn:'Getting discouraged by slow progress and giving up too early.',
+  Rahu:'Chasing shortcuts or shiny things that don\u2019t last.',
+  Ketu:'Drifting or disengaging when focus is still needed.',
+};
+function currentChapter(chart,periods){
+  const now=new Date();
+  const md=periods.find(p=>now>=p.from&&now<p.to);
+  if(!md)return null;
+  const ad=currentAntardasha(md);
+  const t=DASHA_THEME[md.lord];
+  return {
+    md:md.lord, ad:ad?ad.lord:null,
+    fromYr:md.from.getFullYear(), toYr:md.to.getFullYear(),
+    title:t[0], focus:t[1],
+    bestUse:CHAPTER_USE[md.lord],
+    mistake:CHAPTER_MISTAKE[md.lord],
+    adNote:ad?`Within this, you're in a ${ad.lord} sub-period (until ${fdate(ad.to)}) — ${CHAPTER_USE[ad.lord].toLowerCase()}`:''
+  };
+}
+/* ===== NEXT 12 MONTHS — general energy (computed, framed as tendencies) ===== */
+function next12(chart,periods){
+  const now=new Date(), md=periods.find(p=>now>=p.from&&now<p.to);
+  const ad=md?currentAntardasha(md):null;
+  // blend: mahadasha lord strength + antardasha lord strength weighting each area
+  const areaPlanets={Career:['Sun','Saturn','Mars'],Money:['Jupiter','Venus','Mercury'],Relationships:['Venus','Moon'],Health:['Sun','Moon'],Spiritual:['Jupiter','Ketu']};
+  const lords=[md&&md.lord,ad&&ad.lord].filter(Boolean);
+  const rate=(planets)=>{
+    let base=planetStrength(chart,planets[0]);
+    // boost if a running dasha lord governs this area
+    const boost=lords.some(l=>planets.includes(l))?1.5:0;
+    const v=Math.max(2,Math.min(5,Math.round((base/2.2)+boost*0.5)));
+    return v;
+  };
+  const LINE={
+    Career:['Steady ground to build on — keep doing the work.','A supportive window for steady career progress.','Strong momentum — a good year to push your work forward.'],
+    Money:['Focus on saving and stability over big risks.','Finances move in a steady, manageable direction.','A favourable period to grow and consolidate money.'],
+    Relationships:['Nurture existing bonds with patience and warmth.','Pleasant, harmonious energy in your close relationships.','A warm, connecting phase for love and friendship.'],
+    Health:['Protect rest and routine; small habits matter now.','Generally steady energy — keep your rhythm.','Strong vitality — a good time to build healthy habits.'],
+    Spiritual:['A quietly reflective phase — small practices help.','Good energy for inner growth and learning.','A meaningful, expansive time for inner growth.'],
+  };
+  const out={};
+  for(const a in areaPlanets){const stars=rate(areaPlanets[a]);
+    const tierIdx=stars>=5?2:stars>=4?1:0;
+    out[a]={stars,line:LINE[a][tierIdx]};}
+  return out;
+}
+/* ===== MONTHLY ACTION PLAN (from current dasha lord) ===== */
+const ACTION_PLAN={
+  Sun:{do:['Take the lead on one thing you usually wait on','Step into visibility — share your work','Spend time outdoors in the morning'],avoid:['Letting pride win an argument','Waiting for permission to start']},
+  Moon:{do:['Reconnect with family or a close friend','Keep a calm, regular sleep routine','Declutter your home space'],avoid:['Big decisions when you\u2019re emotional','Bottling up how you feel']},
+  Mars:{do:['Start the project you\u2019ve been putting off','Exercise to channel your energy','Tackle one hard task head-on'],avoid:['Impulsive spending or arguments','Starting five things at once']},
+  Mercury:{do:['Learn one new skill or finish a course module','Reach out to an old contact','Organize your finances or notes'],avoid:['Jumping between too many ideas','Over-committing your time']},
+  Jupiter:{do:['Say yes to a growth opportunity','Mentor or help someone learn','Plan one step toward a big goal'],avoid:['Over-promising what you can deliver','Expanding faster than you can manage']},
+  Venus:{do:['Invest time in a key relationship','Enjoy something creative or beautiful','Treat yourself kindly'],avoid:['Avoiding a needed honest talk','Over-indulging for comfort']},
+  Saturn:{do:['Build one consistent daily habit','Finish a long-pending responsibility','Help someone older or in need'],avoid:['Giving up because progress feels slow','Cutting corners on important work']},
+  Rahu:{do:['Explore the bold idea you keep thinking about','Network beyond your usual circle','Research a new opportunity'],avoid:['Chasing get-rich-quick shortcuts','Comparing yourself to others online']},
+  Ketu:{do:['Simplify one area of your life','Spend quiet reflective time','Let go of something that\u2019s run its course'],avoid:['Disengaging from things that still need you','Over-isolating yourself']},
+};
+function actionPlan(periods){
+  const now=new Date(), md=periods.find(p=>now>=p.from&&now<p.to);
+  return md?{lord:md.lord,...ACTION_PLAN[md.lord]}:null;
+}
 /* ===== LIFE OUTCOMES: translate placements into plain-language guidance ===== */
 const HOUSE_LIFE={1:'yourself & vitality',2:'money & family',3:'courage & siblings',4:'home & peace',5:'creativity & children',6:'work & health',7:'partnership',8:'change & depth',9:'fortune & belief',10:'career & status',11:'gains & networks',12:'rest & letting go'};
 function strongestPlanet(chart){let best='Sun',bv=0;for(const k of GRAHA7){const v=planetStrength(chart,k);if(v>bv){bv=v;best=k;}}return best;}
 function weakestPlanet(chart){let w='Saturn',wv=99;for(const k of GRAHA7){const v=planetStrength(chart,k);if(v<wv){wv=v;w=k;}}return w;}
 const PLANET_GIFT={Sun:'leadership and a clear sense of purpose',Moon:'emotional intelligence and care for others',Mars:'drive, courage and the will to act',Mercury:'a sharp, quick and communicative mind',Jupiter:'wisdom, optimism and good judgement',Venus:'charm, creativity and an eye for harmony',Saturn:'discipline, patience and staying power'};
 const PLANET_GROW={Sun:'building quiet confidence without needing approval',Moon:'protecting your peace and emotional rest',Mars:'channelling energy patiently instead of rushing',Mercury:'slowing the mind and finishing what you start',Jupiter:'turning big ideas into steady action',Venus:'valuing yourself as much as you value others',Saturn:'trusting that slow, steady effort pays off'};
-/* Top-5 one-line outcome insights, each tied to a real placement */
+/* Top-5 one-line outcome insights, in plain human language */
+const HOUSE_CAREER={1:'leading and being your own person at work',2:'work tied to money, voice or family business',3:'communication, media, sales or hands-on skill',4:'work connected to home, property, vehicles or land',5:'creative work, teaching, or working with children',6:'service, health, law, or solving problems for others',7:'partnerships, clients, and working with the public',8:'research, finance, or work involving deep change',9:'teaching, travel, law, or work with meaning and ethics',10:'visible leadership, authority and public standing',11:'networks, large organisations and big goals',12:'behind-the-scenes, foreign, creative or spiritual work'};
 function lifeInsights(chart){
   const P=chart.planets,asc=chart.asc.sign;
   const lord=(h)=>SIGN_LORD[(asc+h-1)%12];
   const houseOf=(k)=>P[k].house;
-  const strong=strongestPlanet(chart);
+  const careerH=houseOf(lord(10));
   return [
-   ['💼','Career',`Your career grows fastest through ${HOUSE_LIFE[houseOf(lord(10))]} — your 10th lord sits in your ${houseOf(lord(10))}th house, so you shine when work connects to that area.`],
-   ['💰','Wealth',`Money builds steadily for you through ${HOUSE_LIFE[houseOf(lord(2))]}; with patience your means grow rather than arrive overnight.`],
-   ['❤','Relationships',`In love you're drawn to ${planetStrength(chart,'Venus')>=6?'warmth and harmony — you give and need genuine affection':'depth and loyalty over flash — you bond slowly but deeply'}.`],
-   ['🩺','Health',`Your vitality is ${planetStrength(chart,'Sun')>=6?'naturally strong; keep momentum with regular routine':'steady when you protect rest and manage stress'} — your Moon and 1st house set the tone.`],
-   ['🕉','Spirit',`Your inner growth comes through ${HOUSE_LIFE[houseOf('Ketu')]}; quiet reflection suits you more than show.`],
+   ['💼','Career',`You shine most in ${HOUSE_CAREER[careerH]}. Your career flowers when your work involves that — not when you're boxed into something that ignores it.`],
+   ['💰','Wealth',`Wealth comes to you steadily rather than overnight — building patiently and saving consistently is your real path to money.`],
+   ['❤','Relationships',planetStrength(chart,'Venus')>=6?`In love you give and need genuine warmth — affection, harmony and being truly seen matter most to you.`:`In love you bond slowly but deeply — you value loyalty and depth far more than flash or fast romance.`],
+   ['🩺','Health',planetStrength(chart,'Sun')>=6?`Your vitality is naturally strong — keep it that way with a steady daily routine and regular movement.`:`Your energy stays strong when you protect your rest and manage stress — your body responds well to routine.`],
+   ['🕉','Spirit',`Your inner growth comes through quiet reflection rather than show — a little stillness each day steadies everything else.`],
   ];
 }
 /* Per-area explanation: strength / challenge / focus */
@@ -1415,20 +1535,31 @@ function scoreExplain(chart,area,val){
   return {tier,strength:M.s,challenge:M.c,focus:M.f,
     anchor:`Your ${M.h}th house (${HOUSE_LIFE[M.h]}) is led by ${lord(M.h)}.`};
 }
-/* Cosmic Summary — answers the 5 first-screen questions */
+/* Concrete, human descriptions per life area — used for strength/growth/focus so
+   the label and the explanation always describe the SAME thing. */
+const AREA_CONCRETE={
+  Career:{strong:'your drive to achieve, lead and be recognised for real work',grow:'building a focused, steady career path instead of spreading thin',focus:'putting your energy into one clear professional direction'},
+  Wealth:{strong:'your ability to build lasting resources through patience',grow:'creating consistent, long-term financial habits and savings',focus:'setting up money systems that quietly compound over time'},
+  Marriage:{strong:'your loyalty, warmth and genuine commitment in relationships',grow:'communicating openly and allowing space for differences',focus:'nurturing your closest relationship with honesty and care'},
+  Health:{strong:'your ability to stay steady and recover with good routine',grow:'protecting rest, sleep and a calm daily rhythm',focus:'small daily health habits that keep your energy strong'},
+  Education:{strong:'your quick, creative mind and ability to learn fast',grow:'finishing what you start and going deep on one skill',focus:'mastering one meaningful skill rather than many halfway'},
+  Spirituality:{strong:'your ability to stay calm, intuitive and emotionally balanced',grow:'turning reflection into a simple, steady daily practice',focus:'a short daily practice that grounds everything else'},
+};
+/* Cosmic Summary — answers the 5 first-screen questions, concrete & consistent */
 function cosmicSummary(chart){
   const scores=lifeScores(chart),dest=destinyScore(scores);
-  const strong=strongestPlanet(chart),weak=weakestPlanet(chart);
-  const top=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
-  const low=Object.entries(scores).sort((a,b)=>a[1]-b[1])[0][0];
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted[0][0], second=sorted[1][0], low=sorted[sorted.length-1][0];
+  const strong=strongestPlanet(chart);
   const ascName=RASHI[chart.asc.sign][0];
+  // focus = the strongest area to lean into; "next opportunity" = the SECOND strongest (so it differs from focus)
   return {
-    theme:`A ${ascName}-rising chart with ${strong} as your strongest force — you're built for ${PLANET_GIFT[strong]}.`,
-    strength:`Your biggest strength is ${top.toLowerCase()} — ${PLANET_GIFT[strong]} carries you here.`,
-    challenge:`Your main growth area is ${low.toLowerCase()} — it asks for ${PLANET_GROW[weak]}.`,
-    focus:`Right now, focus on ${top.toLowerCase()}: lean into what already flows for you.`,
-    next:`Your next big opening tends to come through ${HOUSE_LIFE[chart.planets[strong].house]} — stay open to it.`,
-    dest
+    theme:`A ${ascName}-rising chart, with ${strong} as your strongest planet — you're naturally gifted in ${PLANET_GIFT[strong]}.`,
+    strength:`${AREA_CONCRETE[top].strong[0].toUpperCase()+AREA_CONCRETE[top].strong.slice(1)} (your ${top.toLowerCase()} area is your highest).`,
+    challenge:`${AREA_CONCRETE[low].grow[0].toUpperCase()+AREA_CONCRETE[low].grow.slice(1)} (your ${low.toLowerCase()} area has the most room to grow).`,
+    focus:`Lean into ${AREA_CONCRETE[top].focus} — it already flows for you.`,
+    next:`A second strong area is ${second.toLowerCase()}: ${AREA_CONCRETE[second].focus}.`,
+    dest, top, second, low, strong
   };
 }
 /* ----- scorecard rendering ----- */
@@ -1477,6 +1608,37 @@ function shareTimeline(){
   const now=tl.find(c=>c.status==='now');
   const lines=tl.filter(c=>c.status!=='past').slice(0,4).map(c=>`${c.fromYr}–${c.toYr}: ${c.title}`).join('\n');
   shareWhatsApp(`My Life Timeline 🛤${now?`\n\nRight now (${now.fromYr}–${now.toYr}): ${now.title} — ${now.note}`:''}\n\nAhead:\n${lines}`,'My Life Timeline ✨');
+}
+function renderChapter(){
+  const ch=currentChapter(state.chart,state.dasha);state.chapter=ch;
+  if(!ch){document.getElementById('chapter-body').innerHTML='';return;}
+  document.getElementById('chapter-body').innerHTML=
+   `<div class="chapter-title">${ch.title} <span class="chapter-yrs">${ch.fromYr}–${ch.toYr}</span></div>
+    <div class="chapter-focus">This phase favours: <b>${ch.focus}</b></div>
+    ${ch.adNote?`<div class="chapter-ad">${ch.adNote}</div>`:''}
+    <div class="chapter-grid">
+      <div class="chapter-box good"><div class="cb-h">✓ Best use of this phase</div>${ch.bestUse}</div>
+      <div class="chapter-box warn"><div class="cb-h">⚠ Biggest mistake to avoid</div>${ch.mistake}</div>
+    </div>`;
+}
+function renderForecast(){
+  const f=next12(state.chart,state.dasha);state.forecast=f;
+  const ICON={Career:'💼',Money:'💰',Relationships:'❤',Health:'🩺',Spiritual:'🕉'};
+  const stars=(n)=>'★'.repeat(n)+'☆'.repeat(5-n);
+  document.getElementById('forecast').innerHTML=Object.entries(f).map(([k,v])=>
+   `<div class="fc-row"><div class="fc-top"><span class="fc-name">${ICON[k]} ${k}</span><span class="fc-stars">${stars(v.stars)}</span></div>
+      <div class="fc-line">${v.line}</div></div>`).join('');
+}
+function shareForecast(){
+  const f=state.forecast;if(!f)return;
+  const lines=Object.entries(f).map(([k,v])=>`${k}: ${'★'.repeat(v.stars)}`).join('\n');
+  shareWhatsApp(`My Next 12 Months 🔮\n\n${lines}`,'My Year Ahead ✨');
+}
+function renderActionPlan(){
+  const a=actionPlan(state.dasha);if(!a){document.getElementById('actionplan').innerHTML='';return;}
+  document.getElementById('actionplan').innerHTML=
+   `<div class="action-do"><div class="ac-h">Do this month</div><ul>${a.do.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <div class="action-avoid"><div class="ac-h">Best to avoid</div><ul>${a.avoid.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
 }
 function toggleExplain(area,val){
   const host=document.getElementById('explain-'+area);if(!host)return;
@@ -2077,9 +2239,12 @@ function buildChartAndShow(name,dob,tob,place){
   document.getElementById('celebs').innerHTML=celebLine(lifePath(dob));
   renderLoShu(dob);
   renderCosmic(state.chart);
+  renderChapter();
   renderInsights(state.chart);
   renderTimeline();
   renderRemedies();
+  renderForecast();
+  renderActionPlan();
   renderScorecard(state.chart);
   renderTopics();
   skyNow();
