@@ -831,7 +831,7 @@
           <p class="rel-sub">Eight dimensions from your charts, in plain language. Tap any for what it means.</p>
           <div id="ms-bars"></div>
 
-          <h4 class="rel-h">🔢 Numerology & Lo Shu Compatibility</h4>
+          <h4 class="rel-h">🔢 Lo Shu Compatibility</h4>
           <div class="status-line" id="ms-numero"></div>
 
           <h4 class="rel-h">🪔 Dosha & Manglik</h4>
@@ -855,6 +855,10 @@
             <div class="pw-price">Only ₹29</div>
             <button class="btn full" onclick="openPay('match')">🔓 Unlock Full Report · ₹29</button>
             <div class="pw-foot">Already unlocked on another device? <a href="#" onclick="refreshStatus();paintMatchGate();return false;">Refresh</a> · free if you have a question pack</div>
+          </div>
+          <div id="match-free-foot" class="hidden" style="text-align:center;margin:16px 0">
+            <button class="btn ghost" onclick="savePDF()">⬇ Download this preview as PDF</button>
+            <button class="wa-share" onclick="shareMatch()">📲 Share</button>
           </div>
 
           <!-- ===== LOCKED CONTENT (revealed after unlock) ===== -->
@@ -2616,8 +2620,8 @@ function runMatch(){
   // hide BOTH locked content and paywall until status resolves, then paint once.
   if(state.quota){ paintMatchGate(); }
   else {
-    const locked=document.getElementById('match-locked'),pw=document.getElementById('match-paywall');
-    if(locked)locked.style.display='none'; if(pw)pw.classList.add('hidden');
+    const locked=document.getElementById('match-locked'),pw=document.getElementById('match-paywall'),ff=document.getElementById('match-free-foot');
+    if(locked)locked.style.display='none'; if(pw)pw.classList.add('hidden'); if(ff)ff.classList.add('hidden');
   }
   const finish=()=>{ if(!state.quota)state.quota={}; paintMatchGate(); };
   if(!state.uid){ computeUid(A.name,A.dob,A.tob,A.place).then(uid=>{state.uid=uid;refreshStatus().then(finish).catch(finish);}); }
@@ -2681,9 +2685,10 @@ function matchUnlocked(){
 function paintMatchGate(){
   const locked=document.getElementById('match-locked');
   const pw=document.getElementById('match-paywall');
+  const freeFoot=document.getElementById('match-free-foot');
   if(!locked||!pw)return;
-  if(matchUnlocked()){ locked.classList.remove('locked-blur'); locked.style.display=''; pw.classList.add('hidden'); }
-  else{ locked.style.display='none'; pw.classList.remove('hidden'); }
+  if(matchUnlocked()){ locked.classList.remove('locked-blur'); locked.style.display=''; pw.classList.add('hidden'); if(freeFoot)freeFoot.classList.add('hidden'); }
+  else{ locked.style.display='none'; pw.classList.remove('hidden'); if(freeFoot)freeFoot.classList.remove('hidden'); }
 }
 const MATCH_ACTION={
   do:['Talk openly about expectations — money, family, and the future','Lean on your strongest area when things feel tense','Appreciate one thing about each other out loud, daily','Make decisions together on the areas that need care'],
