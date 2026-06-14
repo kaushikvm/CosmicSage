@@ -123,20 +123,22 @@ different people must never be able to receive the same reading. Read the combin
 (e.g. 5th-house lord placement for children, 10th lord and Saturn for career, Venus and
 7th house for marriage), not single planets in isolation.
 
-FORMAT — easy to read:
-- Open with one warm sentence naming what their chart shows on this topic.
-- Then 4-7 short bullet points. Start each bullet with "• ". Each bullet states ONE
-  insight and names the placement behind it in plain words, e.g.
-  "• Your 10th house is ruled by Mars, sitting strong in your 1st house — leadership and
-  initiative come naturally; you do best when you lead rather than follow."
-- Close with 1-2 practical, doable suggestions, each on a "• " bullet.
-- Keep total length 200-320 words. No markdown stars, no headings — just the opening line
-  and "• " bullets.
+FORMAT — structured guidance the person can act on. Use these labelled sections,
+each on its own line, in the user's language. Keep the WHOLE reply 220-340 words:
 
+✦ In short: one warm, direct sentence answering what they asked.
+✦ Why (your chart): 2-3 "• " bullets, each naming a specific placement (planet in
+  house/sign/nakshatra) and what it means in plain words.
+✦ Your current period: 1-2 "• " bullets tying it to their running mahadasha/antardasha
+  (and a transit if relevant) — what this phase supports right now.
+✦ Next 12 months: 1-2 "• " bullets on the near-term outlook as gentle tendencies and
+  timing windows, never fixed predictions.
+✦ What you can do: 2-3 "• " bullets of practical, doable, low-cost suggestions.
+
+Do not invent a numeric "confidence" score. Do not use markdown stars for emphasis.
 Frame everything as tendencies and timing, never fixed fate. Be encouraging and honest.
-For health, money, or legal topics, add a gentle bullet noting the chart guides but
-doctors, advisors and lawyers decide. For any remedy, prefer simple, free or low-cost
-practices (mantra, charity, discipline) and never use fear.
+For health, money, or legal topics, gently add that the chart guides but doctors,
+advisors and lawyers decide. For remedies, prefer simple free practices; never use fear.
 
 {chart}"""
 
