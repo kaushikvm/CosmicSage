@@ -323,6 +323,30 @@
   .action-avoid{background:rgba(200,71,47,.08); border:1px solid rgba(200,71,47,.3);}
   .ac-h{font-weight:600; margin-bottom:7px;} .action-do .ac-h{color:#9BD489;} .action-avoid .ac-h{color:#E8917D;}
   .action-cols ul{margin:0; padding-left:18px;} .action-cols li{font-size:.88rem; color:var(--moon); line-height:1.6;}
+  .rel-type{margin-top:8px;} .rt-badge{background:linear-gradient(135deg,#E85D75,#C8472F); color:#fff; border-radius:99px; padding:5px 16px; font-weight:600; font-size:.92rem;}
+  .rel-overall{margin-top:8px; color:var(--moon); font-size:.95rem;} .rel-overall b{color:var(--gold-soft); font-size:1.15rem;}
+  .rel-summary{margin:18px 0; display:flex; flex-direction:column; gap:11px;}
+  .rel-type-note{background:linear-gradient(160deg,rgba(232,93,117,.1),var(--panel2)); border:1px solid rgba(232,93,117,.3); border-radius:11px; padding:12px 14px; color:var(--moon); font-size:.92rem; line-height:1.5; text-align:center;}
+  .rs-q{display:flex; gap:11px; align-items:flex-start; font-size:.92rem; color:var(--moon); line-height:1.55;}
+  .rs-q .rs-ic{font-size:1.1rem; flex:none;} .rs-q b{color:var(--gold-soft); display:block; font-size:.82rem; text-transform:uppercase; letter-spacing:.03em;}
+  .rel-insights{display:flex; flex-direction:column; gap:10px; margin:16px 0;}
+  .ki-item{border-radius:11px; padding:12px 14px; font-size:.92rem; line-height:1.5; color:var(--moon);}
+  .ki-item .ki-h{font-weight:600; margin-bottom:4px;}
+  .ki-strong{background:rgba(111,174,92,.1); border:1px solid rgba(111,174,92,.32);} .ki-strong .ki-h{color:#9BD489;}
+  .ki-grow{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3);} .ki-grow .ki-h{color:var(--gold-soft);}
+  .ki-uniq{background:linear-gradient(160deg,rgba(232,93,117,.08),var(--panel2)); border:1px solid rgba(232,93,117,.28);} .ki-uniq .ki-h{color:#E8917D;}
+  .rel-h{color:var(--gold); font-family:'Eczar',serif; font-size:1.08rem; margin:22px 0 4px; padding-top:14px; border-top:1px solid var(--line);}
+  .rel-sub{color:var(--muted); font-size:.84rem; margin:0 0 10px;}
+  .koota-explain{display:none;} .koota-explain.open{display:block; margin-top:7px;}
+  .ke-body{background:var(--panel2); border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-size:.88rem; color:var(--moon); line-height:1.5;}
+  .ke-body b{color:var(--gold-soft);} .ke-trad{color:var(--muted); font-size:.8rem; margin-top:5px;}
+  .dosha-row{display:flex; gap:11px; align-items:flex-start;}
+  .dosha-tag{flex:none; border-radius:99px; padding:3px 12px; font-size:.78rem; font-weight:600;}
+  .dosha-tag.low{background:rgba(111,174,92,.16); color:#9BD489;} .dosha-tag.mid{background:rgba(212,162,78,.16); color:var(--gold-soft);}
+  .dosha-text{font-size:.9rem; color:var(--moon); line-height:1.55;}
+  .dosha-extra{font-size:.88rem; color:var(--moon); line-height:1.55; margin-top:10px; padding:10px 12px; background:var(--panel2); border-radius:9px;}
+  .dosha-foot{font-size:.8rem; color:var(--muted); margin-top:10px; font-style:italic;}
+  .rel-cta{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--line);}
   .sc-summary{background:rgba(212,162,78,.08); border:1px solid rgba(212,162,78,.3); border-radius:10px; padding:10px 13px; font-size:.9rem; color:var(--moon); margin-bottom:10px;}
   .sc-summary b{color:var(--gold-soft);}
   .sc-cat{font-size:.68rem; color:var(--muted); background:var(--night); border:1px solid var(--line); border-radius:99px; padding:1px 8px; margin-left:6px; vertical-align:middle;}
@@ -732,13 +756,33 @@
               <div class="ring-num"><span class="big" id="ms-score">–</span><span class="of">out of 36 gunas</span></div>
             </div>
             <div class="verdict" id="ms-verdict"></div>
+            <div class="rel-type" id="ms-type"></div>
+            <div class="rel-overall" id="ms-overall"></div>
           </div>
           <div class="partner-chips" id="ms-chips"></div>
+
+          <div class="rel-summary" id="ms-summary"></div>
+
+          <div class="rel-insights" id="ms-keyinsights"></div>
+
+          <h4 class="rel-h">💞 Your Compatibility Dashboard</h4>
+          <p class="rel-sub">Eight dimensions from your charts, in plain language. Tap any for what it means.</p>
           <div id="ms-bars"></div>
-          <div class="status-line" id="ms-manglik" style="margin-top:14px"></div>
+
+          <h4 class="rel-h">🔢 Numerology & Lo Shu Compatibility</h4>
           <div class="status-line" id="ms-numero"></div>
-          <button class="btn" style="margin-top:16px" onclick="askMatchAI()">✨ Get the sage's reading <span style="opacity:.8;font-size:.82em">(₹29 · free with a pack)</span></button>
-          <button class="btn ghost" style="margin-top:16px; margin-left:8px" onclick="window.print()">⬇ Save as PDF</button>
+
+          <h4 class="rel-h">🪔 Dosha & Manglik — the calm view</h4>
+          <div class="status-line" id="ms-manglik"></div>
+
+          <h4 class="rel-h">✅ Your Action Plan as a Couple</h4>
+          <div class="action-cols" id="ms-action"></div>
+
+          <div class="rel-cta">
+            <button class="btn" onclick="askMatchAI()">✨ Get the sage's full relationship reading <span style="opacity:.8;font-size:.82em">(₹29 · free with a pack)</span></button>
+            <button class="btn ghost" onclick="savePDF()">⬇ Save as PDF</button>
+            <button class="wa-share" onclick="shareMatch()">📲 Share</button>
+          </div>
           <div id="match-ai" style="margin-top:14px"></div>
         </div>
       </div>
@@ -2371,28 +2415,90 @@ function runMatch(){
   const cA=computeChart(A.dob,A.tob,A.place),cB=computeChart(B.dob,B.tob,B.place);
   const g=gunaMilan(cA,cB);
   lastMatch={A,B,cA,cB,g};
+  const R=relationshipAnalysis(A,B,cA,cB,g);state.rel=R;
   const pct=g.total/36;
   document.getElementById('ms-score').textContent=g.total%1?g.total.toFixed(1):g.total;
   const v=document.getElementById('ms-verdict');
-  v.textContent=g.total>=28?'✦ Excellent match':g.total>=24?'Very good match':g.total>=18?'Good — acceptable match':'Below the traditional threshold (18) — guidance advised';
+  v.textContent='✦ '+R.verdict;
   v.style.color=g.total>=24?'#9BD489':g.total>=18?'var(--gold-soft)':'#E8917D';
+  document.getElementById('ms-type').innerHTML=`<span class="rt-badge">${R.type} Match</span>`;
+  document.getElementById('ms-overall').innerHTML=`<b>${R.overall}%</b> overall compatibility`;
   document.getElementById('ms-chips').innerHTML=[[A,cA],[B,cB]].map(([p,c])=>
    `<div class="pchip"><b>${p.name.split(' ')[0]}</b><span>Moon: ${RASHI[c.planets.Moon.sign][1]} · ${c.planets.Moon.nak}<br>Lagna: ${RASHI[c.asc.sign][1]} · ${GANA_N[GANA(c.planets.Moon.nakIdx)]} gana</span></div>`).join('');
-  document.getElementById('ms-bars').innerHTML=g.rows.map(r=>
-   `<div class="koota-row"><div class="koota-top"><span><span class="nm" title="Traditionally: ${r[4]||r[0]}">${r[0]}</span> <span class="meas">· ${r[1]}</span></span><span>${r[2]%1?r[2].toFixed(1):r[2]}/${r[3]}</span></div>
-    <div class="koota-bar"><div class="koota-fill ${r[2]===0?'zero':''}" style="width:0%" data-w="${Math.max(r[2]/r[3]*100,r[2]===0?4:0)}"></div></div></div>`).join('');
+
+  // 7-question relationship summary
+  document.getElementById('ms-summary').innerHTML=
+   `<div class="rel-type-note">${R.typeNote}</div>
+    <div class="rs-q"><span class="rs-ic">💞</span><div><b>Are you a good match?</b> ${R.Q.match}</div></div>
+    <div class="rs-q"><span class="rs-ic">💪</span><div><b>Your biggest strength</b> ${R.Q.strength}</div></div>
+    <div class="rs-q"><span class="rs-ic">🌱</span><div><b>Your area to nurture</b> ${R.Q.challenge}</div></div>
+    <div class="rs-q"><span class="rs-ic">🕰</span><div><b>Will it last?</b> ${R.Q.lasting}</div></div>
+    <div class="rs-q"><span class="rs-ic">🎯</span><div><b>What to focus on</b> ${R.Q.focus}</div></div>
+    <div class="rs-q"><span class="rs-ic">⚠</span><div><b>What to avoid</b> ${R.Q.avoid}</div></div>
+    <div class="rs-q"><span class="rs-ic">👉</span><div><b>What to do next</b> ${R.Q.next}</div></div>`;
+
+  // key insights
+  document.getElementById('ms-keyinsights').innerHTML=
+   `<div class="ki-item ki-strong"><div class="ki-h">✨ Relationship superpower</div>${R.strongest.dim.area}: ${R.strongest.dim.hi}</div>
+    <div class="ki-item ki-grow"><div class="ki-h">🔍 Conscious-effort area</div>${R.weakest.dim.area}: ${R.weakest.ratio<0.5?R.weakest.dim.lo:R.weakest.dim.mid}</div>
+    <div class="ki-item ki-uniq"><div class="ki-h">🌟 What makes you unique</div>${R.unique}</div>`;
+
+  // compatibility dashboard — tappable for depth
+  document.getElementById('ms-bars').innerHTML=g.rows.map((r,i)=>{
+    const ratio=r[2]/r[3], tier=ratio>=0.75?'hi':ratio>=0.5?'mid':'lo';
+    return `<div class="koota-row" onclick="toggleKoota(${i})" style="cursor:pointer"><div class="koota-top"><span><span class="nm" title="Traditionally: ${r[4]||r[0]}">${r[0]}</span> <span class="meas">· ${KOOTA_DIM[r[0]]?KOOTA_DIM[r[0]].area:r[1]}</span></span><span>${r[2]%1?r[2].toFixed(1):r[2]}/${r[3]} <span class="sc-chev">▾</span></span></div>
+    <div class="koota-bar"><div class="koota-fill ${r[2]===0?'zero':''}" style="width:0%" data-w="${Math.max(ratio*100,r[2]===0?4:0)}"></div></div>
+    <div class="koota-explain" id="koota-exp-${i}"></div></div>`;}).join('');
   show('match-result');
   requestAnimationFrame(()=>setTimeout(()=>{
     document.querySelectorAll('.koota-fill').forEach(el=>el.style.width=el.dataset.w+'%');
     const arc=document.getElementById('ring-arc'); arc.style.transition='stroke-dashoffset 1s ease';
     arc.style.strokeDashoffset=402*(1-pct);
   },60));
-  const mA=manglik(cA),mB=manglik(cB);
-  document.getElementById('ms-manglik').innerHTML=`<b>Manglik check:</b> ${A.name.split(' ')[0]} — ${mA?'Manglik':'Non-manglik'} · ${B.name.split(' ')[0]} — ${mB?'Manglik':'Non-manglik'}${mA!==mB?' · One partner manglik — traditionally reviewed with an astrologer; matching mangliks or remedies are common resolutions.':mA&&mB?' · Both manglik — dosha is traditionally considered cancelled.':''}`;
-  const l1=lifePath(A.dob),l2=lifePath(B.dob);
-  renderMatchNumerology(A,B,l1,l2);
+
+  // calm dosha/manglik panel
+  renderDoshaPanel(R);
+  renderMatchNumerology(A,B,R.l1,R.l2);
+  renderMatchAction(R);
   document.getElementById('match-ai').innerHTML='';
   show('match-result');
+}
+function toggleKoota(i){
+  const r=lastMatch.g.rows[i];const host=document.getElementById('koota-exp-'+i);if(!host)return;
+  if(host.innerHTML){host.innerHTML='';host.classList.remove('open');return;}
+  document.querySelectorAll('.koota-explain').forEach(e=>{e.innerHTML='';e.classList.remove('open');});
+  const dim=KOOTA_DIM[r[0]],ratio=r[2]/r[3];
+  const interp=ratio>=0.75?dim.hi:ratio>=0.5?dim.mid:dim.lo;
+  host.innerHTML=`<div class="ke-body"><b>${dim.area}</b> — ${interp}<div class="ke-trad">Traditionally called <i>${r[4]||r[0]}</i> · scores ${r[2]%1?r[2].toFixed(1):r[2]} of ${r[3]} points.</div></div>`;
+  host.classList.add('open');
+}
+function renderDoshaPanel(R){
+  const {mA,mB,nA,nB}=R;
+  const level=(mA&&mB)?'Low':(mA||mB)?'Moderate':'Low';
+  let body;
+  if(!mA&&!mB) body=`Neither of you is Manglik — this traditional concern simply doesn't apply to your match. Nothing to worry about here.`;
+  else if(mA&&mB) body=`Both of you are Manglik — and traditionally, when both partners share it, the dosha is considered to <b>cancel out</b>. This is regarded as a balanced, compatible situation.`;
+  else body=`One of you (${mA?nA:nB}) has a Manglik placement. This is <b>very common</b> and not a barrier — traditionally it's reviewed thoughtfully, and matching with remedies or simple rituals is a well-established path. Many happy marriages have exactly this.`;
+  // Nadi (Health & Children) is the most weighted koota; surface calmly if zero
+  const nadi=R.scored.find(k=>k.name==='Health & Children');
+  const nadiNote=nadi&&nadi.val===0?` <div class="dosha-extra">Your Health & Children koota scored low — traditionally worth a gentle conversation about family planning and wellbeing, and often softened when other factors (like sharing a sign or strong overall match) are present. It's guidance, not a verdict.</div>`:'';
+  document.getElementById('ms-manglik').innerHTML=
+   `<div class="dosha-row"><span class="dosha-tag ${level==='Low'?'low':'mid'}">${level} concern</span>
+      <span class="dosha-text">${body}</span></div>${nadiNote}
+    <div class="dosha-foot">CosmicSage always frames these as areas for awareness, never fear. A low score is a conversation, not a stop sign.</div>`;
+}
+const MATCH_ACTION={
+  do:['Talk openly about expectations — money, family, and the future','Lean on your strongest area when things feel tense','Appreciate one thing about each other out loud, daily','Make decisions together on the areas that need care'],
+  avoid:['Letting small differences become silent resentments','Avoiding the one topic you both keep dodging','Comparing your match score to anyone else\u2019s','Treating a low score as fate rather than a focus area'],
+};
+function renderMatchAction(R){
+  document.getElementById('ms-action').innerHTML=
+   `<div class="action-do"><div class="ac-h">Do together</div><ul>${MATCH_ACTION.do.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <div class="action-avoid"><div class="ac-h">Gently avoid</div><ul>${MATCH_ACTION.avoid.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+function shareMatch(){
+  const R=state.rel;if(!R)return;
+  shareWhatsApp(`${R.nA} & ${R.nB} — ${R.type} Match 💞\n\n${R.total} of 36 gunas · ${R.overall}% overall\n\n💪 ${R.Q.strength}\n🌱 ${R.Q.challenge}\n🕰 ${R.Q.lasting}`,'Our Compatibility ✨');
 }
 /* numerology compatibility: driver/conductor friendliness + complementary numbers */
 const NUM_FRIEND={1:[1,3,5,9],2:[2,3,5],3:[1,2,3,9],4:[1,5,6,7],5:[1,3,5,6],6:[3,5,6,9],7:[1,4,5],8:[3,4,5],9:[1,3,6,9]};
@@ -2400,11 +2506,67 @@ function numCompat(rA,rB){
   let s=50;
   if(NUM_FRIEND[rA.driver]&&NUM_FRIEND[rA.driver].includes(rB.driver))s+=18; else s-=6;
   if(NUM_FRIEND[rA.conductor]&&NUM_FRIEND[rA.conductor].includes(rB.conductor))s+=14; else s-=4;
-  // complementary: each fills the other's missing numbers
   const fillAtoB=rB.missing.filter(n=>rA.present.includes(n)).length;
   const fillBtoA=rA.missing.filter(n=>rB.present.includes(n)).length;
   s+=Math.min(16,(fillAtoB+fillBtoA)*2);
   return Math.round(Math.max(45,Math.min(96,s)));
+}
+/* ===== RELATIONSHIP INTELLIGENCE — all derived from real computed scores ===== */
+// Map each koota to a relationship dimension + warm interpretation by how full it is
+const KOOTA_DIM={
+  'Ego Compatibility':{area:'Mutual respect',hi:'You naturally respect each other\u2019s pride and individuality.',mid:'You mostly respect each other; small ego clashes are easy to smooth over.',lo:'You each carry strong pride — give each other room to be right sometimes.'},
+  'Influence Compatibility':{area:'Give & take',hi:'There\u2019s an easy, natural give-and-take between you.',mid:'You balance influence reasonably; take turns leading.',lo:'You may pull in different directions — agree who leads on what.'},
+  'Luck & Wellbeing':{area:'Fortune together',hi:'You bring each other genuine luck and wellbeing.',mid:'You\u2019re generally good for each other\u2019s fortune.',lo:'Support each other\u2019s wellbeing consciously, especially in tough phases.'},
+  'Physical Chemistry':{area:'Attraction & instinct',hi:'Strong instinctive attraction and physical comfort.',mid:'Comfortable physical chemistry that grows with closeness.',lo:'Build intimacy slowly through patience and affection.'},
+  'Mental Connection':{area:'Meeting of minds',hi:'Your minds meet easily — conversation flows.',mid:'You understand each other well with a little effort.',lo:'You think differently — listen actively to bridge the gap.'},
+  'Personality Match':{area:'Temperament',hi:'Your temperaments blend beautifully.',mid:'Your natures are compatible with mutual understanding.',lo:'Quite different temperaments — appreciate the contrast rather than fight it.'},
+  'Family & Prosperity':{area:'Shared home & growth',hi:'Strong potential for a prosperous, harmonious home.',mid:'A stable home life with shared effort.',lo:'Be intentional about money and family expectations together.'},
+  'Health & Children':{area:'Family planning & vitality',hi:'Supportive energy for family health and children.',mid:'Generally supportive of family wellbeing.',lo:'Plan family and health matters thoughtfully and together.'},
+};
+const REL_TYPES={
+  Soulmate:'A rare, deeply aligned bond — you understand each other almost instinctively.',
+  Growth:'A relationship that makes you both grow — challenge and support in healthy balance.',
+  Complementary:'You\u2019re not identical — you each bring what the other lacks, and grow through balance rather than sameness.',
+  Companion:'A warm, steady companionship built on comfort, loyalty and ease.',
+  Karmic:'A meaningful, lesson-rich connection that asks for patience and conscious effort.',
+};
+function relationshipAnalysis(A,B,cA,cB,g){
+  const total=g.total, pct=Math.round(total/36*100);
+  const rA=loShu(A.dob),rB=loShu(B.dob);
+  const numC=numCompat(rA,rB);
+  const l1=lifePath(A.dob),l2=lifePath(B.dob);
+  // sort kootas by fill ratio
+  const scored=g.rows.map(r=>({name:r[0],orig:r[4]||r[0],val:r[2],max:r[3],ratio:r[2]/r[3],dim:KOOTA_DIM[r[0]]}));
+  const strong=scored.filter(k=>k.ratio>=0.75).sort((a,b)=>b.ratio-a.ratio);
+  const weak=scored.filter(k=>k.ratio<0.5).sort((a,b)=>a.ratio-b.ratio);
+  const nA=A.name.split(' ')[0],nB=B.name.split(' ')[0];
+  // Relationship type from blended signals
+  const fills=rA.missing.filter(n=>rB.present.includes(n)).length+rB.missing.filter(n=>rA.present.includes(n)).length;
+  let type='Companion';
+  if(total>=30&&numC>=78)type='Soulmate';
+  else if(fills>=4&&total<26)type='Complementary';
+  else if(total>=24&&weak.length<=2)type='Growth';
+  else if(total<18||weak.length>=4)type='Karmic';
+  else type='Companion';
+  // verdict
+  const verdict=total>=30?'Exceptional match':total>=28?'Excellent match':total>=24?'Very good match':total>=18?'Good, workable match':'Needs conscious effort';
+  // overall compatibility blends guna (weighted) + numerology
+  const overall=Math.round(pct*0.7+numC*0.3);
+  const strongest=strong[0]||scored.sort((a,b)=>b.ratio-a.ratio)[0];
+  const weakest=weak[0]||scored.sort((a,b)=>a.ratio-b.ratio)[0];
+  const mA=manglik(cA),mB=manglik(cB);
+  // 7-question summary
+  const Q={
+    match:`Together you score ${total%1?total.toFixed(1):total} of 36 gunas (${verdict.toLowerCase()}), with ${overall}% overall compatibility blending your charts and numerology.`,
+    strength:`Your biggest strength is ${strongest.dim.area.toLowerCase()} — ${strongest.dim.hi}`,
+    challenge:`Your main area to nurture is ${weakest.dim.area.toLowerCase()} — ${weakest.ratio<0.5?weakest.dim.lo:weakest.dim.mid}`,
+    lasting:total>=24?`The long-term signs are positive — the foundations for a lasting, stable bond are here.`:total>=18?`This can absolutely last with mutual effort — the basics are workable and many strong marriages start here.`:`Longevity is possible but asks for real commitment and open communication from both of you.`,
+    focus:`Focus on ${strongest.dim.area.toLowerCase()} and let it carry you through the areas that need patience.`,
+    avoid:`Avoid ignoring ${weakest.dim.area.toLowerCase()} — a little conscious attention here prevents most friction.`,
+    next:`Talk openly about expectations early, lean on your strengths, and treat the growth areas as a shared project, not a verdict.`,
+  };
+  const unique=`What makes you unique: ${l1===l2?`you share Life Path ${l1}, giving deep natural understanding`:`your Life Paths ${l1} & ${l2} blend differently`}${fills>=3?', and you each bring numbers the other is missing — you genuinely complete each other.':'.'} ${type==='Complementary'?'You grow through balance, not sameness.':type==='Soulmate'?'This is a rare degree of alignment.':''}`;
+  return {total,pct,overall,numC,l1,l2,rA,rB,type,typeNote:REL_TYPES[type],verdict,scored,strong,weak,strongest,weakest,nA,nB,mA,mB,Q,unique,fills};
 }
 function renderMatchNumerology(A,B,l1,l2){
   const rA=loShu(A.dob),rB=loShu(B.dob);
