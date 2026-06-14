@@ -41,6 +41,8 @@
   .pill.btn-like:hover{border-color:var(--gold); color:var(--gold-soft);}
   .hero{padding:44px 0 30px; text-align:center;}
   .hero .eyebrow{color:var(--sindoor); text-transform:uppercase; letter-spacing:.22em; font-size:.75rem; font-weight:600;}
+  .btn-match{background:linear-gradient(135deg,#E85D75,#C8472F); color:#fff; border:none; box-shadow:0 4px 16px rgba(200,71,47,.4);}
+  .btn-match:hover{transform:translateY(-2px); box-shadow:0 7px 22px rgba(200,71,47,.55); background:linear-gradient(135deg,#F06A82,#D8543A);}
   .hero-logo{width:auto; max-height:120px; margin:0 auto 6px; display:block; filter:drop-shadow(0 4px 18px rgba(226,112,42,.35));}
   .hero-sub{color:var(--gold-soft)!important; font-size:1rem; font-weight:500; max-width:540px; margin:0 auto 8px;}
   .btn-hero{font-size:1.15rem; padding:16px 36px; border-radius:12px; background:linear-gradient(135deg,#FFD75E,#F6A93B,#E2702A); color:#3a1d05; font-weight:700; box-shadow:0 6px 22px rgba(226,112,42,.45);}
@@ -239,6 +241,15 @@
   /* donation modal */
   .overlay{position:fixed; inset:0; background:rgba(8,6,20,.78); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; overflow-y:auto;}
   .modal-title-row{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:8px;}
+  #loader{position:fixed; inset:0; z-index:100; background:radial-gradient(circle at 50% 40%,#1a1640,#0b0920); display:flex; align-items:center; justify-content:center;}
+  #loader.hidden{display:none;}
+  .loader-inner{text-align:center;}
+  .loader-logo{width:120px; height:auto; filter:drop-shadow(0 0 26px rgba(246,169,59,.5)); animation:loaterFloat 2.4s ease-in-out infinite;}
+  @keyframes loaterFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .loader-text{margin-top:18px; color:var(--gold-soft); font-family:'Eczar',serif; font-size:1.1rem; letter-spacing:.02em; min-height:1.4em; animation:loaderFade .6s ease;}
+  @keyframes loaderFade{from{opacity:0}to{opacity:1}}
+  #toast{position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px); background:var(--panel); border:1px solid var(--gold); color:var(--ink); padding:12px 20px; border-radius:12px; font-size:.9rem; z-index:120; opacity:0; pointer-events:none; transition:all .3s; max-width:90%; text-align:center;}
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
   .modal{background:var(--panel); border:1px solid var(--gold); border-radius:16px; max-width:380px; width:100%; padding:18px 20px; text-align:center;}
   .modal h3{color:var(--gold); font-size:1.2rem; margin-bottom:6px;}
   .modal p{color:var(--muted); font-size:.85rem; margin-bottom:12px; line-height:1.5;}
@@ -262,6 +273,13 @@
 </style>
 </head>
 <body>
+<div id="loader" class="hidden">
+  <div class="loader-inner">
+    <svg class="loader-logo" viewBox="0 0 160 180" aria-hidden="true"><defs><radialGradient id="orbL" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D8"/><stop offset="40%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F6A93B" stop-opacity="0"/></radialGradient><linearGradient id="threadL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#F6A93B"/></linearGradient><linearGradient id="robeL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient></defs><circle cx="80" cy="20" r="22" fill="url(#orbL)"><animate attributeName="r" values="20;26;20" dur="1.8s" repeatCount="indefinite"/></circle><circle cx="80" cy="20" r="8" fill="#FFF6D8"/><path d="M80 28 q-7 22 0 40 q7 18 0 38 q-5 14 0 26" stroke="url(#threadL)" stroke-width="2.6" fill="none" stroke-linecap="round"/><g fill="url(#robeL)"><circle cx="80" cy="118" r="9"/><path d="M80 110 q-3 -6 0 -10 q3 4 0 10z" fill="#FFE9A8"/><path d="M80 127 C66 130 58 144 58 160 L102 160 C102 144 94 130 80 127 Z"/><ellipse cx="80" cy="162" rx="34" ry="9"/></g></svg>
+    <div class="loader-text" id="loader-text">Aligning the planets…</div>
+  </div>
+</div>
+
 <div id="stars"></div>
 <div class="shell">
 
@@ -280,13 +298,12 @@
   <!-- ============ LANDING ============ -->
   <section id="view-landing">
     <div class="hero">
-      <svg class="sage-logo-full hero-logo" style="height:120px;width:auto" viewBox="0 0 160 180" role="img" aria-label="CosmicSage — meditating sage with rising light"><defs><radialGradient id="orbH" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D8"/><stop offset="40%" stop-color="#FFD75E"/><stop offset="100%" stop-color="#F6A93B" stop-opacity="0"/></radialGradient><linearGradient id="threadH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#F6A93B"/></linearGradient><linearGradient id="robeH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD75E"/><stop offset=".5" stop-color="#F6A93B"/><stop offset="1" stop-color="#E2702A"/></linearGradient><radialGradient id="auraH" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F6C453" stop-opacity=".4"/><stop offset="100%" stop-color="#F6C453" stop-opacity="0"/></radialGradient><filter id="softH" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.4"/></filter></defs><circle cx="80" cy="20" r="22" fill="url(#orbH)"/><circle cx="80" cy="20" r="8" fill="#FFF6D8"/><path d="M80 28 q-7 22 0 40 q7 18 0 38 q-5 14 0 26" stroke="url(#threadH)" stroke-width="2.4" fill="none" stroke-linecap="round" filter="url(#softH)"/><circle cx="80" cy="138" r="42" fill="url(#auraH)"/><g fill="url(#robeH)"><circle cx="80" cy="118" r="9"/><path d="M80 110 q-3 -6 0 -10 q3 4 0 10z" fill="#FFE9A8"/><path d="M80 127 C66 130 58 144 58 160 L102 160 C102 144 94 130 80 127 Z"/><ellipse cx="80" cy="162" rx="34" ry="9"/></g><path d="M72 128 q8 14 16 0" stroke="#8B3A1E" stroke-width="2.2" fill="none" stroke-dasharray="0.5 3" stroke-linecap="round"/><circle cx="64" cy="150" r="3.2" fill="#FFD75E"/><circle cx="96" cy="150" r="3.2" fill="#FFD75E"/><ellipse cx="80" cy="170" rx="40" ry="7" fill="#E2702A" opacity=".5"/></svg>
       <div class="eyebrow">Vedic astrology · real ephemeris · free for everyone</div>
       <h2>Your birth sky, drawn the moment you arrive. <em>Then ask it anything.</em></h2>
       <p class="hero-sub">Free Vedic Kundali, Navamsa &amp; Kundali matching — ask about career, marriage, health and more, in your own language.</p>
       <p>Real planetary positions, dasha timeline, yogas &amp; doshas, and a wise guide to talk to. No sign-up, no payment — donations welcome.</p>
       <button class="btn btn-hero" onclick="switchView('view-onboard')">🔮 Get my free Kundali</button>
-      <button class="btn ghost" style="margin-left:8px" onclick="goMatch()">Kundali matching</button>
+      <button class="btn btn-match" style="margin-left:8px" onclick="goMatch()">💞 Kundali Matching</button>
       <div class="note">No sign-up · takes 30 seconds · your birth details stay in your browser.</div>
     </div>
     <div class="card fest-card">
@@ -305,7 +322,7 @@
   <!-- ============ ONBOARDING ============ -->
   <section id="view-onboard" class="hidden">
     <div class="form-wrap card">
-      <h2 style="color:var(--gold)">Three details, one sky</h2>
+      <h2 style="color:var(--gold)">Tell us when &amp; where you were born</h2>
       <div class="sub">Your birth moment fixes the ascendant — the lens the whole chart is read through.</div>
       <label for="f-name">Full name</label>
       <input id="f-name" type="text" placeholder="e.g. Ananya Sharma" autocomplete="off">
@@ -692,6 +709,7 @@ setInterval(tickClock,1000); tickClock();
 (function(){const s=skyAt(new Date());
   document.getElementById('now-nak').textContent=`${NAK[nakIdx(s.sMoon)]} · Tithi ${s.tithi<=15?'Shukla '+s.tithi:(s.tithi===30?'Amavasya':'Krishna '+(s.tithi-15))}`;
   renderFestivals();})();
+try{history.replaceState({view:'view-landing'},'',location.pathname);}catch(e){}
 
 /* ===== DASHA (maha + antar) ===== */
 const DASHA=[["Ketu",7],["Venus",20],["Sun",6],["Moon",10],["Mars",7],["Rahu",18],["Jupiter",16],["Saturn",19],["Mercury",17]];
@@ -1346,7 +1364,21 @@ async function claimUTR(){
 const state={birth:null,chart:null,dasha:null,history:[],answers:0,busy:false,places:{},donAmt:100,lang:'en',chartStyle:'north',vargaD:1};
 const show=id=>document.getElementById(id).classList.remove('hidden');
 const hide=id=>document.getElementById(id).classList.add('hidden');
-function switchView(id){['view-landing','view-onboard','view-dash','view-match'].forEach(hide);show(id);window.scrollTo(0,0);}
+function switchView(id,fromPop){
+  ['view-landing','view-onboard','view-dash','view-match'].forEach(hide);show(id);window.scrollTo(0,0);
+  state.view=id;
+  if(!fromPop){
+    // push a history entry so the browser Back button returns to the previous in-app view
+    try{history.pushState({view:id},'', id==='view-landing'?location.pathname:'#'+id);}catch(e){}
+  }
+}
+window.addEventListener('popstate',e=>{
+  const id=(e.state&&e.state.view)||'view-landing';
+  // close any open modal first; if a modal was open, that's all Back should do
+  const openModal=['modal-pay','modal-donate'].map(m=>document.getElementById(m)).find(el=>el&&!el.classList.contains('hidden'));
+  if(openModal){openModal.classList.add('hidden');return;}
+  switchView(id,true);
+});
 async function findPlace(prefix){
   const q=document.getElementById(prefix+'-place').value.trim();
   const out=document.getElementById(prefix+'-geo');
@@ -1571,6 +1603,16 @@ function finishIntake(){
 }
 
 /* ===== CHART GENERATION ===== */
+const LOADER_LINES=['Aligning the planets…','Drawing your birth sky…','Casting your Navamsa…','Calculating your dasha…','Reading your yogas…','Almost ready ✨'];
+let _loaderTimer=null;
+function showLoader(){
+  const l=document.getElementById('loader'),t=document.getElementById('loader-text');
+  l.classList.remove('hidden');let i=0;t.textContent=LOADER_LINES[0];
+  clearInterval(_loaderTimer);
+  _loaderTimer=setInterval(()=>{i=(i+1)%LOADER_LINES.length;t.style.animation='none';void t.offsetWidth;t.style.animation='loaderFade .6s ease';t.textContent=LOADER_LINES[i];},1100);
+}
+function hideLoader(){document.getElementById('loader').classList.add('hidden');clearInterval(_loaderTimer);}
+
 function generateChart(){
   const name=document.getElementById('f-name').value.trim();
   const dob=document.getElementById('f-dob').value;
@@ -1579,7 +1621,12 @@ function generateChart(){
   if(!name||!dob){alert('Name and date of birth are needed.');return;}
   if(!place){alert('Please find your place of birth first (type it and press Find).');return;}
   if(+dob.slice(0,4)<1900||new Date(dob)>new Date()){alert('Please check the date of birth — year must be between 1900 and today.');return;}
-  place.tz=resolveTZ(place,dob); // DST- and history-correct offset for the birth date
+  showLoader();
+  // let the loader paint, then compute (keeps UI responsive + gives branded feedback)
+  setTimeout(()=>{ try{ buildChartAndShow(name,dob,tob,place); } finally { setTimeout(hideLoader,650); } },480);
+}
+function buildChartAndShow(name,dob,tob,place){
+  place.tz=resolveTZ(place,dob);
   state.birth={name,dob,tob,place};
   computeUid(name,dob,tob,place).then(uid=>{state.uid=uid;refreshStatus();});
   state.chart=computeChart(dob,tob,place);
@@ -1650,18 +1697,29 @@ function fmtAnswer(text){ // escape, then render "• " bullets as a clean list
   if(inList)html+='</ul>';
   return html;
 }
-function shareWhatsApp(text,title){
+async function shareWhatsApp(text,title){
   const site=location.origin&&location.origin.startsWith('http')?location.origin:'https://cosmicsage.onrender.com';
-  // keep it short and link back to the site — drives new visitors
   let body=String(text).replace(/\n{3,}/g,'\n\n').trim();
   if(body.length>600)body=body.slice(0,580).trim()+'…';
-  const msg=`*${title||'My CosmicSage reading'}* ✨\n\n${body}\n\n🔮 Get your own free Vedic reading at ${site}`;
+  const msg=`${title||'My CosmicSage reading'} ✨\n\n${body}\n\n🔮 Get your own free Vedic reading at ${site}`;
+  // 1) Mobile / modern browsers: native share sheet (most reliable — lets user pick WhatsApp)
+  if(navigator.share){
+    try{ await navigator.share({title:title||'CosmicSage',text:msg}); return; }
+    catch(e){ if(e&&e.name==='AbortError') return; /* user cancelled */ }
+  }
+  // 2) Desktop: open WhatsApp web/app directly (must be in the click gesture, so no async before this)
   const url='https://api.whatsapp.com/send?text='+encodeURIComponent(msg);
   const win=window.open(url,'_blank');
-  if(!win){ // popup blocked — copy to clipboard as fallback
-    try{navigator.clipboard.writeText(msg);alert('WhatsApp could not open here, so the message is copied — paste it into any chat.');}
-    catch(e){prompt('Copy this and share:',msg);}
-  }
+  if(win) return;
+  // 3) Last resort: copy to clipboard
+  try{ await navigator.clipboard.writeText(msg); toast('Message copied — paste it into WhatsApp or any chat ♥'); }
+  catch(e){ prompt('Copy this and share:',msg); }
+}
+function toast(text){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}
+  t.textContent=text;t.className='show';
+  clearTimeout(t._h);t._h=setTimeout(()=>t.className='',3200);
 }
 function addMsg(cls,text,who){const log=document.getElementById('chat-log');
   const d=document.createElement('div');d.className='msg '+cls;
